@@ -46,7 +46,7 @@ public class CandidateTest {
     MockitoAnnotations.initMocks(this);
 
     when(mockRaftLog.self()).thenReturn(self);
-    when(mockRaftLog.lastVotedFor()).thenReturn(Optional.<Replica>absent());
+    when(mockRaftLog.votedFor()).thenReturn(Optional.<Replica>absent());
     when(mockRaftLog.lastLogTerm()).thenReturn(0L);
     when(mockRaftLog.lastLogIndex()).thenReturn(0L);
     when(mockRaftLog.currentTerm()).thenReturn(term);
@@ -90,17 +90,16 @@ public class CandidateTest {
     verify(mockRaftLog).currentTerm(4L);
     verify(mockRaftLog, times(2)).currentTerm(anyLong());
 
-    verify(mockRaftLog).lastVotedFor(Optional.of(self));
-    verify(mockRaftLog).lastVotedFor(Optional.of(mockCandidate));
-    verify(mockRaftLog, times(2)).lastVotedFor(any(Optional.class));
+    verify(mockRaftLog).votedFor(Optional.of(self));
+    verify(mockRaftLog).votedFor(Optional.of(mockCandidate));
+    verify(mockRaftLog, times(2)).votedFor(any(Optional.class));
 
     verify(mockRaftLog, never()).commitIndex(anyLong());
 
     verify(mockRaftStateContext, times(1)).setState(any(Candidate.class), eq(Raft.StateType.FOLLOWER));
     verify(mockRaftStateContext, times(1)).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
 
-    verify(mockRaftClient, times(1)).requestVote(any(Replica.class), any(RequestVote.class));
-    verifyNoMoreInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClient);
 
   }
 
@@ -124,16 +123,15 @@ public class CandidateTest {
     verify(mockRaftLog).currentTerm(3L);
     verify(mockRaftLog, times(1)).currentTerm(anyLong());
 
-    verify(mockRaftLog).lastVotedFor(Optional.of(self));
-    verify(mockRaftLog, never()).lastVotedFor(Optional.of(mockCandidate));
-    verify(mockRaftLog, times(1)).lastVotedFor(any(Optional.class));
+    verify(mockRaftLog).votedFor(Optional.of(self));
+    verify(mockRaftLog, never()).votedFor(Optional.of(mockCandidate));
+    verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
 
     verify(mockRaftLog, never()).commitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
 
-    verify(mockRaftClient, times(1)).requestVote(any(Replica.class), any(RequestVote.class));
-    verifyNoMoreInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClient);
   }
 
   @Test
@@ -156,9 +154,9 @@ public class CandidateTest {
     verify(mockRaftLog).currentTerm(3L);
     verify(mockRaftLog, times(1)).currentTerm(anyLong());
 
-    verify(mockRaftLog).lastVotedFor(Optional.of(self));
-    verify(mockRaftLog, times(1)).lastVotedFor(Optional.of(mockCandidate));
-    verify(mockRaftLog, times(2)).lastVotedFor(any(Optional.class));
+    verify(mockRaftLog).votedFor(Optional.of(self));
+    verify(mockRaftLog, times(1)).votedFor(Optional.of(mockCandidate));
+    verify(mockRaftLog, times(2)).votedFor(any(Optional.class));
 
     verify(mockRaftLog, never()).commitIndex(anyLong());
 
@@ -166,8 +164,7 @@ public class CandidateTest {
 
     verifyZeroInteractions(mockRaftStateContext);
 
-    verify(mockRaftClient, times(1)).requestVote(any(Replica.class), any(RequestVote.class));
-    verifyNoMoreInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClient);
   }
 
   @Test
@@ -193,16 +190,15 @@ public class CandidateTest {
     verify(mockRaftLog).currentTerm(4L);
     verify(mockRaftLog, times(2)).currentTerm(anyLong());
 
-    verify(mockRaftLog).lastVotedFor(Optional.of(self));
-    verify(mockRaftLog, times(1)).lastVotedFor(any(Optional.class));
+    verify(mockRaftLog).votedFor(Optional.of(self));
+    verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
 
     verify(mockRaftLog, times(1)).commitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.FOLLOWER));
     verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
 
-    verify(mockRaftClient, times(1)).requestVote(any(Replica.class), any(RequestVote.class));
-    verifyNoMoreInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClient);
 
   }
 
@@ -228,15 +224,14 @@ public class CandidateTest {
     verify(mockRaftLog).currentTerm(3L);
     verify(mockRaftLog, times(1)).currentTerm(anyLong());
 
-    verify(mockRaftLog).lastVotedFor(Optional.of(self));
-    verify(mockRaftLog, times(1)).lastVotedFor(any(Optional.class));
+    verify(mockRaftLog).votedFor(Optional.of(self));
+    verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
 
     verify(mockRaftLog, never()).commitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
 
-    verify(mockRaftClient, times(1)).requestVote(any(Replica.class), any(RequestVote.class));
-    verifyNoMoreInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClient);
 
   }
 
@@ -260,15 +255,14 @@ public class CandidateTest {
     verify(mockRaftLog).currentTerm(3L);
     verify(mockRaftLog, times(1)).currentTerm(anyLong());
 
-    verify(mockRaftLog).lastVotedFor(Optional.of(self));
-    verify(mockRaftLog, times(1)).lastVotedFor(any(Optional.class));
+    verify(mockRaftLog).votedFor(Optional.of(self));
+    verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
 
     verify(mockRaftLog, times(1)).commitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(any(Candidate.class), eq(LEADER));
 
-    verify(mockRaftClient, times(1)).requestVote(any(Replica.class), any(RequestVote.class));
-    verifyNoMoreInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClient);
 
   }
 

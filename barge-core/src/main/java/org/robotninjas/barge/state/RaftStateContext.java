@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.ListenableFutureTask;
 import org.jetlang.fibers.Fiber;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftExecutor;
+import org.robotninjas.barge.log.RaftLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -53,7 +54,13 @@ class RaftStateContext implements Raft {
   private boolean stop;
 
   @Inject
-  RaftStateContext(StateFactory stateFactory, @RaftExecutor Fiber executor) {
+  RaftStateContext(RaftLog log, StateFactory stateFactory, @RaftExecutor Fiber executor) {
+    this(log.self().toString(), stateFactory, executor);
+  }
+
+  RaftStateContext(String name, StateFactory stateFactory, @RaftExecutor Fiber executor) {
+    MDC.put("self", name);
+
     this.stateFactory = stateFactory;
     this.executor = executor;
     this.listeners.add(new LogListener());
@@ -131,16 +138,17 @@ class RaftStateContext implements Raft {
   public synchronized void setState(State oldState, @Nonnull StateType state) {
 
     if (this.delegate != oldState) {
+      LOGGER.info("Previous state was not correct (transitioning to {}). Expected {}, was {}", state, oldState, this.delegate);
       notifiesInvalidTransition(oldState);
       throw new IllegalStateException();
     }
 
     if (stop) {
       state = StateType.STOPPED;
-      LOGGER.info("Service stopping); replaced state with {}", state);
+      LOGGER.info("Service stopping; replaced state with {}", state);
     }
     
-    LOGGER.info("old state: {}, new state: {}", this.state, state);
+    LOGGER.info("Transition: old state: {}, new state: {}", this.state, state);
     if (this.delegate != null) {
       this.delegate.destroy(this);
     }
