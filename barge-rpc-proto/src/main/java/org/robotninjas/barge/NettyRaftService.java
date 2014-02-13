@@ -54,6 +54,15 @@ public class NettyRaftService extends AbstractService implements RaftService {
 
   }
 
+  public void bootstrap(Membership membership) {
+    LOGGER.info("Bootstrapping log with {}", membership);
+    if (!raftLog.isEmpty()) {
+      LOGGER.warn("Cannot bootstrap, as raft log already contains data");
+      throw new IllegalStateException();
+    }
+    raftLog.append(null, membership);
+  }
+
   @Override
   protected void doStart() {
 
@@ -85,6 +94,8 @@ public class NettyRaftService extends AbstractService implements RaftService {
       rpcServer.stopAsync().awaitTerminated();
 
       ctx.stop();
+      
+      raftLog.close();
 
       notifyStopped();
     } catch (Exception e) {
@@ -109,6 +120,21 @@ public class NettyRaftService extends AbstractService implements RaftService {
       propagateIfInstanceOf(e.getCause(), NoLeaderException.class);
       throw propagate(e.getCause());
     }
+  }
+
+  public ListenableFuture<Boolean> setConfiguration(final RaftMembership oldMembership, final RaftMembership newMembership) {
+
+    // Make sure this happens on the Barge thread
+    ListenableFuture<ListenableFuture<Boolean>> response =
+      executor.submit(new Callable<ListenableFuture<Boolean>>() {
+        @Override
+        public ListenableFuture<Boolean> call() throws Exception {
+          return ctx.setConfiguration(oldMembership, newMembership);
+        }
+      });
+
+    return Futures.dereference(response);
+
   }
 
   public boolean isLeader() {

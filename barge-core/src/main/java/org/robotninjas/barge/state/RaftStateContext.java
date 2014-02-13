@@ -50,6 +50,7 @@ class RaftStateContext implements Raft {
 
   private volatile StateType state;
   private volatile State delegate;
+  private final ConfigurationState configurationState;
 
   private boolean stop;
 
@@ -133,6 +134,23 @@ class RaftStateContext implements Raft {
     return response;
 
   }
+  
+  @Nonnull
+  public ListenableFuture<Boolean> setConfiguration(@Nonnull final RaftMembership oldMembership, @Nonnull final RaftMembership newMembership) throws RaftException {
+    checkNotNull(oldMembership);
+    checkNotNull(newMembership);
+    ListenableFutureTask<Boolean> response =
+        ListenableFutureTask.create(new Callable<Boolean>() {
+          @Override
+          public Boolean call() throws Exception {
+            return delegate.setConfiguration(RaftStateContext.this, oldMembership, newMembership);
+          }
+        });
+
+    executor.execute(response);
+
+    return response;
+  }
 
   @Override
   public synchronized void setState(State oldState, @Nonnull StateType state) {
@@ -187,11 +205,20 @@ class RaftStateContext implements Raft {
     return state;
   }
 
+  @Nonnull
+  public ConfigurationState getConfigurationState() {
+    return configurationState;
+  }
+
   public synchronized void stop() {
     stop = true;
     if (this.delegate != null) {
       this.delegate.doStop(this);
     }
+  }
+  
+  public boolean shouldStop() {
+    return stop;
   }
 
   private class LogListener implements StateTransitionListener {

@@ -29,19 +29,19 @@ import com.google.protobuf.ByteString;
 import journal.io.api.Journal;
 import org.robotninjas.barge.ClusterConfig;
 import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentMap;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Throwables.propagate;
@@ -78,11 +78,19 @@ public class RaftLog {
     this.stateMachine = checkNotNull(stateMachine);
   }
 
+  public void close() throws IOException {
+    this.journal.close();
+  }
+
   public void load() {
 
     LOGGER.info("Replaying log");
 
     journal.init();
+    
+    long oldCommitIndex = commitIndex;
+
+    // TODO: fireCommitted more often??
 
     journal.replay(new RaftJournal.Visitor() {
       @Override
@@ -105,11 +113,27 @@ public class RaftLog {
         lastLogIndex = Math.max(index, lastLogIndex);
         lastLogTerm =  Math.max(entry.getTerm(), lastLogTerm);
         log.put(index, entry);
+        
+        if (entry.hasMembership()) {
+          config.addMembershipEntry(index, entry);
+        }
       }
     });
 
+    final SettableFuture<Object> lastResult;
+    if (oldCommitIndex != commitIndex) {
+      lastResult = SettableFuture.create();
+      operationResults.put(commitIndex, lastResult);
+    } else {
+      lastResult = null;
+    }
+    
     fireComitted();
 
+    if (lastResult != null) {
+      Futures.getUnchecked(lastResult);
+    }
+      
     LOGGER.info("Finished replaying log lastIndex {}, currentTerm {}, commitIndex {}, lastVotedFor {}",
       lastLogIndex, currentTerm, commitIndex, votedFor.orNull());
   }
@@ -118,23 +142,36 @@ public class RaftLog {
     LOGGER.debug("{} storing {}", config.local(),entry);
     journal.appendEntry(entry, index);
     log.put(index, entry);
+
+    if (entry.hasMembership()) {
+      config.addMembershipEntry(index, entry);
+    }
+
     SettableFuture<Object> result = SettableFuture.create();
     operationResults.put(index, result);
     return result;
   }
 
-  public ListenableFuture<Object> append(@Nonnull byte[] operation) {
+  public ListenableFuture<Object> append(@Nonnull byte[] operation, @Nonnull Membership membership) {
 
     long index = ++lastLogIndex;
     lastLogTerm = currentTerm;
 
-    Entry entry =
+    Entry.Builder entry =
       Entry.newBuilder()
-        .setCommand(ByteString.copyFrom(operation))
-        .setTerm(currentTerm)
-        .build();
+        .setTerm(currentTerm);
 
-    return storeEntry(index, entry);
+    if (operation != null) {
+      checkArgument(membership == null);
+      entry.setCommand(ByteString.copyFrom(operation));
+    } else if (membership != null) {
+      checkArgument(operation == null);
+      entry.setMembership(membership);
+    } else {
+      checkArgument(false);
+    }
+    
+    return storeEntry(index, entry.build());
 
   }
 
@@ -178,14 +215,28 @@ public class RaftLog {
   void fireComitted() {
     try {
       for (long i = lastApplied + 1; i <= Math.min(commitIndex, lastLogIndex); ++i, ++lastApplied) {
-        byte[] rawCommand = log.get(i).getCommand().toByteArray();
-        final ByteBuffer operation = ByteBuffer.wrap(rawCommand).asReadOnlyBuffer();
-        ListenableFuture<Object> result = stateMachine.dispatchOperation(operation);
-
-        final SettableFuture<Object> returnedResult = operationResults.remove(i);
+        Entry entry = log.get(i);
+        
         // returnedResult may be null on log replay
-        if (returnedResult != null) {
-          Futures.addCallback(result, new PromiseBridge<Object>(returnedResult));
+        final SettableFuture<Object> returnedResult = operationResults.remove(i);
+
+        if (entry.hasCommand()) {
+          assert !entry.hasMembership();
+
+          // TODO: Use entry.getCommand().asReadOnlyBuffer()?
+          byte[] rawCommand = entry.getCommand().toByteArray();
+          final ByteBuffer operation = ByteBuffer.wrap(rawCommand).asReadOnlyBuffer();
+          
+          ListenableFuture<Object> result = stateMachine.dispatchOperation(operation);
+          if (returnedResult != null) {
+            Futures.addCallback(result, new PromiseBridge<Object>(returnedResult));
+          }
+        } else if (entry.hasMembership()) {
+          if (returnedResult != null) {
+            returnedResult.set(Boolean.TRUE);
+          }
+        } else {
+          LOGGER.warn("Ignoring unusual log entry: {}", entry);
         }
       }
     } catch (Exception e) {

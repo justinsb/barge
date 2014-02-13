@@ -39,6 +39,10 @@ interface State {
   @Nonnull
   ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException;
 
+  @Nonnull
+  ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership,
+      RaftMembership newMembership) throws RaftException;
+  
   void doStop(RaftStateContext ctx);
 
   StateType type();

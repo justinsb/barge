@@ -57,6 +57,14 @@ class RaftJournal {
     }
   }
 
+  public void close() throws IOException {
+    this.journal.close();
+  }
+  
+  public boolean isEmpty() {
+    return journal.getFiles().isEmpty();
+  }
+
   private void delete(Location loc) {
     try {
       journal.delete(loc);

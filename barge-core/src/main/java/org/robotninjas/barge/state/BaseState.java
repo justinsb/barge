@@ -10,16 +10,18 @@ import org.robotninjas.barge.NotLeaderException;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.robotninjas.barge.proto.RaftProto.*;
 import static org.robotninjas.barge.state.Raft.StateType.*;
 import static org.robotninjas.barge.state.RaftStateContext.StateType;
 
 public abstract class BaseState implements State {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(BaseState.class);
 
   private final StateType type;
   private final RaftLog log;
@@ -92,10 +94,13 @@ public abstract class BaseState implements State {
 
     boolean success = false;
 
+    if (request.getTerm() < log.currentTerm()) {
+      LOGGER.info("Caller has out-of-date term; ignoring request: {}", request);
+    }
+    
     if (request.getTerm() >= log.currentTerm()) {
 
       if (request.getTerm() > log.currentTerm()) {
-
         log.currentTerm(request.getTerm());
 
         if (ctx.type().equals(LEADER) || ctx.type().equals(CANDIDATE)) {
@@ -174,7 +179,22 @@ public abstract class BaseState implements State {
     } else if (stateType.equals(CANDIDATE)) {
       throw new NoLeaderException();
     }
+    // TODO: This seems wrong
     return Futures.immediateCancelledFuture();
+  }
+  
+  @Nonnull
+  @Override
+  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership,
+      RaftMembership newMembership) throws RaftException {
+    StateType stateType = ctx.type();
+    Preconditions.checkNotNull(stateType);
+    if (stateType.equals(FOLLOWER)) {
+      throw new NotLeaderException(leader.get());
+    } else if (stateType.equals(CANDIDATE)) {
+      throw new NoLeaderException();
+    }
+    throw new NoLeaderException();
   }
   
   @Override

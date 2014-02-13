@@ -55,7 +55,8 @@ class RaftCoreModule extends PrivateModule {
   @Override
   protected void configure() {
 
-    install(new StateModule(timeout));
+    Replica local = config.local();
+    install(new StateModule(local, timeout));
 
     PoolFiberFactory fiberFactory = new PoolFiberFactory(executor);
 

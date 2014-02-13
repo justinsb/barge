@@ -69,6 +69,8 @@ class Candidate extends BaseState {
   @Override
   public void init(@Nonnull final RaftStateContext ctx) {
 
+    ConfigurationState configurationState = ctx.getConfigurationState();
+
     final RaftLog log = getLog();
 
     log.currentTerm(log.currentTerm() + 1);
@@ -76,13 +78,18 @@ class Candidate extends BaseState {
 
     LOGGER.debug("Election starting for term {}", log.currentTerm());
 
+    LOGGER.info("Starting election with members: {}", configurationState.getAllVotingMembers());
+    
+    Replica self = configurationState.self();
     List<ListenableFuture<RequestVoteResponse>> responses = Lists.newArrayList();
-    // Request votes from peers
-    for (Replica replica : log.members()) {
-      responses.add(sendVoteRequest(ctx, replica));
+    for (Replica replica : configurationState.getAllVotingMembers()) {
+      if (replica == self) {
+        // We always vote for ourselves
+        responses.add(Futures.immediateFuture(RequestVoteResponse.newBuilder().setVoteGranted(true).buildPartial()));
+      } else {
+        responses.add(sendVoteRequest(ctx, replica));
+      }
     }
-    // We always vote for ourselves
-    responses.add(Futures.immediateFuture(RequestVoteResponse.newBuilder().setVoteGranted(true).buildPartial()));
 
     electionResult = majorityResponse(responses, voteGranted());
 
