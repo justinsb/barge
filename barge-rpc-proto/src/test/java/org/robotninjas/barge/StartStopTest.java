@@ -80,7 +80,7 @@ public class StartStopTest {
     return server;
   }
 
-  @Test(timeout = 5000)
+  @Test(timeout = 10000)
   public void canStartAndStop() throws Exception {
     {
       Server server = buildServer(1);
