@@ -266,8 +266,8 @@ public class RaftStateContext implements Raft {
     return delegate.getClusterHealth(this);
   }
 
-  public RaftClientManager getClient() {
-    return client;
+  public RaftClientManager getClientManager() {
+    return clientManager;
   }
 
   State makeState(RaftStateContext.StateType state) {
@@ -279,7 +279,7 @@ public class RaftStateContext implements Raft {
     case LEADER:
       return new Leader(log, threadPools, configurationState.getElectionTimeout());
     case CANDIDATE:
-      return new Candidate(log, threadPools, configurationState.getElectionTimeout(), client);
+      return new Candidate(log, threadPools, configurationState.getElectionTimeout(), clientManager);
     case STOPPED:
       return new Stopped(log);
     default:

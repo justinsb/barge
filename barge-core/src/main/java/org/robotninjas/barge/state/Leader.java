@@ -97,7 +97,7 @@ class Leader extends BaseState {
     ReplicaManager replicaManager = replicaManagers.get(replica);
     if (replicaManager == null) {
 //      replicaManager = replicaManagerFactory.create(replica);
-      replicaManager = new ReplicaManager(ctx.getClient(), log, replica);
+      replicaManager = new ReplicaManager(ctx.getClientManager(), log, replica);
       replicaManagers.put(replica, replicaManager);
     }
 

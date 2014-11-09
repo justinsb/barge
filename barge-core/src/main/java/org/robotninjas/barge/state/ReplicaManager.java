@@ -94,7 +94,7 @@ class ReplicaManager {
         .build();
 
     LOGGER.debug("Sending update to {} prevLogIndex {} prevLogTerm {}", remote, result.lastLogIndex(), result.lastLogTerm());
-    final ListenableFuture<AppendEntriesResponse> response = client.appendEntries(remote, request);
+    final ListenableFuture<AppendEntriesResponse> response = clientManager.appendEntries(remote, request);
 
     final SettableFuture<AppendEntriesResponse> previousResponse = nextResponse;
 
