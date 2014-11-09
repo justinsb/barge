@@ -52,7 +52,7 @@ public class NettyRaftServiceTest {
 
     long expected = 0;
     for (int j = 0; j < 10; j++) {
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 10; i++) {
         int step = r.nextInt(100);
         expected += step;
         counters.commitToLeader(new byte[] { (byte) step });

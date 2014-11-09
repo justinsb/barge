@@ -60,7 +60,7 @@ public class GroupOfCounters extends ExternalResource implements StateTransition
     for (int peer : peers) {
       allMembers.add(buildReplicaName(peer));
     }
-    ClusterConfig seedConfig = new ClusterConfig(self, allMembers, 1000);
+    ClusterConfig seedConfig = new ClusterConfig(self, allMembers, 500);
     SimpleCounterMachine server = new SimpleCounterMachine(id, seedConfig, this);
     servers.put(id, server);
 
