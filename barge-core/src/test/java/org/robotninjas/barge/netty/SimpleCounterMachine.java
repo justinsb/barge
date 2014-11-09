@@ -22,7 +22,7 @@ public class SimpleCounterMachine implements StateMachine {
   private final int id;
   private final GroupOfCounters groupOfCounters;
 
-  private int counter;
+  private long counter;
   private File logDirectory;
   private NettyRaftService service;
   Replica self;
@@ -57,7 +57,8 @@ public class SimpleCounterMachine implements StateMachine {
 
   @Override
   public Object applyOperation(@Nonnull ByteBuffer entry) {
-    return this.counter++;
+    this.counter += entry.get();
+    return this.counter;
   }
 
   public void startRaft() {
@@ -115,11 +116,11 @@ public class SimpleCounterMachine implements StateMachine {
    * @param timeout    timeout in ms.
    * @throws IllegalStateException if {@code expected} is not reached at end of timeout.
    */
-  public void waitForValue(final int increments, long timeout) {
+  public void waitForValue(final long target, long timeout) {
     new Prober(new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
-        return increments == counter;
+        return target == counter;
       }
     }).probe(timeout);
   }
@@ -128,9 +129,9 @@ public class SimpleCounterMachine implements StateMachine {
     return service.isLeader();
   }
 
-  public void bootstrap(Membership membership) {
-    this.service.bootstrap(membership);
-  }
+//  public void bootstrap(Membership membership) {
+//    this.service.bootstrap(membership);
+//  }
 
   public ListenableFuture<Boolean>  setConfiguration(RaftMembership oldMembership, RaftMembership newMembership) {
     return this.service.setConfiguration(oldMembership, newMembership);

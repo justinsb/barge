@@ -59,10 +59,10 @@ public class StartStopTest {
       raftService.stopAsync().awaitTerminated();
     }
 
-    public void bootstrap() {
-      Membership membership = Membership.newBuilder().addMembers(self.getKey()).build();
-      this.raftService.bootstrap(membership);
-    }
+//    public void bootstrap() {
+//      Membership membership = Membership.newBuilder().addMembers(self.getKey()).build();
+//      this.raftService.bootstrap(membership);
+//    }
     
     public void setState(String s) throws RaftException, InterruptedException {
       raftService.commit(s.getBytes(Charsets.UTF_8));
@@ -112,7 +112,7 @@ public class StartStopTest {
 
       Thread.sleep(500);
       
-      server.bootstrap();
+//      server.bootstrap();
       
       while (!server.isLeader()) {
         Thread.sleep(50);

@@ -91,15 +91,15 @@ public abstract class RaftService extends AbstractService {
    */
   public abstract Object commit(byte[] operation) throws RaftException, InterruptedException;
   
-  // TODO: This should probably take a RaftMembership
-  public void bootstrap(Membership membership) {
-    LOGGER.info("Bootstrapping log with {}", membership);
-    if (!raftLog.isEmpty()) {
-      LOGGER.warn("Cannot bootstrap, as raft log already contains data");
-      throw new IllegalStateException();
-    }
-    raftLog.append(null, membership);
-  }
+//  // TODO: This should probably take a RaftMembership
+//  public void bootstrap(Membership membership) {
+//    LOGGER.info("Bootstrapping log with {}", membership);
+//    if (!raftLog.isEmpty()) {
+//      LOGGER.warn("Cannot bootstrap, as raft log already contains data");
+//      throw new IllegalStateException();
+//    }
+//    raftLog.append(null, membership);
+//  }
 
   public ListenableFuture<Boolean> setConfiguration(final RaftMembership oldMembership,
       final RaftMembership newMembership) {

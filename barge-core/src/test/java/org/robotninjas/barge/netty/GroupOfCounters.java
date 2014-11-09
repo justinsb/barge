@@ -60,7 +60,7 @@ public class GroupOfCounters extends ExternalResource implements StateTransition
     for (int peer : peers) {
       allMembers.add(buildReplicaName(peer));
     }
-    ClusterConfig seedConfig = new ClusterConfig(self, allMembers, ClusterConfig.DEFAULT_TIMEOUT);
+    ClusterConfig seedConfig = new ClusterConfig(self, allMembers, 1000);
     SimpleCounterMachine server = new SimpleCounterMachine(id, seedConfig, this);
     servers.put(id, server);
 
@@ -110,7 +110,7 @@ public class GroupOfCounters extends ExternalResource implements StateTransition
    * @param timeout
    *          timeout in ms. Timeout is evaluated per instance of counter within the cluster.
    */
-  public void waitAllToReachValue(int target, long timeout) {
+  public void waitAllToReachValue(long target, long timeout) {
     for (SimpleCounterMachine counter : servers.values()) {
       counter.waitForValue(target, timeout);
     }
@@ -168,12 +168,12 @@ public class GroupOfCounters extends ExternalResource implements StateTransition
     // IGNORED
   }
 
-  public void bootstrap(int id) {
-    SimpleCounterMachine seed = servers.get(id);
-    Membership.Builder membership = Membership.newBuilder();
-    membership.addMembers(seed.self.getKey());
-    seed.bootstrap(membership.build());
-  }
+//  public void bootstrap(int id) {
+//    SimpleCounterMachine seed = servers.get(id);
+//    Membership.Builder membership = Membership.newBuilder();
+//    membership.addMembers(seed.self.getKey());
+//    seed.bootstrap(membership.build());
+//  }
 
   public void changeCluster(Collection<Replica> replicas) throws Exception {
     Optional<SimpleCounterMachine> leader = getLeader();
