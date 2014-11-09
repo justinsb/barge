@@ -26,7 +26,7 @@ import com.google.inject.assistedinject.Assisted;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.GetEntriesResult;
 import org.robotninjas.barge.log.RaftLog;
-import org.robotninjas.barge.rpc.Client;
+import org.robotninjas.barge.rpc.RaftClientManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ class ReplicaManager {
   private static final int BATCH_SIZE = 1000;
   private static final int MAX_RUNNING = 1;
 
-  private final Client client;
+  private final RaftClientManager client;
   private final RaftLog log;
   private final Replica remote;
   private long nextIndex;
@@ -62,7 +62,7 @@ class ReplicaManager {
   private volatile long lastResponse;
   
   @Inject
-  ReplicaManager(Client client, RaftLog log, @Assisted Replica remote) {
+  ReplicaManager(RaftClientManager client, RaftLog log, @Assisted Replica remote) {
 
     this.nextIndex = log.lastLogIndex() + 1;
     this.log = log;

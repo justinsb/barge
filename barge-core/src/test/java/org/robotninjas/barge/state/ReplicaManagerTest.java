@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.GetEntriesResult;
 import org.robotninjas.barge.log.RaftLog;
-import org.robotninjas.barge.rpc.Client;
+import org.robotninjas.barge.rpc.RaftClientManager;
 
 import java.util.Collections;
 
@@ -31,7 +31,7 @@ public class ReplicaManagerTest {
 
   private
   @Mock
-  Client mockClient;
+  RaftClientManager mockRaftClientManager;
   private
   @Mock
   RaftLog mockRaftLog;
@@ -52,12 +52,12 @@ public class ReplicaManagerTest {
   public void testInitialSendOutstanding() {
 
     ListenableFuture<AppendEntriesResponse> mockResponse = mock(ListenableFuture.class);
-    when(mockClient.appendEntries(eq(FOLLOWER), any(AppendEntries.class))).thenReturn(mockResponse);
+    when(mockRaftClientManager.appendEntries(eq(FOLLOWER), any(AppendEntries.class))).thenReturn(mockResponse);
 
     GetEntriesResult entriesResult = new GetEntriesResult(0l, 0l, Collections.<Entry>emptyList());
     when(mockRaftLog.getEntriesFrom(anyLong(), anyInt())).thenReturn(entriesResult);
 
-    ReplicaManager replicaManager = new ReplicaManager(mockClient, mockRaftLog, FOLLOWER);
+    ReplicaManager replicaManager = new ReplicaManager(mockRaftClientManager, mockRaftLog, FOLLOWER);
     ListenableFuture f1 = replicaManager.requestUpdate();
 
     AppendEntries appendEntries =
@@ -69,8 +69,8 @@ public class ReplicaManagerTest {
         .setTerm(1)
         .build();
 
-    verify(mockClient, times(1)).appendEntries(FOLLOWER, appendEntries);
-    verifyNoMoreInteractions(mockClient);
+    verify(mockRaftClientManager, times(1)).appendEntries(FOLLOWER, appendEntries);
+    verifyNoMoreInteractions(mockRaftClientManager);
 
     verify(mockRaftLog, times(1)).getEntriesFrom(1, 1);
 
@@ -91,7 +91,7 @@ public class ReplicaManagerTest {
   public void testFailedAppend() {
 
     SettableFuture<AppendEntriesResponse> response = SettableFuture.create();
-    when(mockClient.appendEntries(eq(FOLLOWER), any(AppendEntries.class)))
+    when(mockRaftClientManager.appendEntries(eq(FOLLOWER), any(AppendEntries.class)))
       .thenReturn(response)
       .thenReturn(mock(ListenableFuture.class));
 
@@ -99,7 +99,7 @@ public class ReplicaManagerTest {
     GetEntriesResult entriesResult = new GetEntriesResult(0l, 0l, Collections.<Entry>emptyList());
     when(mockRaftLog.getEntriesFrom(anyLong(), anyInt())).thenReturn(entriesResult);
 
-    ReplicaManager replicaManager = new ReplicaManager(mockClient, mockRaftLog, FOLLOWER);
+    ReplicaManager replicaManager = new ReplicaManager(mockRaftClientManager, mockRaftLog, FOLLOWER);
 
     replicaManager.requestUpdate();
 
@@ -125,8 +125,8 @@ public class ReplicaManagerTest {
 
     response.set(appendEntriesResponse);
 
-    verify(mockClient, times(2)).appendEntries(FOLLOWER, appendEntries);
-    verifyNoMoreInteractions(mockClient);
+    verify(mockRaftClientManager, times(2)).appendEntries(FOLLOWER, appendEntries);
+    verifyNoMoreInteractions(mockRaftClientManager);
 
     verify(mockRaftLog, times(2)).getEntriesFrom(1, 1);
 
@@ -140,7 +140,7 @@ public class ReplicaManagerTest {
   public void testSuccessfulAppend() {
 
     SettableFuture<AppendEntriesResponse> response = SettableFuture.create();
-    when(mockClient.appendEntries(eq(FOLLOWER), any(AppendEntries.class)))
+    when(mockRaftClientManager.appendEntries(eq(FOLLOWER), any(AppendEntries.class)))
       .thenReturn(response)
       .thenReturn(mock(ListenableFuture.class));
 
@@ -152,7 +152,7 @@ public class ReplicaManagerTest {
     GetEntriesResult entriesResult = new GetEntriesResult(0l, 0l, Lists.newArrayList(entry));
     when(mockRaftLog.getEntriesFrom(anyLong(), anyInt())).thenReturn(entriesResult);
 
-    ReplicaManager replicaManager = new ReplicaManager(mockClient, mockRaftLog, FOLLOWER);
+    ReplicaManager replicaManager = new ReplicaManager(mockRaftClientManager, mockRaftLog, FOLLOWER);
 
     replicaManager.requestUpdate();
 
@@ -179,8 +179,8 @@ public class ReplicaManagerTest {
 
     response.set(appendEntriesResponse);
 
-    verify(mockClient, times(1)).appendEntries(FOLLOWER, appendEntries);
-    verifyNoMoreInteractions(mockClient);
+    verify(mockRaftClientManager, times(1)).appendEntries(FOLLOWER, appendEntries);
+    verifyNoMoreInteractions(mockRaftClientManager);
 
     verify(mockRaftLog, times(1)).getEntriesFrom(1, 1);
 

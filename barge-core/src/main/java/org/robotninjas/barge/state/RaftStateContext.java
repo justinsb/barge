@@ -26,7 +26,7 @@ import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.log.RaftLog;
-import org.robotninjas.barge.rpc.Client;
+import org.robotninjas.barge.rpc.RaftClientManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -58,18 +58,18 @@ public class RaftStateContext implements Raft {
 
   private final ConfigurationState configurationState;
 
-  private final Client client;
+  private final RaftClientManager client;
 
   private final RaftLog log;
 
   private final BargeThreadPools threadPools;
 
   @Inject
-  RaftStateContext(RaftLog log, Client client, ConfigurationState configurationState, BargeThreadPools threadPools) {
+  RaftStateContext(RaftLog log, RaftClientManager client, ConfigurationState configurationState, BargeThreadPools threadPools) {
     this(log.self().toString(), log, client, configurationState, threadPools);
   }
 
-  RaftStateContext(String name, RaftLog log, Client client, ConfigurationState configurationState, BargeThreadPools threadPools) {
+  RaftStateContext(String name, RaftLog log, RaftClientManager client, ConfigurationState configurationState, BargeThreadPools threadPools) {
     this.configurationState = configurationState;
     this.log = log;
     MDC.put("self", name);
@@ -266,7 +266,7 @@ public class RaftStateContext implements Raft {
     return delegate.getClusterHealth(this);
   }
 
-  public Client getClient() {
+  public RaftClientManager getClient() {
     return client;
   }
 

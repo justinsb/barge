@@ -8,13 +8,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.robotninjas.barge.*;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto;
 import org.robotninjas.barge.proto.RaftProto.RequestVoteResponse;
-import org.robotninjas.barge.rpc.Client;
+import org.robotninjas.barge.rpc.RaftClientManager;
 
 import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,7 +36,7 @@ public class CandidateTest {
 //  private final ClusterConfig config = ClusterConfigStub.getStub();
 //  private final Replica self = config.local();
   private final Replica self = Replica.fromString("localhost:1");
-  private @Mock Client mockRaftClient;
+  private @Mock RaftClientManager mockRaftClientManager;
   private @Mock StateMachine mockStateMachine;
   private @Mock RaftLog mockRaftLog;
   private @Mock RaftStateContext mockRaftStateContext;
@@ -84,13 +82,13 @@ public class CandidateTest {
 
     RequestVoteResponse response = RequestVoteResponse.newBuilder().setTerm(0).setVoteGranted(true).build();
     ListenableFuture<RequestVoteResponse> responseFuture = Futures.immediateFuture(response);
-    when(mockRaftClient.requestVote(any(Replica.class), any(RequestVote.class))).thenReturn(responseFuture);
+    when(mockRaftClientManager.requestVote(any(Replica.class), any(RequestVote.class))).thenReturn(responseFuture);
   }
 
   @Test
   public void testRequestVoteWithNewerTerm() throws Exception {
 
-    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 150, mockRaftClient);
+    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 150, mockRaftClientManager);
     candidate.init(mockRaftStateContext);
 
     Replica mockCandidate = Replica.fromString("other");
@@ -120,13 +118,13 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClientManager);
 
   }
 
   @Test
   public void testRequestVoteWithOlderTerm() throws Exception {
-    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 150, mockRaftClient);
+    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 150, mockRaftClientManager);
     candidate.init(mockRaftStateContext);
 
     Replica mockCandidate = Replica.fromString("other");
@@ -154,12 +152,12 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClientManager);
   }
 
   @Test
   public void testRequestVoteWithSameTerm() throws Exception {
-    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 150, mockRaftClient);
+    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 150, mockRaftClientManager);
     candidate.init(mockRaftStateContext);
 
     Replica mockCandidate = Replica.fromString("other");
@@ -188,13 +186,13 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
 
-    verifyZeroInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClientManager);
   }
 
   @Test
   public void testAppendEntriesWithNewerTerm() throws Exception {
 
-    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 1, mockRaftClient);
+    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 1, mockRaftClientManager);
     candidate.init(mockRaftStateContext);
 
     Replica mockLeader = Replica.fromString("other");
@@ -224,14 +222,14 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClientManager);
 
   }
 
   @Test
   public void testAppendEntriesWithOlderTerm() throws Exception {
 
-    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 1, mockRaftClient);
+    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 1, mockRaftClientManager);
     candidate.init(mockRaftStateContext);
 
     Replica mockLeader = Replica.fromString("other");
@@ -259,14 +257,14 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClientManager);
 
   }
 
   @Test
   public void testAppendEntriesWithSameTerm() throws Exception {
 
-    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 1, mockRaftClient);
+    Candidate candidate = new Candidate(mockRaftLog, mockThreadPools, 1, mockRaftClientManager);
     candidate.init(mockRaftStateContext);
 
     AppendEntries request =
@@ -292,7 +290,7 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClient);
+    verifyZeroInteractions(mockRaftClientManager);
 
   }
 

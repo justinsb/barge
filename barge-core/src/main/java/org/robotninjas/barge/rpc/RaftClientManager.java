@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.robotninjas.barge.proto.RaftProto.*;
 
 @Immutable
-public class Client {
+public class RaftClientManager {
 
   @Nonnull
   private final RaftClientProvider clientProvider;
@@ -41,7 +41,7 @@ public class Client {
   private final Executor executor;
 
   @Inject
-  public Client(@Nonnull RaftClientProvider clientProvider, @Nonnull BargeThreadPools threadPools) {
+  public RaftClientManager(@Nonnull RaftClientProvider clientProvider, @Nonnull BargeThreadPools threadPools) {
     this.clientProvider = clientProvider;
     this.executor = threadPools.getRaftExecutor();
   }

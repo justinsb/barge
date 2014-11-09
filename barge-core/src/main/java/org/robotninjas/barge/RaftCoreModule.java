@@ -23,7 +23,7 @@ import com.google.inject.PrivateModule;
 
 import org.robotninjas.barge.log.LogModule;
 import org.robotninjas.barge.netty.rpc.RpcModule;
-import org.robotninjas.barge.rpc.Client;
+import org.robotninjas.barge.rpc.RaftClientManager;
 import org.robotninjas.barge.state.Raft;
 import org.robotninjas.barge.state.StateModule;
 
@@ -69,7 +69,7 @@ public class RaftCoreModule extends AbstractModule {
     
 //    bind(ClusterConfig.class).toInstance(config);
 
-    bind(Client.class).asEagerSingleton();
+    bind(RaftClientManager.class).asEagerSingleton();
 
 //    expose(Raft.class);
 

@@ -31,7 +31,7 @@ import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto.RequestVoteResponse;
-import org.robotninjas.barge.rpc.Client;
+import org.robotninjas.barge.rpc.RaftClientManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,16 +59,16 @@ class Candidate extends BaseState {
 
   private final ScheduledExecutorService scheduler;
   private final long electionTimeout;
-  private final Client client;
+  private final RaftClientManager clientManager;
   private DeadlineTimer electionTimer;
   private ListenableFuture<Boolean> electionResult;
 
   @Inject
-  Candidate(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout, Client client) {
+  Candidate(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout, RaftClientManager client) {
     super(CANDIDATE, log);
     this.scheduler = bargeThreadPools.getRaftScheduler();
     this.electionTimeout = electionTimeout;
-    this.client = client;
+    this.clientManager = client;
   }
 
   @Override
@@ -158,7 +158,7 @@ class Candidate extends BaseState {
         .setLastLogTerm(log.lastLogTerm())
         .build();
 
-    ListenableFuture<RequestVoteResponse> response = client.requestVote(replica, request);
+    ListenableFuture<RequestVoteResponse> response = clientManager.requestVote(replica, request);
     Futures.addCallback(response, checkTerm(ctx));
 
     return response;
