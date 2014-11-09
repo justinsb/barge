@@ -94,6 +94,8 @@ public abstract class BaseState implements State {
   @Nonnull
   @Override
   public AppendEntriesResponse appendEntries(@Nonnull RaftStateContext ctx, @Nonnull AppendEntries request) {
+    LOGGER.debug("AppendEntries prev index {}, prev term {}, num entries {}, term {}",
+        request.getPrevLogIndex(), request.getPrevLogTerm(), request.getEntriesCount(), request.getTerm());
 
     boolean success = false;
 

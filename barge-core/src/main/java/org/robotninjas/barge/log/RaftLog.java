@@ -212,19 +212,22 @@ public class RaftLog {
     final long prevLogTerm = appendEntries.getPrevLogTerm();
     final List<Entry> entries = appendEntries.getEntriesList();
 
-    if (log.containsKey(prevLogIndex)) {
+    RaftJournal.Mark previousLogIndexMark = log.get(prevLogIndex);
+    if (prevLogIndex > 0 && previousLogIndexMark == null) {
+      LOGGER.debug("Can't append; missing tail: prevLogIndex {} prevLogTerm {}", prevLogIndex, prevLogTerm);
+      return false;
+    }
 
-      RaftJournal.Mark previousMark = log.get(prevLogIndex);
-      Entry previousEntry = journal.get(previousMark);
+    if (previousLogIndexMark != null) {
+      Entry previousEntry = journal.get(previousLogIndexMark);
 
       if ((prevLogIndex > 0) && previousEntry.getTerm() != prevLogTerm) {
-        LOGGER.debug("Append prevLogIndex {} prevLogTerm {}", prevLogIndex, prevLogTerm);
+        LOGGER.debug("Can't append; missing tail: prevLogIndex {} prevLogTerm {}", prevLogIndex, prevLogTerm);
         return false;
       }
 
-      journal.truncateTail(previousMark);
+      journal.truncateTail(previousLogIndexMark);
       log.tailMap(prevLogIndex, false).clear();
-
     }
 
     lastLogIndex = prevLogIndex;
