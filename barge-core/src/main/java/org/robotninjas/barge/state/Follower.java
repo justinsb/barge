@@ -45,46 +45,46 @@ class Follower extends BaseState {
   private static final Logger LOGGER = LoggerFactory.getLogger(Follower.class);
 
   private final ScheduledExecutorService scheduler;
-  private final long timeout;
-  private DeadlineTimer timeoutTask;
+  private final long electionTimeout;
+  private DeadlineTimer electionTimeoutTimer;
 
-  Follower(RaftLog log, BargeThreadPools threadPools, long timeout) {
+  Follower(RaftLog log, BargeThreadPools threadPools, long electionTimeout) {
     super(FOLLOWER, log);
 
     this.scheduler = checkNotNull(threadPools.getRaftScheduler());
-    checkArgument(timeout >= 0);
-    this.timeout = timeout;
+    checkArgument(electionTimeout >= 0);
+    this.electionTimeout = electionTimeout;
   }
 
   @Override
   public void init(@Nonnull final RaftStateContext ctx) {
     LOGGER.debug("Init on follower: {}", this);
     
-    timeoutTask = DeadlineTimer.start(scheduler, new Runnable() {
+    electionTimeoutTimer = DeadlineTimer.start(scheduler, new Runnable() {
       @Override
       public void run() {
         LOGGER.debug("DeadlineTimer expired, starting election");
         ctx.setState(Follower.this, CANDIDATE);
       }
-    }, timeout * 2);
+    }, electionTimeout * 2);
   }
 
   @Override
   public void destroy(RaftStateContext ctx) {
     LOGGER.debug("destroy on follower: {}", this);
-    timeoutTask.cancel();
+    electionTimeoutTimer.cancel();
   }
 
 
   protected void resetTimer() {
     LOGGER.debug("resetTimer on follower: {}", this);
-    timeoutTask.reset();
+    electionTimeoutTimer.reset();
   }
 
   @Override
   public void doStop(RaftStateContext ctx) {
     LOGGER.debug("doStop on follower: {}", this);
-    timeoutTask.cancel();
+    electionTimeoutTimer.cancel();
     super.doStop(ctx);
   }
 

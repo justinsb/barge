@@ -22,12 +22,10 @@ public abstract class BaseState implements State {
   private final StateType type;
   protected final RaftLog log;
   protected Optional<Replica> leader;
-  private final Replica self;
 
   protected BaseState(@Nullable StateType type, @Nonnull RaftLog log) {
     this.log = checkNotNull(log);
     this.type = type;
-    this.self = log.self();
   }
 
   @Nullable
@@ -40,11 +38,6 @@ public abstract class BaseState implements State {
     return log;
   }
 
-//
-//  public Replica self() {
-//    return self;
-//  }
-  
   @Override
   public void destroy(RaftStateContext ctx) {
   }

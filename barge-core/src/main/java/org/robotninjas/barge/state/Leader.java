@@ -67,20 +67,20 @@ class Leader extends BaseState {
   private static final long HEALTH_TIMEOUT = TimeUnit.MINUTES.toNanos(1);
   
   private final ScheduledExecutorService scheduler;
-  private final long timeout;
+  private final long electionTimeout;
   private final Map<Replica, ReplicaManager> replicaManagers = Maps.newHashMap();
   private long replicaManagersLastUpdated;
 
   private ScheduledFuture<?> heartbeatTask;
 
   @Inject
-  Leader(RaftLog log, BargeThreadPools bargeThreadPools, long timeout) {
+  Leader(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout) {
 
     super(LEADER, log);
 
     this.scheduler = checkNotNull(bargeThreadPools.getRaftScheduler());
-    checkArgument(timeout > 0);
-    this.timeout = timeout;
+    checkArgument(electionTimeout > 0);
+    this.electionTimeout = electionTimeout;
 
   }
 
@@ -152,7 +152,7 @@ class Leader extends BaseState {
         LOGGER.debug("Sending heartbeat");
         sendRequests(ctx);
       }
-    }, timeout, timeout, MILLISECONDS);
+    }, electionTimeout, electionTimeout, MILLISECONDS);
 
   }
 
