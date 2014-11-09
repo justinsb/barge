@@ -7,8 +7,8 @@ import org.robotninjas.barge.ClusterConfig;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
-import org.robotninjas.barge.netty.NettyRaftService;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.rpc.netty.NettyRaftService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

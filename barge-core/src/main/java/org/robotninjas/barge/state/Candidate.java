@@ -64,11 +64,11 @@ class Candidate extends BaseState {
   private ListenableFuture<Boolean> electionResult;
 
   @Inject
-  Candidate(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout, RaftClientManager client) {
+  Candidate(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout, RaftClientManager clientManager) {
     super(CANDIDATE, log);
     this.scheduler = bargeThreadPools.getRaftScheduler();
     this.electionTimeout = electionTimeout;
-    this.clientManager = client;
+    this.clientManager = clientManager;
   }
 
   @Override

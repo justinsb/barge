@@ -1,4 +1,4 @@
-package org.robotninjas.barge.netty;
+package org.robotninjas.barge.rpc.netty;
 
 import com.google.inject.PrivateModule;
 

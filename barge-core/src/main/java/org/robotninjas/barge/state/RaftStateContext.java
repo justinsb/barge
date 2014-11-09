@@ -58,18 +58,18 @@ public class RaftStateContext implements Raft {
 
   private final ConfigurationState configurationState;
 
-  private final RaftClientManager client;
+  private final RaftClientManager clientManager;
 
   private final RaftLog log;
 
   private final BargeThreadPools threadPools;
 
   @Inject
-  RaftStateContext(RaftLog log, RaftClientManager client, ConfigurationState configurationState, BargeThreadPools threadPools) {
-    this(log.self().toString(), log, client, configurationState, threadPools);
+  RaftStateContext(RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState, BargeThreadPools threadPools) {
+    this(log.self().toString(), log, clientManager, configurationState, threadPools);
   }
 
-  RaftStateContext(String name, RaftLog log, RaftClientManager client, ConfigurationState configurationState, BargeThreadPools threadPools) {
+  RaftStateContext(String name, RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState, BargeThreadPools threadPools) {
     this.configurationState = configurationState;
     this.log = log;
     MDC.put("self", name);
@@ -77,7 +77,7 @@ public class RaftStateContext implements Raft {
     this.executor = threadPools.getRaftExecutor();
     this.threadPools = threadPools;
     this.listeners.add(new LogListener());
-    this.client = client;
+    this.clientManager = clientManager;
   }
 
   @Override

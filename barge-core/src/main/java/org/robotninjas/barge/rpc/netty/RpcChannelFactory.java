@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.robotninjas.barge.netty.rpc;
+package org.robotninjas.barge.rpc.netty;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;

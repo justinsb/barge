@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.robotninjas.barge.netty;
+package org.robotninjas.barge.rpc.netty;
 
-import com.google.common.io.Files;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Guice;
 import com.google.protobuf.Service;
@@ -26,6 +25,7 @@ import org.robotninjas.barge.ClusterConfig;
 import org.robotninjas.barge.NoLeaderException;
 import org.robotninjas.barge.NotLeaderException;
 import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.RaftService;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.log.RaftLog;
@@ -81,7 +81,7 @@ public class NettyRaftService extends RaftService {
   }
 
   private void configureRpcServer() {
-    RaftServiceEndpoint endpoint = new RaftServiceEndpoint(ctx);
+    ProtobufRaftServiceEndpoint endpoint = new ProtobufRaftServiceEndpoint(ctx);
     Service replicaService = RaftProto.RaftService.newReflectiveService(endpoint);
     rpcServer.registerService(replicaService);
   }

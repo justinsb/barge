@@ -1,4 +1,4 @@
-package org.robotninjas.barge.netty;
+package org.robotninjas.barge.rpc.netty;
 
 import com.google.protobuf.RpcCallback;
 import com.google.protobuf.RpcController;
@@ -12,13 +12,13 @@ import javax.annotation.Nonnull;
 import static com.google.common.base.Strings.nullToEmpty;
 import static org.robotninjas.barge.proto.RaftProto.*;
 
-class RaftServiceEndpoint implements RaftProto.RaftService.Interface {
+class ProtobufRaftServiceEndpoint implements RaftProto.RaftService.Interface {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RaftServiceEndpoint.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufRaftServiceEndpoint.class);
 
   private final Raft ctx;
 
-  public RaftServiceEndpoint(Raft ctx) {
+  public ProtobufRaftServiceEndpoint(Raft ctx) {
     this.ctx = ctx;
   }
 

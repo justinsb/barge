@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.robotninjas.barge.netty.rpc;
+package org.robotninjas.barge.rpc.netty;
 
 import com.google.inject.PrivateModule;
 
@@ -31,12 +31,12 @@ import java.net.SocketAddress;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class RpcModule extends PrivateModule {
+public class NettyRpcModule extends PrivateModule {
 
   private final SocketAddress saddr;
   private final BargeThreadPools bargeThreadPools;
 
-  public RpcModule(@Nonnull SocketAddress saddr, BargeThreadPools bargeThreadPools) {
+  public NettyRpcModule(@Nonnull SocketAddress saddr, BargeThreadPools bargeThreadPools) {
     this.saddr = checkNotNull(saddr);
     this.bargeThreadPools = checkNotNull(bargeThreadPools);
   }

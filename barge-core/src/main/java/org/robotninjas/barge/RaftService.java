@@ -1,4 +1,4 @@
-package org.robotninjas.barge.netty;
+package org.robotninjas.barge;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -7,10 +7,6 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import org.robotninjas.barge.BargeThreadPools;
-import org.robotninjas.barge.RaftClusterHealth;
-import org.robotninjas.barge.RaftException;
-import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.state.RaftStateContext;
@@ -41,7 +37,7 @@ public abstract class RaftService extends AbstractService {
   protected final BargeThreadPools bargeThreadPools;
   
   @Inject
-  RaftService(@Nonnull BargeThreadPools bargeThreadPools, @Nonnull RaftStateContext ctx, @Nonnull RaftLog raftLog) {
+  protected RaftService(@Nonnull BargeThreadPools bargeThreadPools, @Nonnull RaftStateContext ctx, @Nonnull RaftLog raftLog) {
 
     this.bargeThreadPools = checkNotNull(bargeThreadPools);
     this.executor = checkNotNull(bargeThreadPools.getRaftExecutor());

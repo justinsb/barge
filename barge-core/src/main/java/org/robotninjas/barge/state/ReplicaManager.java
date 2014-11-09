@@ -49,7 +49,7 @@ class ReplicaManager {
   private static final int BATCH_SIZE = 1000;
   private static final int MAX_RUNNING = 1;
 
-  private final RaftClientManager client;
+  private final RaftClientManager clientManager;
   private final RaftLog log;
   private final Replica remote;
   private long nextIndex;
@@ -62,11 +62,11 @@ class ReplicaManager {
   private volatile long lastResponse;
   
   @Inject
-  ReplicaManager(RaftClientManager client, RaftLog log, @Assisted Replica remote) {
+  ReplicaManager(RaftClientManager clientManager, RaftLog log, @Assisted Replica remote) {
 
     this.nextIndex = log.lastLogIndex() + 1;
     this.log = log;
-    this.client = client;
+    this.clientManager = clientManager;
     this.remote = remote;
 
   }

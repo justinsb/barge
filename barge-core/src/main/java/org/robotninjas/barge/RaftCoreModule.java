@@ -22,8 +22,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.PrivateModule;
 
 import org.robotninjas.barge.log.LogModule;
-import org.robotninjas.barge.netty.rpc.RpcModule;
 import org.robotninjas.barge.rpc.RaftClientManager;
+import org.robotninjas.barge.rpc.netty.NettyRpcModule;
 import org.robotninjas.barge.state.Raft;
 import org.robotninjas.barge.state.StateModule;
 

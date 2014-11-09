@@ -1,4 +1,4 @@
-package org.robotninjas.barge.netty;
+package org.robotninjas.barge.rpc.netty;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -9,7 +9,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.RaftCoreModule;
 import org.robotninjas.barge.Replica;
-import org.robotninjas.barge.netty.rpc.RpcModule;
 
 class RaftProtoRpcModule extends AbstractModule {
 
@@ -29,7 +28,7 @@ class RaftProtoRpcModule extends AbstractModule {
     final NioEventLoopGroup eventLoop = initializeEventLoop();
 
     BargeThreadPools bargeThreadPools = new BargeThreadPools(self.toString(), Optional.of(eventLoop), stateMachineExecutor);
-    install(new RpcModule(self.address(), bargeThreadPools));
+    install(new NettyRpcModule(self.address(), bargeThreadPools));
     //expose(BargeThreadPools.class);
 
 //    expose(RpcServer.class);
