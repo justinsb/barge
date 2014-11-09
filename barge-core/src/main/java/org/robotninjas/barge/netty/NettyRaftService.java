@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package org.robotninjas.barge;
+package org.robotninjas.barge.netty;
 
 import com.google.common.io.Files;
-import com.google.common.util.concurrent.AbstractService;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Guice;
 import com.google.protobuf.Service;
+
+import org.robotninjas.barge.BargeThreadPools;
+import org.robotninjas.barge.ClusterConfig;
+import org.robotninjas.barge.NoLeaderException;
+import org.robotninjas.barge.NotLeaderException;
+import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.StateMachine;
+import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto;
-import org.robotninjas.barge.state.Raft;
 import org.robotninjas.barge.state.Raft.StateType;
+import org.robotninjas.barge.state.RaftStateContext;
 import org.robotninjas.barge.state.StateTransitionListener;
 import org.robotninjas.protobuf.netty.server.RpcServer;
 
@@ -31,6 +39,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Inject;
+
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
@@ -40,16 +49,16 @@ import static com.google.common.base.Throwables.propagateIfInstanceOf;
 
 @ThreadSafe
 @Immutable
-public class NettyRaftService extends AbstractService implements RaftService {
+public class NettyRaftService extends RaftService {
 
   private final RpcServer rpcServer;
-  private final Raft ctx;
-
+  
   @Inject
-  NettyRaftService(@Nonnull RpcServer rpcServer, @Nonnull Raft ctx) {
+  NettyRaftService(@Nonnull RpcServer rpcServer, @Nonnull BargeThreadPools bargeThreadPools, @Nonnull RaftStateContext ctx, @Nonnull RaftLog raftLog) {
 
+    super(bargeThreadPools, ctx, raftLog);
+    
     this.rpcServer = checkNotNull(rpcServer);
-    this.ctx = checkNotNull(ctx);
 
   }
 
@@ -82,7 +91,13 @@ public class NettyRaftService extends AbstractService implements RaftService {
 
     try {
       rpcServer.stopAsync().awaitTerminated();
+      ctx.stop();
+      while (!ctx.isStopped()) {
+        Thread.sleep(10);
+      }
+      raftLog.close();
 
+      bargeThreadPools.close();
       ctx.stop();
 
       notifyStopped();
@@ -114,8 +129,8 @@ public class NettyRaftService extends AbstractService implements RaftService {
     return StateType.LEADER == ctx.type();
   }
 
-  public static Builder newBuilder(NettyClusterConfig config) {
-    return new Builder(config);
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
   private void addTransitionListener(StateTransitionListener listener) {
@@ -124,31 +139,35 @@ public class NettyRaftService extends AbstractService implements RaftService {
 
   public static class Builder {
 
-    private static long TIMEOUT = 150;
+//    private final NettyClusterConfig config;
+    public Replica self;
+    public ClusterConfig seedConfig;
+    public File logDir;
+    public StateTransitionListener listener;
+    public StateMachine stateMachine;
 
-    private final NettyClusterConfig config;
-    private File logDir = Files.createTempDir();
-    private long timeout = TIMEOUT;
-    private StateTransitionListener listener;
+//    protected Builder(NettyClusterConfig config) {
+//      this.config = config;
+//    }
+//
+//    public Builder timeout(long timeout) {
+//      this.timeout = timeout;
+//      return this;
+//    }
+//
+//    public Builder logDir(File logDir) {
+//      this.logDir = logDir;
+//      return this;
+//    }
 
-    protected Builder(NettyClusterConfig config) {
-      this.config = config;
-    }
+    public NettyRaftService build() {
+//      logDir = Files.createTempDir();
+      checkNotNull(logDir);
+      checkNotNull(self);
+      checkNotNull(seedConfig);
 
-    public Builder timeout(long timeout) {
-      this.timeout = timeout;
-      return this;
-    }
-
-    public Builder logDir(File logDir) {
-      this.logDir = logDir;
-      return this;
-    }
-
-    public NettyRaftService build(StateMachine stateMachine) {
-      NettyRaftService nettyRaftService = Guice.createInjector(
-        new NettyRaftModule(config, logDir, stateMachine, timeout))
-        .getInstance(NettyRaftService.class);
+      NettyRaftService nettyRaftService = Guice.createInjector(new NettyRaftModule(self, seedConfig, logDir, stateMachine)).getInstance(
+          NettyRaftService.class);
 
       if (listener != null) {
         nettyRaftService.addTransitionListener(listener);
@@ -157,10 +176,10 @@ public class NettyRaftService extends AbstractService implements RaftService {
       return nettyRaftService;
     }
 
-    public Builder transitionListener(StateTransitionListener listener) {
-      this.listener = listener;
-      return this;
-    }
+//    public Builder transitionListener(StateTransitionListener listener) {
+//      this.listener = listener;
+//      return this;
+//    }
   }
 
 }

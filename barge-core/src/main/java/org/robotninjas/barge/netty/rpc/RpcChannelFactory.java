@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.robotninjas.barge.rpc;
+package org.robotninjas.barge.netty.rpc;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
 import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
-import org.robotninjas.barge.NettyReplica;
+import org.robotninjas.barge.Replica;
 import org.robotninjas.protobuf.netty.client.NettyRpcChannel;
 import org.robotninjas.protobuf.netty.client.RpcClient;
 import org.slf4j.Logger;
@@ -44,8 +45,8 @@ class RpcChannelFactory extends BaseKeyedPoolableObjectFactory<Object, Listenabl
 
   @Override
   public ListenableFuture<NettyRpcChannel> makeObject(Object key) throws Exception {
-    Preconditions.checkArgument(key instanceof NettyReplica);
-    NettyReplica replica = (NettyReplica) key;
+    Preconditions.checkArgument(key instanceof Replica);
+    Replica replica = (Replica) key;
     return client.connectAsync(replica.address());
   }
 

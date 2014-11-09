@@ -2,14 +2,11 @@ package org.robotninjas.barge.state;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import org.robotninjas.barge.NoLeaderException;
-import org.robotninjas.barge.NotLeaderException;
-import org.robotninjas.barge.RaftException;
+
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,14 +17,17 @@ import static org.robotninjas.barge.state.Raft.StateType.*;
 import static org.robotninjas.barge.state.RaftStateContext.StateType;
 
 public abstract class BaseState implements State {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BaseState.class);
 
   private final StateType type;
-  private final RaftLog log;
-  private Optional<Replica> leader;
+  protected final RaftLog log;
+  protected Optional<Replica> leader;
+  private final Replica self;
 
   protected BaseState(@Nullable StateType type, @Nonnull RaftLog log) {
     this.log = checkNotNull(log);
     this.type = type;
+    this.self = log.self();
   }
 
   @Nullable
@@ -40,6 +40,11 @@ public abstract class BaseState implements State {
     return log;
   }
 
+//
+//  public Replica self() {
+//    return self;
+//  }
+  
   @Override
   public void destroy(RaftStateContext ctx) {
   }
@@ -51,7 +56,7 @@ public abstract class BaseState implements State {
     //  least as up-to-date as receiver’s log, grant vote (§5.2, §5.4)
       
     Optional<Replica> votedFor = log.votedFor();
-    Replica candidate = log.getReplica(request.getCandidateId());
+    Replica candidate = Replica.fromString(request.getCandidateId());
 
     if (votedFor.isPresent()) {
       if (!votedFor.get().equals(candidate)) {
@@ -104,7 +109,7 @@ public abstract class BaseState implements State {
 
       }
 
-      leader = Optional.of(log.getReplica(request.getLeaderId()));
+      leader = Optional.of(Replica.fromString(request.getLeaderId()));
       resetTimer();
       success = log.append(request);
 
@@ -131,6 +136,8 @@ public abstract class BaseState implements State {
     long term = request.getTerm();
     long currentTerm = log.currentTerm();
     
+    LOGGER.debug("RequestVote received for term {}", term);
+
     if (term < currentTerm) {
       // Reply false if term < currentTerm (§5.1)
       voteGranted = false;
@@ -148,7 +155,7 @@ public abstract class BaseState implements State {
 
       }
 
-      Replica candidate = log.getReplica(request.getCandidateId());
+      Replica candidate = Replica.fromString(request.getCandidateId());
       voteGranted = shouldVoteFor(log, request);
 
       if (voteGranted) {
@@ -163,23 +170,24 @@ public abstract class BaseState implements State {
         .build();
 
   }
-
-  @Nonnull
-  @Override
-  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
-    StateType stateType = ctx.type();
-    Preconditions.checkNotNull(stateType);
-    if (stateType.equals(FOLLOWER)) {
-      throw new NotLeaderException(leader.get());
-    } else if (stateType.equals(CANDIDATE)) {
-      throw new NoLeaderException();
-    }
-    return Futures.immediateCancelledFuture();
-  }
+//
+////  @Nonnull
+////  @Override
+////  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
+////    StateType stateType = ctx.type();
+////    Preconditions.checkNotNull(stateType);
+////    if (stateType.equals(FOLLOWER)) {
+////      throw new NotLeaderException(leader.get());
+////    } else if (stateType.equals(CANDIDATE)) {
+////      throw new NoLeaderException();
+////    }
+////    return Futures.immediateCancelledFuture();
+////  }
   
   @Override
   public void doStop(RaftStateContext ctx) {
     ctx.setState(this, STOPPED);
   }
+
 
 }

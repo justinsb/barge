@@ -16,34 +16,33 @@
 
 package org.robotninjas.barge.state;
 
+import org.robotninjas.barge.ClusterConfig;
+import org.robotninjas.barge.Replica;
+
+import com.google.inject.AbstractModule;
 import com.google.inject.PrivateModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
-public class StateModule extends PrivateModule {
+public class StateModule extends AbstractModule {
 
-  private final long electionTimeout;
+  private final Replica self;
+  private final ClusterConfig seedConfig;
 
-  public StateModule(long electionTimeout) {
-    this.electionTimeout = electionTimeout;
+  public StateModule(Replica self, ClusterConfig seedConfig) {
+    this.self = self;
+    this.seedConfig = seedConfig;
   }
 
   @Override
   protected void configure() {
 
-    bind(StateFactory.class).to(DefaultStateFactory.class);
+    // bind(Long.class).annotatedWith(ElectionTimeout.class).toInstance(electionTimeout);
 
-    install(new FactoryModuleBuilder()
-      .build(ReplicaManagerFactory.class));
+    bind(Raft.class).to(RaftStateContext.class).asEagerSingleton();
+    // expose(Raft.class);
 
-    bind(Long.class)
-      .annotatedWith(ElectionTimeout.class)
-      .toInstance(electionTimeout);
-
-    bind(Raft.class)
-      .to(RaftStateContext.class)
-      .asEagerSingleton();
-
-    expose(Raft.class);
+    bind(ConfigurationState.class).toInstance(new ConfigurationState(self, seedConfig.allMembers, seedConfig.electionTimeout));
+    // expose(ConfigurationState.class);
 
   }
 

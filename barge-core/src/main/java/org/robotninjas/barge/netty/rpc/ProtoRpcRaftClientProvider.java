@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package org.robotninjas.barge.rpc;
+package org.robotninjas.barge.netty.rpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
 import org.apache.commons.pool.KeyedObjectPool;
 import org.apache.commons.pool.PoolUtils;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.rpc.RaftClient;
+import org.robotninjas.barge.rpc.RaftClientProvider;
 import org.robotninjas.protobuf.netty.client.NettyRpcChannel;
 import org.robotninjas.protobuf.netty.client.RpcClient;
 
@@ -55,7 +58,7 @@ class ProtoRpcRaftClientProvider implements RaftClientProvider {
   @Nonnull
   public RaftClient get(@Nonnull Replica replica) {
     checkNotNull(replica);
-    return new ProtoRpcRaftClient(PoolUtils.adapt(connectionPools, replica));
+    return new ProtoRpcRaftClient(replica, PoolUtils.adapt(connectionPools, replica));
   }
 
 }

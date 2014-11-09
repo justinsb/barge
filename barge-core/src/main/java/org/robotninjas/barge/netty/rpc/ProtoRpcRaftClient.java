@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package org.robotninjas.barge.rpc;
+package org.robotninjas.barge.netty.rpc;
 
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.protobuf.RpcCallback;
 import com.google.protobuf.RpcController;
+
 import org.apache.commons.pool.ObjectPool;
 import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.proto.RaftProto;
+import org.robotninjas.barge.rpc.RaftClient;
 import org.robotninjas.protobuf.netty.client.ClientController;
 import org.robotninjas.protobuf.netty.client.NettyRpcChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,12 +47,15 @@ import static org.robotninjas.barge.proto.RaftProto.*;
 //TODO write a protoc code generator for this bullshit
 @Immutable
 class ProtoRpcRaftClient implements RaftClient {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProtoRpcRaftClient.class);
+  
   private static final long DEFAULT_TIMEOUT = 2000;
 
+  private final Replica replica;
   private final ObjectPool<ListenableFuture<NettyRpcChannel>> channelPool;
 
-  ProtoRpcRaftClient(@Nonnull ObjectPool<ListenableFuture<NettyRpcChannel>> channelPool) {
+  ProtoRpcRaftClient(@Nonnull Replica replica, @Nonnull ObjectPool<ListenableFuture<NettyRpcChannel>> channelPool) {
+    this.replica = replica;
     this.channelPool = checkNotNull(channelPool);
   }
 
@@ -63,7 +72,8 @@ class ProtoRpcRaftClient implements RaftClient {
   }
 
   private <T> ListenableFuture<T> call(final RpcCall<T> call) {
-
+    LOGGER.debug("Sending message to {}: {}", replica, call);
+    
     ListenableFuture<NettyRpcChannel> channel = null;
     try {
 
@@ -127,6 +137,11 @@ class ProtoRpcRaftClient implements RaftClient {
         public void call(RaftService.Stub stub, RpcController controller, RpcCallback<AppendEntriesResponse> callback) {
           stub.appendEntries(controller, request, callback);
         }
+        
+        @Override
+        public String toString() {
+          return request.toString();
+        }
       };
     }
 
@@ -135,6 +150,11 @@ class ProtoRpcRaftClient implements RaftClient {
         @Override
         public void call(RaftService.Stub stub, RpcController controller, RpcCallback<RequestVoteResponse> callback) {
           stub.requestVote(controller, request, callback);
+        }
+        
+        @Override
+        public String toString() {
+          return request.toString();
         }
       };
     }

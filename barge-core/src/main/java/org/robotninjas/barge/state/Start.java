@@ -2,7 +2,10 @@ package org.robotninjas.barge.state;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
+
+import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.log.RaftLog;
 import org.slf4j.MDC;
 
@@ -45,6 +48,16 @@ class Start extends BaseState {
   @Nonnull
   @Override
   public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
+    throw new RaftException("Service has not started yet");
+  }
+
+  @Override
+  public RaftClusterHealth getClusterHealth(@Nonnull RaftStateContext ctx) throws RaftException {
+    throw new RaftException("Service has not started yet");
+  }
+  
+  @Override
+  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership, RaftMembership newMembership) throws RaftException {
     throw new RaftException("Service has not started yet");
   }
 

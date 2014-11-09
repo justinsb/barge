@@ -2,7 +2,11 @@ package org.robotninjas.barge.state;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
+
+import org.robotninjas.barge.NoLeaderException;
+import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.log.RaftLog;
 
 import javax.annotation.Nonnull;
@@ -37,6 +41,21 @@ class Stopped extends BaseState {
   @Override
   public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
     throw new RaftException("Service is stopped");
+  }
+
+  @Override
+  public RaftClusterHealth getClusterHealth(RaftStateContext raftStateContext) throws NoLeaderException, RaftException {
+    throw new RaftException("Service is stopped");
+  }
+
+  @Override
+  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership, RaftMembership newMembership) throws RaftException {
+    throw new RaftException("Service is stopped");
+  }
+
+  @Override
+  public String toString() {
+    return "Stopped";
   }
 
 }

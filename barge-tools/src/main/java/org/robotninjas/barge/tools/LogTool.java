@@ -1,10 +1,13 @@
 package org.robotninjas.barge.tools;
 
 import com.google.common.base.Optional;
+
 import journal.io.api.Journal;
 import journal.io.api.JournalBuilder;
 import journal.io.api.Location;
+
 import org.robotninjas.barge.proto.LogProto;
+import org.robotninjas.barge.proto.RaftEntry.Entry;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,20 +43,22 @@ public class LogTool {
 
         LogProto.Append a = entry.getAppend();
         index = a.getIndex();
+        
+        Entry appendEntry = a.getEntry();
+        if (appendEntry.hasMembership()) {
+          lastEntryType = Type.MEMBERSHIP;
+        }
+        if (appendEntry.hasCommand()) {
+          lastEntryType = Type.APPEND;
+        }
+
         term = a.getEntry().getTerm();
-        lastEntryType = Type.APPEND;
 
       } else if (entry.hasCommit()) {
 
         LogProto.Commit c = entry.getCommit();
         committed = c.getIndex();
         lastEntryType = Type.COMMIT;
-
-      } else if (entry.hasMembership()) {
-
-        LogProto.Membership m = entry.getMembership();
-        membership = m.getMembersList();
-        lastEntryType = Type.MEMBERSHIP;
 
       } else if (entry.hasSnapshot()) {
 

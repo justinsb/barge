@@ -34,33 +34,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @ThreadSafe
 public class Replica {
 
-  private final InetSocketAddress address;
+  private final String key;
+  private InetSocketAddress address;
 
-  Replica(@Nonnull InetSocketAddress address) {
-    this.address = checkNotNull(address);
+  protected Replica(@Nonnull String key) {
+    this.key = key;
   }
 
   @Nonnull
-  public static Replica fromString(@Nonnull String info) {
-    try {
-      checkNotNull(info);
-      HostAndPort hostAndPort = HostAndPort.fromString(info);
-      InetAddress addr = InetAddress.getByName(hostAndPort.getHostText());
-      InetSocketAddress saddr = new InetSocketAddress(addr,
-          hostAndPort.getPort());
-      return new Replica(saddr);
-    } catch (UnknownHostException e) {
-      throw Throwables.propagate(e);
-    }
+  public static Replica fromString(@Nonnull String key) {
+      checkNotNull(key);
+      return new Replica(key);
   }
 
-  public SocketAddress address() {
+  public synchronized SocketAddress address() {
+    if (address == null) {
+      try {
+        HostAndPort hostAndPort = HostAndPort.fromString(key);
+        InetAddress addr = InetAddress.getByName(hostAndPort.getHostText());
+        InetSocketAddress saddr = new InetSocketAddress(addr, hostAndPort.getPort());
+        this.address = saddr;
+      } catch (UnknownHostException e) {
+        throw Throwables.propagate(e);
+      }
+    }
     return address;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(address());
+    return Objects.hashCode(key);
   }
 
   @Override
@@ -72,7 +75,7 @@ public class Replica {
 
     if (o instanceof Replica) {
       Replica other = (Replica) o;
-      return Objects.equal(address(), other.address());
+      return Objects.equal(key, other.key);
     }
 
     return false;
@@ -82,6 +85,10 @@ public class Replica {
   @Nonnull
   @Override
   public String toString() {
-    return address.getAddress().getHostName() + ":" + address.getPort();
+    return key;
+  }
+
+  public String getKey() {
+    return key;
   }
 }

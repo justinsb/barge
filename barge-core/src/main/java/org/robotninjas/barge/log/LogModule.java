@@ -16,14 +16,18 @@
 
 package org.robotninjas.barge.log;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+
 import journal.io.api.Journal;
 import journal.io.api.JournalBuilder;
+
 import org.robotninjas.barge.StateMachine;
 
 import javax.annotation.Nonnull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Executor;
@@ -31,16 +35,14 @@ import java.util.concurrent.Executor;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Throwables.propagate;
 
-public class LogModule extends PrivateModule {
+public class LogModule extends AbstractModule {
 
   private final File logDirectory;
   private final StateMachine stateMachine;
-  private final Executor executor;
 
-  public LogModule(@Nonnull File logDirectory, @Nonnull StateMachine stateMachine, @Nonnull Executor executor) {
+  public LogModule(@Nonnull File logDirectory, @Nonnull StateMachine stateMachine) {
     this.logDirectory = checkNotNull(logDirectory);
     this.stateMachine = checkNotNull(stateMachine);
-    this.executor = checkNotNull(executor);
   }
 
   @Override
@@ -48,12 +50,8 @@ public class LogModule extends PrivateModule {
 
     bind(StateMachine.class).toInstance(stateMachine);
     bind(StateMachineProxy.class);
-    bind(Executor.class)
-        .annotatedWith(StateExecutor.class)
-        .toInstance(executor);
     bind(RaftLog.class).asEagerSingleton();
-    expose(RaftLog.class);
-
+    //expose(RaftLog.class);
   }
 
   @Nonnull

@@ -20,8 +20,8 @@ import com.google.common.base.Functions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
-import org.jetlang.fibers.Fiber;
-import org.robotninjas.barge.RaftExecutor;
+
+import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.Replica;
 
 import javax.annotation.Nonnull;
@@ -41,9 +41,9 @@ public class Client {
   private final Executor executor;
 
   @Inject
-  public Client(@Nonnull RaftClientProvider clientProvider, @Nonnull @RaftExecutor Fiber executor) {
+  public Client(@Nonnull RaftClientProvider clientProvider, @Nonnull BargeThreadPools threadPools) {
     this.clientProvider = clientProvider;
-    this.executor = executor;
+    this.executor = threadPools.getRaftExecutor();
   }
 
   @Nonnull

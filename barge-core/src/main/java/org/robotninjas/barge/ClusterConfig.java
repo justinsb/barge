@@ -1,11 +1,18 @@
 package org.robotninjas.barge;
 
-public interface ClusterConfig {
+import java.util.Collections;
+import java.util.List;
 
-  Replica local();
+public class ClusterConfig {
+  public static final long DEFAULT_TIMEOUT = 225;
 
-  Iterable<Replica> remote();
-
-  Replica getReplica(String info);
-
+  public final Replica self;
+  public final List<Replica> allMembers;
+  public final long electionTimeout;
+  
+  public ClusterConfig(Replica self, List<Replica> allMembers, long electionTimeout) {
+    this.self = self;
+    this.electionTimeout = electionTimeout;
+    this.allMembers = Collections.unmodifiableList(allMembers);
+  }
 }

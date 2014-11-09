@@ -1,4 +1,4 @@
-package org.robotninjas.barge;
+package org.robotninjas.barge.netty;
 
 import com.google.protobuf.RpcCallback;
 import com.google.protobuf.RpcController;

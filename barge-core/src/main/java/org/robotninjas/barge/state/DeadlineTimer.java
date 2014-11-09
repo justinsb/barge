@@ -1,8 +1,9 @@
 package org.robotninjas.barge.state;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+
 import com.google.common.base.Optional;
-import org.jetlang.core.Disposable;
-import org.jetlang.core.Scheduler;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -12,13 +13,13 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 @NotThreadSafe
 class DeadlineTimer {
 
-  private final Scheduler scheduler;
+  private final ScheduledExecutorService scheduler;
   private final Runnable action;
   private final long timeout;
   private boolean started = false;
-  private Optional<Disposable> future;
+  private Optional<ScheduledFuture> future;
 
-  DeadlineTimer(Scheduler scheduler, Runnable action, long timeout) {
+  DeadlineTimer(ScheduledExecutorService scheduler, Runnable action, long timeout) {
     this.scheduler = scheduler;
     this.action = action;
     this.timeout = timeout;
@@ -34,19 +35,20 @@ class DeadlineTimer {
   public void reset() {
     checkState(started);
     if (future.isPresent()) {
-      future.get().dispose();
+      future.get().cancel(false);
     }
-    future = Optional.of(scheduler.schedule(action, timeout, MILLISECONDS));
+    ScheduledFuture<?> scheduled = scheduler.schedule(action, timeout, MILLISECONDS);
+    future = Optional.of((ScheduledFuture) scheduled);
   }
 
   public void cancel() {
     checkState(started);
     if (future.isPresent()) {
-      future.get().dispose();
+      future.get().cancel(false);
     }
   }
 
-  public static DeadlineTimer start(Scheduler scheduler, Runnable action, long timeout) {
+  public static DeadlineTimer start(ScheduledExecutorService scheduler, Runnable action, long timeout) {
     DeadlineTimer t = new DeadlineTimer(scheduler, action, timeout);
     t.start();
     return t;

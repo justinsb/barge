@@ -41,7 +41,6 @@
   <modules>
     <module>barge-core</module>
     <module>barge-tools</module>
-    <module>barge-rpc-proto</module>
   </modules>
 
   <dependencyManagement>
@@ -50,12 +49,6 @@
       <dependency>
         <groupId>org.robotninjas.barge</groupId>
         <artifactId>barge-core</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.robotninjas.barge</groupId>
-        <artifactId>barge-rpc-proto</artifactId>
         <version>${project.version}</version>
       </dependency>
 

@@ -16,10 +16,16 @@
 
 package org.robotninjas.barge.state;
 
+import java.util.concurrent.ScheduledExecutorService;
+
+import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
-import org.jetlang.fibers.Fiber;
+
 import org.robotninjas.barge.*;
 import org.robotninjas.barge.log.RaftLog;
+import org.robotninjas.barge.state.Raft.StateType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,23 +44,22 @@ class Follower extends BaseState {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Follower.class);
 
-  private final Fiber scheduler;
+  private final ScheduledExecutorService scheduler;
   private final long timeout;
   private DeadlineTimer timeoutTask;
 
-  @Inject
-  Follower(RaftLog log, @RaftExecutor Fiber scheduler, @ElectionTimeout @Nonnegative long timeout) {
-
+  Follower(RaftLog log, BargeThreadPools threadPools, long timeout) {
     super(FOLLOWER, log);
 
-    this.scheduler = checkNotNull(scheduler);
+    this.scheduler = checkNotNull(threadPools.getRaftScheduler());
     checkArgument(timeout >= 0);
     this.timeout = timeout;
-
   }
 
   @Override
   public void init(@Nonnull final RaftStateContext ctx) {
+    LOGGER.debug("Init on follower: {}", this);
+    
     timeoutTask = DeadlineTimer.start(scheduler, new Runnable() {
       @Override
       public void run() {
@@ -66,18 +71,54 @@ class Follower extends BaseState {
 
   @Override
   public void destroy(RaftStateContext ctx) {
+    LOGGER.debug("destroy on follower: {}", this);
     timeoutTask.cancel();
   }
 
 
   protected void resetTimer() {
+    LOGGER.debug("resetTimer on follower: {}", this);
     timeoutTask.reset();
   }
 
   @Override
   public void doStop(RaftStateContext ctx) {
+    LOGGER.debug("doStop on follower: {}", this);
     timeoutTask.cancel();
     super.doStop(ctx);
   }
 
+  @Nonnull
+  @Override
+  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation)
+      throws RaftException {
+    throw throwMustBeLeader();
+  }
+
+  protected RuntimeException throwMustBeLeader() throws RaftException {
+    if (leader.isPresent()) {
+      throw new NotLeaderException(leader.get());
+    } else {
+      throw new NoLeaderException();
+    }
+  }
+
+  @Override
+  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership,
+      RaftMembership newMembership) throws RaftException {
+    throw throwMustBeLeader();
+  }
+  
+
+  @Override
+  public RaftClusterHealth getClusterHealth(@Nonnull RaftStateContext ctx) throws RaftException {
+    throw  throwMustBeLeader();
+  }
+  
+  
+  @Override
+  public String toString() {
+    return "Follower [" + log.getName() + " @ " + log.self() + "]";
+  }
+   
 }

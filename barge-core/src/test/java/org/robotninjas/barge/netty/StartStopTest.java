@@ -1,18 +1,28 @@
-package org.robotninjas.barge;
+package org.robotninjas.barge.netty;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.robotninjas.barge.state.Raft;
+import org.robotninjas.barge.ClusterConfig;
+import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.StateMachine;
+import org.robotninjas.barge.netty.NettyRaftService;
+import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+
 import javax.annotation.Nonnull;
+
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StartStopTest {
@@ -21,7 +31,7 @@ public class StartStopTest {
 
   private File TEST_TMP_DIR;
 
-  private final NettyReplica replicas[] = new NettyReplica[] { NettyReplica.fromString("localhost:10001") };
+  private final Replica replicas[] = new Replica[] { Replica.fromString("localhost:10001") };
 
   private List<Server> allServers = Lists.newArrayList();
 
@@ -30,8 +40,10 @@ public class StartStopTest {
     final NettyRaftService raftService;
     final File logDirectory;
     final ServerState state;
+    final Replica self;
 
-    public Server(NettyRaftService raftService, File logDirectory, ServerState state) {
+    public Server(Replica self, NettyRaftService raftService, File logDirectory, ServerState state) {
+      this.self = self;
       this.raftService = raftService;
       this.logDirectory = logDirectory;
       this.state = state;
@@ -47,6 +59,11 @@ public class StartStopTest {
       raftService.stopAsync().awaitTerminated();
     }
 
+    public void bootstrap() {
+      Membership membership = Membership.newBuilder().addMembers(self.getKey()).build();
+      this.raftService.bootstrap(membership);
+    }
+    
     public void setState(String s) throws RaftException, InterruptedException {
       raftService.commit(s.getBytes(Charsets.UTF_8));
     }
@@ -71,11 +88,17 @@ public class StartStopTest {
 
     ServerState state = new ServerState();
 
-    NettyClusterConfig clusterConfig = NettyClusterConfig.from(replicas[0]);
+    Replica self = replicas[id];
+    ClusterConfig seedConfig = new ClusterConfig(self, Arrays.asList(self), ClusterConfig.DEFAULT_TIMEOUT);
 
-    NettyRaftService raftService = NettyRaftService.newBuilder(clusterConfig).logDir(logDir).timeout(500).build(state);
+    NettyRaftService.Builder raftServiceBuilder = NettyRaftService.newBuilder();
+    raftServiceBuilder.self = self;
+    raftServiceBuilder.seedConfig = seedConfig;
+    raftServiceBuilder.logDir = logDir;
+    raftServiceBuilder.stateMachine = state;
+    NettyRaftService raftService = raftServiceBuilder.build();
 
-    Server server = new Server(raftService, logDir, state);
+    Server server = new Server(self, raftService, logDir, state);
     allServers.add(server);
     return server;
   }
@@ -83,10 +106,14 @@ public class StartStopTest {
   @Test(timeout = 10000)
   public void canStartAndStop() throws Exception {
     {
-      Server server = buildServer(1);
+      Server server = buildServer(0);
 
       server.start();
 
+      Thread.sleep(500);
+      
+      server.bootstrap();
+      
       while (!server.isLeader()) {
         Thread.sleep(50);
       }
@@ -97,7 +124,7 @@ public class StartStopTest {
     }
 
     {
-      Server server = buildServer(1);
+      Server server = buildServer(0);
 
       server.start();
 
@@ -110,6 +137,8 @@ public class StartStopTest {
       server.stop();
     }
   }
+
+  
 
   @Before
   public void prepare() throws Exception {

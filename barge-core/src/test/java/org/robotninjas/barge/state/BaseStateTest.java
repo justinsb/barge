@@ -2,6 +2,7 @@ package org.robotninjas.barge.state;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,9 +10,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.robotninjas.barge.ClusterConfig;
-import org.robotninjas.barge.ClusterConfigStub;
+import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto;
@@ -26,9 +27,10 @@ import static org.robotninjas.barge.proto.RaftProto.RequestVote;
 
 public class BaseStateTest {
 
-  private final ClusterConfig config = ClusterConfigStub.getStub();
-  private final Replica self = config.local();
-  private final Replica candidate = config.getReplica("candidate");
+//  private final ClusterConfig config = ClusterConfigStub.getStub();
+//  private final Replica self = config.local();
+  private final Replica candidate = Replica.fromString("candidate");
+  private final Replica self = Replica.fromString("local");
   private @Mock RaftLog mockRaftLog;
 
   @Before
@@ -40,14 +42,14 @@ public class BaseStateTest {
     when(mockRaftLog.lastLogIndex()).thenReturn(2l);
     when(mockRaftLog.lastLogTerm()).thenReturn(2l);
     when(mockRaftLog.self()).thenReturn(self);
-    when(mockRaftLog.config()).thenReturn(config);
-    when(mockRaftLog.getReplica(anyString())).thenAnswer(new Answer<Replica>() {
-      @Override
-      public Replica answer(InvocationOnMock invocation) throws Throwable {
-        String arg = (String) invocation.getArguments()[0];
-        return config.getReplica(arg);
-      }
-    });
+//    when(mockRaftLog.config()).thenReturn(config);
+//    when(mockRaftLog.getReplica(anyString())).thenAnswer(new Answer<Replica>() {
+//      @Override
+//      public Replica answer(InvocationOnMock invocation) throws Throwable {
+//        String arg = (String) invocation.getArguments()[0];
+//        return config.getReplica(arg);
+//      }
+//    });
 
   }
 
@@ -100,7 +102,7 @@ public class BaseStateTest {
       .setTerm(2)
       .build();
 
-    Replica otherCandidate = config.getReplica("other");
+    Replica otherCandidate = Replica.fromString("other");
     when(mockRaftLog.votedFor()).thenReturn(Optional.of(otherCandidate));
     boolean shouldVote = state.shouldVoteFor(mockRaftLog, requestVote);
 
@@ -119,7 +121,7 @@ public class BaseStateTest {
       .setTerm(2)
       .build();
 
-    Replica otherCandidate = config.getReplica("other");
+    Replica otherCandidate = Replica.fromString("other");
     when(mockRaftLog.votedFor()).thenReturn(Optional.of(otherCandidate));
     boolean shouldVote = state.shouldVoteFor(mockRaftLog, requestVote);
 
@@ -138,7 +140,7 @@ public class BaseStateTest {
       .setTerm(2)
       .build();
 
-    Replica otherCandidate = config.getReplica("other");
+    Replica otherCandidate = Replica.fromString("other");
     when(mockRaftLog.votedFor()).thenReturn(Optional.of(otherCandidate));
     boolean shouldVote = state.shouldVoteFor(mockRaftLog, requestVote);
 
@@ -158,7 +160,7 @@ public class BaseStateTest {
       .setTerm(2)
       .build();
 
-    Replica otherCandidate = config.getReplica("other");
+    Replica otherCandidate = Replica.fromString("other");
     when(mockRaftLog.votedFor()).thenReturn(Optional.of(otherCandidate));
     boolean shouldVote = state.shouldVoteFor(mockRaftLog, requestVote);
 
@@ -195,6 +197,17 @@ public class BaseStateTest {
     @Nonnull
     @Override
     public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
+      return null;
+    }
+    
+    @Override
+    public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership, RaftMembership newMembership)
+        throws RaftException {
+      return null;
+    }
+    
+    @Override
+    public RaftClusterHealth getClusterHealth(RaftStateContext ctx) {
       return null;
     }
 

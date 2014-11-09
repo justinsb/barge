@@ -22,8 +22,12 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.jetlang.fibers.Fiber;
-import org.robotninjas.barge.RaftExecutor;
+
+import org.robotninjas.barge.BargeThreadPools;
+import org.robotninjas.barge.NoLeaderException;
+import org.robotninjas.barge.RaftClusterHealth;
+import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto.RequestVoteResponse;
@@ -35,8 +39,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.inject.Inject;
+
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.util.concurrent.Futures.addCallback;
@@ -51,17 +57,16 @@ class Candidate extends BaseState {
   private static final Logger LOGGER = LoggerFactory.getLogger(Candidate.class);
   private static final Random RAND = new Random(System.nanoTime());
 
-  private final Fiber scheduler;
+  private final ScheduledExecutorService scheduler;
   private final long electionTimeout;
   private final Client client;
   private DeadlineTimer electionTimer;
   private ListenableFuture<Boolean> electionResult;
 
   @Inject
-  Candidate(RaftLog log, @RaftExecutor Fiber scheduler,
-            @ElectionTimeout long electionTimeout, Client client) {
+  Candidate(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout, Client client) {
     super(CANDIDATE, log);
-    this.scheduler = scheduler;
+    this.scheduler = bargeThreadPools.getRaftScheduler();
     this.electionTimeout = electionTimeout;
     this.client = client;
   }
@@ -74,15 +79,29 @@ class Candidate extends BaseState {
     log.currentTerm(log.currentTerm() + 1);
     log.votedFor(Optional.of(log.self()));
 
+    ConfigurationState configurationState = ctx.getConfigurationState();
+    
+    if (configurationState.getAllVotingMembers().isEmpty()) {
+      // If there is nobody to vote in an election, we can't run it...
+      LOGGER.debug("No voting members; won't run election");
+      return;
+    }
+    
     LOGGER.debug("Election starting for term {}", log.currentTerm());
 
     List<ListenableFuture<RequestVoteResponse>> responses = Lists.newArrayList();
-    // Request votes from peers
-    for (Replica replica : log.members()) {
-      responses.add(sendVoteRequest(ctx, replica));
+    Replica self = configurationState.self();
+    LOGGER.info("Starting election with members: {}", configurationState.getAllVotingMembers());
+    for (Replica replica : configurationState.getAllVotingMembers()) {
+      if (replica == self) {
+        // We always vote for ourselves
+        responses.add(Futures.immediateFuture(RequestVoteResponse.newBuilder().setVoteGranted(true).buildPartial()));
+      } else {
+        ListenableFuture<RequestVoteResponse> response = sendVoteRequest(ctx, replica);
+        Futures.addCallback(response, checkTerm(ctx));
+        responses.add(response);
+      }
     }
-    // We always vote for ourselves
-    responses.add(Futures.immediateFuture(RequestVoteResponse.newBuilder().setVoteGranted(true).buildPartial()));
 
     electionResult = majorityResponse(responses, voteGranted());
 
@@ -118,18 +137,23 @@ class Candidate extends BaseState {
 
   @Override
   public void destroy(RaftStateContext ctx) {
-    electionResult.cancel(false);
-    electionTimer.cancel();
+    if (electionResult != null) {
+      electionResult.cancel(false);
+    }
+    if (electionTimer != null) {
+      electionTimer.cancel();
+    }
   }
 
   @VisibleForTesting
   ListenableFuture<RequestVoteResponse> sendVoteRequest(RaftStateContext ctx, Replica replica) {
-
+    ConfigurationState configurationState = ctx.getConfigurationState();
+    
     RaftLog log = getLog();
     RequestVote request =
       RequestVote.newBuilder()
         .setTerm(log.currentTerm())
-        .setCandidateId(log.self().toString())
+        .setCandidateId(configurationState.self().toString())
         .setLastLogIndex(log.lastLogIndex())
         .setLastLogTerm(log.lastLogTerm())
         .build();
@@ -154,5 +178,26 @@ class Candidate extends BaseState {
       public void onFailure(Throwable t) {}
     };
   }
+  
+  @Override
+  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership,  RaftMembership newMembership) throws RaftException {
+    throw new NoLeaderException();
+  }
 
+  @Override
+  public RaftClusterHealth getClusterHealth(@Nonnull RaftStateContext ctx) throws NoLeaderException {
+    throw new NoLeaderException();
+  }
+
+  @Nonnull
+  @Override
+  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
+    throw new NoLeaderException();
+  }
+  
+  @Override
+  public String toString() {
+    return "Candidate [" + log.getName() + " @ " + log.self() + "]";
+  }
+  
 }

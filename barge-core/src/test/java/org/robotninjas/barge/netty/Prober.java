@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.robotninjas.barge;
+package org.robotninjas.barge.netty;
 
 import java.util.concurrent.Callable;
 

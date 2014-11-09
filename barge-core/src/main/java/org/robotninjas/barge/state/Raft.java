@@ -43,7 +43,7 @@ public interface Raft {
   @Nonnull
   StateType type();
 
-  public static enum StateType {START, FOLLOWER, CANDIDATE, LEADER, STOPPED}
+  public static enum StateType {START, FOLLOWER, CANDIDATE, LEADER, STOPPED }
 
   void stop();
 }

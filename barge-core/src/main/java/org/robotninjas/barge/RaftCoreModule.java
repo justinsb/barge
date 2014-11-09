@@ -17,66 +17,61 @@
 package org.robotninjas.barge;
 
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.inject.AbstractModule;
 import com.google.inject.PrivateModule;
-import org.jetlang.fibers.Fiber;
-import org.jetlang.fibers.PoolFiberFactory;
+
 import org.robotninjas.barge.log.LogModule;
+import org.robotninjas.barge.netty.rpc.RpcModule;
 import org.robotninjas.barge.rpc.Client;
 import org.robotninjas.barge.state.Raft;
 import org.robotninjas.barge.state.StateModule;
 
 import javax.annotation.concurrent.Immutable;
+
 import java.io.File;
 import java.util.concurrent.Executor;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 @Immutable
-public class RaftCoreModule extends PrivateModule {
+public class RaftCoreModule extends AbstractModule {
 
-  private static final long DEFAULT_TIMEOUT = 225;
-
-  private final long timeout;
-  private final ClusterConfig config;
+  private final Replica self;
   private final File logDir;
   private final StateMachine stateMachine;
-  private final Executor executor;
+//  private final Executor executor;
+  private final ClusterConfig seedConfig;
 
   private RaftCoreModule(Builder builder) {
-    this.config = builder.config.get();
-    this.timeout = builder.timeout;
-    this.logDir = builder.logDir.get();
-    this.stateMachine = builder.stateMachine.get();
-    this.executor = builder.executor.or(newCachedThreadPool());
+    this.self = builder.self;
+    this.seedConfig = builder.seedConfig;
+    this.logDir = builder.logDir;
+    this.stateMachine = builder.stateMachine;
+//    this.executor = builder.executor.or(newCachedThreadPool());
   }
 
   @Override
   protected void configure() {
 
-    install(new StateModule(timeout));
+    install(new StateModule(self, seedConfig));
 
-    PoolFiberFactory fiberFactory = new PoolFiberFactory(executor);
+//    PoolFiberFactory fiberFactory = new PoolFiberFactory(executor);
 
-    Fiber raftFiber = fiberFactory.create(new BatchExecutor());
-    raftFiber.start();
-    bind(Fiber.class)
-        .annotatedWith(RaftExecutor.class)
-        .toInstance(raftFiber);
 
-    Fiber stateMachineFiber = fiberFactory.create(new BatchExecutor());
-    stateMachineFiber.start();
+    // Fiber stateMachineFiber = fiberFactory.create(new BatchExecutor());
+    // stateMachineFiber.start();
 
-    install(new LogModule(logDir, stateMachine, stateMachineFiber));
+    install(new LogModule(logDir, stateMachine));
+    
+//    bind(ClusterConfig.class).toInstance(config);
 
-    bind(ClusterConfig.class)
-        .toInstance(config);
+    bind(Client.class).asEagerSingleton();
 
-    bind(Client.class)
-        .asEagerSingleton();
-
-    expose(Raft.class);
+//    expose(Raft.class);
 
   }
 
@@ -86,46 +81,53 @@ public class RaftCoreModule extends PrivateModule {
 
   public static class Builder {
 
-    private long timeout = DEFAULT_TIMEOUT;
-    private Optional<Executor> executor = Optional.absent();
-    private Optional<ClusterConfig> config = Optional.absent();
-    private Optional<StateMachine> stateMachine = Optional.absent();
-    private Optional<File> logDir = Optional.absent();
+    public ClusterConfig seedConfig;
+//    public Optional<Executor> executor = Optional.absent();
+    public Replica self;
+    public StateMachine stateMachine;
+    public File logDir;
+    public Optional<ListeningExecutorService> stateMachineExecutor = Optional.absent();
 
-    private Builder() {
-
-    }
-
-    public Builder withTimeout(long timeout) {
-      this.timeout = timeout;
-      return this;
-    }
-
-    public Builder withExecutor(Executor executor) {
-      this.executor = Optional.of(executor);
-      return this;
-    }
-
-    public Builder withConfig(ClusterConfig config) {
-      this.config = Optional.of(config);
-      return this;
-    }
-
-    public Builder withStateMachine(StateMachine stateMachine) {
-      this.stateMachine = Optional.of(stateMachine);
-      return this;
-    }
-
-    public Builder withLogDir(File logDir) {
-      this.logDir = Optional.of(logDir);
-      return this;
-    }
+//    private Builder() {
+//
+//    }
+//
+//    public Builder withTimeout(long timeout) {
+//      this.timeout = timeout;
+//      return this;
+//    }
+//
+//    public Builder withExecutor(Executor executor) {
+//      this.executor = Optional.of(executor);
+//      return this;
+//    }
+//
+////    public Builder withConfig(ClusterConfig config) {
+////      this.config = Optional.of(config);
+////      return this;
+////    }
+//
+//    public Builder withSelf(ClusterConfig config) {
+//      this.config = Optional.of(config);
+//      return this;
+//    }
+//
+//    public Builder withStateMachine(StateMachine stateMachine) {
+//      this.stateMachine = Optional.of(stateMachine);
+//      return this;
+//    }
+//
+//    public Builder withLogDir(File logDir) {
+//      this.logDir = Optional.of(logDir);
+//      return this;
+//    }
 
     public RaftCoreModule build() {
-      checkState(config.isPresent());
-      checkState(stateMachine.isPresent());
-      checkState(logDir.isPresent());
-      checkArgument(timeout > 0);
+      checkNotNull(seedConfig);
+      checkNotNull(self);
+      checkNotNull(stateMachine);
+      checkNotNull(logDir);
+//      checkArgument(timeout > 0);
       return new RaftCoreModule(this);
     }
 

@@ -5,10 +5,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.inject.Inject;
+
+import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.StateMachine;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -24,14 +27,14 @@ class StateMachineProxy {
 
   private final int BATCH_SIZE = 10;
 
-  private final Executor executor;
+  private final Executor stateMachineExecutor;
   private final StateMachine stateMachine;
   private final LinkedBlockingQueue<Runnable> operations;
   private final AtomicBoolean running;
 
   @Inject
-  StateMachineProxy(@Nonnull @StateExecutor Executor executor, @Nonnull StateMachine stateMachine) {
-    this.executor = checkNotNull(executor);
+  StateMachineProxy(@Nonnull BargeThreadPools bargeThreadPools, @Nonnull StateMachine stateMachine) {
+    this.stateMachineExecutor = checkNotNull(bargeThreadPools.getStateMachineExecutor());
     this.stateMachine = checkNotNull(stateMachine);
     this.operations = Queues.newLinkedBlockingQueue();
     this.running = new AtomicBoolean(false);
@@ -42,7 +45,7 @@ class StateMachineProxy {
     ListenableFutureTask<V> operation =
         ListenableFutureTask.create(runnable);
 
-    executor.execute(operation);
+    stateMachineExecutor.execute(operation);
 
     return operation;
 
