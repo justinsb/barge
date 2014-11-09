@@ -116,6 +116,7 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).setState(any(Candidate.class), eq(Raft.StateType.FOLLOWER));
     verify(mockRaftStateContext, times(1)).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
+    verify(mockRaftStateContext, times(2)).type();
     verifyNoMoreInteractions(mockRaftStateContext);
     
     verifyZeroInteractions(mockRaftClientManager);
@@ -220,6 +221,7 @@ public class CandidateTest {
     verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.FOLLOWER));
     verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
+    verify(mockRaftStateContext, times(2)).type();
     verifyNoMoreInteractions(mockRaftStateContext);
     
     verifyZeroInteractions(mockRaftClientManager);
