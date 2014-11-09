@@ -31,7 +31,7 @@ import static org.robotninjas.barge.proto.RaftProto.RequestVoteResponse;
 class RaftPredicates {
 
   @Nonnull
-  static Predicate<AppendEntriesResponse> appendSuccessul() {
+  static Predicate<AppendEntriesResponse> appendSuccessful() {
     return AppendSuccessPredicate.Success;
   }
 
