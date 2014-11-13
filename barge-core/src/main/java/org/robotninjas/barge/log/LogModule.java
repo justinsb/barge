@@ -25,6 +25,7 @@ import journal.io.api.Journal;
 import journal.io.api.JournalBuilder;
 
 import org.robotninjas.barge.StateMachine;
+import org.robotninjas.barge.log.journalio.JournalRaftLog;
 
 import javax.annotation.Nonnull;
 
@@ -50,8 +51,8 @@ public class LogModule extends AbstractModule {
 
     bind(StateMachine.class).toInstance(stateMachine);
     bind(StateMachineProxy.class);
-    bind(RaftLog.class).asEagerSingleton();
-    //expose(RaftLog.class);
+    bind(RaftLog.class).to(JournalRaftLog.class).asEagerSingleton();
+    // expose(RaftLog.class);
   }
 
   @Nonnull
@@ -66,11 +67,11 @@ public class LogModule extends AbstractModule {
       Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
         @Override
         public void run() {
-          //noinspection EmptyCatchBlock
+          // noinspection EmptyCatchBlock
           try {
             journal.close();
           } catch (IOException e) {
-            //TODO log it
+            // TODO log it
           }
         }
       }));
@@ -84,6 +85,5 @@ public class LogModule extends AbstractModule {
     }
 
   }
-
 
 }
