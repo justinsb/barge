@@ -1,4 +1,4 @@
-package org.robotninjas.barge.log;
+package org.robotninjas.barge.log.journalio;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;

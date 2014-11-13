@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @ThreadSafe
-class StateMachineProxy {
+public class StateMachineProxy {
 
   private final int BATCH_SIZE = 10;
 

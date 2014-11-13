@@ -24,7 +24,7 @@ public interface StateMachine {
   Object applyOperation(@Nonnull ByteBuffer entry);
 
 //  void takeSnapshot(@Nonnull OutputStream snapshot);
-//
+
 //  void installSnapshot(@Nonnull InputStream snapshot);
 
 }
