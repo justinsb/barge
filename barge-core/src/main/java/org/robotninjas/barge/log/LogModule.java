@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +18,6 @@
 package org.robotninjas.barge.log;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
@@ -26,18 +26,20 @@ import journal.io.api.JournalBuilder;
 
 import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.log.journalio.JournalRaftLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Executor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Throwables.propagate;
 
 public class LogModule extends AbstractModule {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(JournalRaftLog.class);
+	 
   private final File logDirectory;
   private final StateMachine stateMachine;
 
@@ -67,11 +69,10 @@ public class LogModule extends AbstractModule {
       Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
         @Override
         public void run() {
-          // noinspection EmptyCatchBlock
           try {
             journal.close();
           } catch (IOException e) {
-            // TODO log it
+        	  LOGGER.error("Error closing journal", e);
           }
         }
       }));
