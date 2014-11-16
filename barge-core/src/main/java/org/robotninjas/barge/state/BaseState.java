@@ -2,7 +2,11 @@ package org.robotninjas.barge.state;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.ListenableFuture;
 
+import org.robotninjas.barge.RaftClusterHealth;
+import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.slf4j.Logger;
@@ -16,39 +20,38 @@ import static org.robotninjas.barge.proto.RaftProto.*;
 import static org.robotninjas.barge.state.Raft.StateType.*;
 import static org.robotninjas.barge.state.RaftStateContext.StateType;
 
-public abstract class BaseState implements State {
+public abstract class BaseState {
   private static final Logger LOGGER = LoggerFactory.getLogger(BaseState.class);
 
   private final StateType type;
-  protected final RaftLog log;
+  protected final RaftStateContext ctx;
   protected Optional<Replica> leader;
 
-  protected BaseState(@Nullable StateType type, @Nonnull RaftLog log) {
-    this.log = checkNotNull(log);
-    this.type = type;
+  protected BaseState(@Nonnull StateType type, @Nonnull RaftStateContext ctx) {
+    this.ctx = checkNotNull(ctx);
+    this.type = checkNotNull(type);
     this.leader = Optional.absent();
   }
 
-  @Nullable
-  @Override
   public StateType type() {
     return type;
   }
 
   protected RaftLog getLog() {
-    return log;
+    return ctx.getLog();
   }
 
-  @Override
-  public void destroy(RaftStateContext ctx) {
+  public void destroy() {
   }
 
   @VisibleForTesting
-  boolean shouldVoteFor(@Nonnull RaftLog log, @Nonnull RequestVote request) {
+  boolean shouldVoteFor(@Nonnull RequestVote request) {
 
-    //  If votedFor is null or candidateId, and candidate's log is at 
-    //  least as up-to-date as receiver’s log, grant vote (§5.2, §5.4)
-      
+    RaftLog log = getLog();
+
+    // If votedFor is null or candidateId, and candidate's log is at
+    // least as up-to-date as receiver’s log, grant vote (§5.2, §5.4)
+
     Optional<Replica> votedFor = log.votedFor();
     Replica candidate = Replica.fromString(request.getCandidateId());
 
@@ -57,9 +60,9 @@ public abstract class BaseState implements State {
         return false;
       }
     }
-    
+
     assert !votedFor.isPresent() || votedFor.get().equals(candidate);
-    
+
     boolean logIsComplete;
     if (request.getLastLogTerm() > log.lastLogTerm()) {
       logIsComplete = true;
@@ -72,12 +75,12 @@ public abstract class BaseState implements State {
     } else {
       logIsComplete = false;
     }
-    
+
     if (logIsComplete) {
       // Requestor has an up-to-date log, we haven't voted for anyone else => OK
       return true;
     }
-   
+
     return false;
   }
 
@@ -86,10 +89,11 @@ public abstract class BaseState implements State {
   }
 
   @Nonnull
-  @Override
-  public AppendEntriesResponse appendEntries(@Nonnull RaftStateContext ctx, @Nonnull AppendEntries request) {
-    LOGGER.debug("AppendEntries prev index {}, prev term {}, num entries {}, term {}",
-        request.getPrevLogIndex(), request.getPrevLogTerm(), request.getEntriesCount(), request.getTerm());
+  public AppendEntriesResponse appendEntries(@Nonnull AppendEntries request) {
+    LOGGER.debug("AppendEntries prev index {}, prev term {}, num entries {}, term {}", request.getPrevLogIndex(),
+        request.getPrevLogTerm(), request.getEntriesCount(), request.getTerm());
+
+    RaftLog log = getLog();
 
     boolean success = false;
 
@@ -117,23 +121,21 @@ public abstract class BaseState implements State {
 
     }
 
-    return AppendEntriesResponse.newBuilder()
-        .setTerm(log.currentTerm())
-        .setSuccess(success)
-        .setLastLogIndex(log.lastLogIndex())
-        .build();
+    return AppendEntriesResponse.newBuilder().setTerm(log.currentTerm()).setSuccess(success)
+        .setLastLogIndex(log.lastLogIndex()).build();
 
   }
 
   @Nonnull
-  @Override
-  public RequestVoteResponse requestVote(@Nonnull RaftStateContext ctx, @Nonnull RequestVote request) {
+  public RequestVoteResponse requestVote(@Nonnull RequestVote request) {
+
+    RaftLog log = getLog();
 
     boolean voteGranted;
 
     long term = request.getTerm();
     long currentTerm = log.currentTerm();
-    
+
     LOGGER.debug("RequestVote received for term {}", term);
 
     if (term < currentTerm) {
@@ -148,13 +150,13 @@ public abstract class BaseState implements State {
         log.currentTerm(term);
 
         if (ctx.type().equals(LEADER) || ctx.type().equals(CANDIDATE)) {
-          ctx.setState(this, ctx.buildStateFollower(Optional.<Replica>absent()));
+          ctx.setState(this, ctx.buildStateFollower(Optional.<Replica> absent()));
         }
 
       }
 
       Replica candidate = Replica.fromString(request.getCandidateId());
-      voteGranted = shouldVoteFor(log, request);
+      voteGranted = shouldVoteFor(request);
 
       if (voteGranted) {
         log.votedFor(Optional.of(candidate));
@@ -162,37 +164,44 @@ public abstract class BaseState implements State {
 
     }
 
-    return RequestVoteResponse.newBuilder()
-        .setTerm(currentTerm)
-        .setVoteGranted(voteGranted)
-        .build();
+    return RequestVoteResponse.newBuilder().setTerm(currentTerm).setVoteGranted(voteGranted).build();
 
   }
-//
-////  @Nonnull
-////  @Override
-////  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
-////    StateType stateType = ctx.type();
-////    Preconditions.checkNotNull(stateType);
-////    if (stateType.equals(FOLLOWER)) {
-////      throw new NotLeaderException(leader.get());
-////    } else if (stateType.equals(CANDIDATE)) {
-////      throw new NoLeaderException();
-////    }
-////    return Futures.immediateCancelledFuture();
-////  }
-  
-  @Override
-  public void doStop(RaftStateContext ctx) {
+
+  //
+  // // @Nonnull
+  // // @Override
+  // // public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws
+  // RaftException {
+  // // StateType stateType = ctx.type();
+  // // Preconditions.checkNotNull(stateType);
+  // // if (stateType.equals(FOLLOWER)) {
+  // // throw new NotLeaderException(leader.get());
+  // // } else if (stateType.equals(CANDIDATE)) {
+  // // throw new NoLeaderException();
+  // // }
+  // // return Futures.immediateCancelledFuture();
+  // // }
+
+  public void doStop() {
     ctx.setState(this, ctx.buildStateStopped());
   }
 
   @Override
   public String toString() {
+    RaftLog log = getLog();
+
     return type.toString() + " [" + log.getName() + " @ " + log.self() + "]";
   }
-   
 
-  
+  public void init() {
 
+  }
+
+  public abstract ListenableFuture<Object> commitOperation(byte[] operation) throws RaftException;
+
+  public abstract ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, RaftMembership newMembership)
+      throws RaftException;
+
+  public abstract RaftClusterHealth getClusterHealth() throws RaftException;
 }

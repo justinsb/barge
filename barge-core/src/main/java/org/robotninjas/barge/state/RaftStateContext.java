@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +30,7 @@ import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
+import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 import org.robotninjas.barge.rpc.RaftClientManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.robotninjas.barge.proto.RaftProto.*;
@@ -55,7 +58,7 @@ public class RaftStateContext implements Raft {
   private final Executor executor;
   private final Set<StateTransitionListener> listeners = Sets.newConcurrentHashSet();
 
-  private volatile State state;
+  private volatile BaseState state;
 
   private boolean stop;
 
@@ -68,7 +71,7 @@ public class RaftStateContext implements Raft {
   private final BargeThreadPools threadPools;
 
   private final Random random = new Random();
-  
+
   @Inject
   RaftStateContext(RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState,
       BargeThreadPools threadPools) {
@@ -104,7 +107,6 @@ public class RaftStateContext implements Raft {
 
   }
 
-
   @Override
   @Nonnull
   public RequestVoteResponse requestVote(@Nonnull final RequestVote request) {
@@ -115,7 +117,7 @@ public class RaftStateContext implements Raft {
         .create(new Callable<RequestVoteResponse>() {
           @Override
           public RequestVoteResponse call() throws Exception {
-            return state.requestVote(RaftStateContext.this, request);
+            return state.requestVote(request);
           }
         });
 
@@ -139,7 +141,7 @@ public class RaftStateContext implements Raft {
         .create(new Callable<AppendEntriesResponse>() {
           @Override
           public AppendEntriesResponse call() throws Exception {
-            return state.appendEntries(RaftStateContext.this, request);
+            return state.appendEntries(request);
           }
         });
 
@@ -163,7 +165,7 @@ public class RaftStateContext implements Raft {
         .create(new Callable<ListenableFuture<Object>>() {
           @Override
           public ListenableFuture<Object> call() throws Exception {
-            return state.commitOperation(RaftStateContext.this, op);
+            return state.commitOperation(op);
           }
         });
 
@@ -178,28 +180,29 @@ public class RaftStateContext implements Raft {
       @Nonnull RaftMembership newMembership) throws RaftException {
     checkNotNull(oldMembership);
     checkNotNull(newMembership);
-    return state.setConfiguration(this, oldMembership, newMembership);
+    return state.setConfiguration(oldMembership, newMembership);
   }
 
-  public synchronized void setState(State oldState, @Nonnull State newState) {
+  public synchronized void setState(BaseState oldState, @Nonnull BaseState newState) {
 
     if (this.state != oldState) {
-      LOGGER.info("Previous state was not correct (transitioning to {}). Expected {}, was {}", newState, state, oldState);
+      LOGGER.info("Previous state was not correct (transitioning to {}). Expected {}, was {}", newState, state,
+          oldState);
       notifiesInvalidTransition(oldState);
       throw new IllegalStateException();
     }
 
-//    StateType newState;
+    // StateType newState;
     if (stop && state.type() != StateType.STOPPED) {
       newState = buildStateStopped();
       LOGGER.info("Service stopping; replaced state with {}", newState);
-//    } else {
-//      newState = checkNotNull(state);
+      // } else {
+      // newState = checkNotNull(state);
     }
 
     LOGGER.info("Transition: old state: {}, new state: {}", this.state, newState);
     if (this.state != null) {
-      this.state.destroy(this);
+      this.state.destroy();
     }
 
     this.state = checkNotNull(newState);
@@ -209,29 +212,29 @@ public class RaftStateContext implements Raft {
     notifiesChangeState(oldState);
 
     if (state != null) {
-      state.init(this);
+      state.init();
     }
 
-//    if (this.state.type() == StateType.LEADER) {
-//      if (log.isEmpty()) {
-//        RaftMembership initialMembership = getConfigurationState().getClusterMembership();
-//        try {
-//          state.setConfiguration(this, null, initialMembership);
-//        } catch (RaftException e) {
-//          LOGGER.error("Error during bootstrap", e);
-//          throw new IllegalStateException("Error during bootstrap", e);
-//        }
-//      }
-//    }
+    // if (this.state.type() == StateType.LEADER) {
+    // if (log.isEmpty()) {
+    // RaftMembership initialMembership = getConfigurationState().getClusterMembership();
+    // try {
+    // state.setConfiguration(this, null, initialMembership);
+    // } catch (RaftException e) {
+    // LOGGER.error("Error during bootstrap", e);
+    // throw new IllegalStateException("Error during bootstrap", e);
+    // }
+    // }
+    // }
   }
 
-  private void notifiesInvalidTransition(State oldState) {
+  private void notifiesInvalidTransition(BaseState oldState) {
     for (StateTransitionListener listener : listeners) {
       listener.invalidTransition(this, state.type(), oldState == null ? null : oldState.type());
     }
   }
 
-  private void notifiesChangeState(State oldState) {
+  private void notifiesChangeState(BaseState oldState) {
     for (StateTransitionListener listener : listeners) {
       listener.changeState(this, oldState == null ? null : oldState.type(), state.type());
     }
@@ -251,7 +254,7 @@ public class RaftStateContext implements Raft {
   public synchronized void stop() {
     stop = true;
     if (this.state != null) {
-      this.state.doStop(this);
+      this.state.doStop();
     }
   }
 
@@ -286,7 +289,7 @@ public class RaftStateContext implements Raft {
   }
 
   public RaftClusterHealth getClusterHealth() throws RaftException {
-    return state.getClusterHealth(this);
+    return state.getClusterHealth();
   }
 
   public RaftClientManager getClientManager() {
@@ -299,23 +302,23 @@ public class RaftStateContext implements Raft {
   }
 
   Follower buildStateFollower(Optional<Replica> leader) {
-    return new Follower(log, threadPools, configurationState.getElectionTimeout() * 3, leader);
+    return new Follower(this, leader);
   }
 
   Start buildStateStart() {
-    return new Start(log);
+    return new Start(this);
   }
 
   Stopped buildStateStopped() {
-    return new Stopped(log);
+    return new Stopped(this);
   }
 
   Candidate buildStateCandidate() {
-    return new Candidate(log, threadPools, configurationState.getElectionTimeout() * 3, clientManager);
+    return new Candidate(this);
   }
-  
+
   Leader buildStateLeader() {
-    return new Leader(log, threadPools, configurationState.getElectionTimeout());
+    return new Leader(this);
   }
 
   public Replica self() {
@@ -324,5 +327,17 @@ public class RaftStateContext implements Raft {
 
   Random random() {
     return random;
+  }
+
+  ScheduledExecutorService getRaftScheduler() {
+    return threadPools.getRaftScheduler();
+  }
+
+  RaftLog getLog() {
+    return log;
+  }
+
+  ConfigTimeouts getTimeouts() {
+    return configurationState.getTimeouts();
   }
 }

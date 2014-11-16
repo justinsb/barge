@@ -8,15 +8,15 @@ public final class RaftEntry {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface MembershipOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface MembershipOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Membership)
+      com.google.protobuf.MessageOrBuilder {
 
-    // repeated string members = 1;
     /**
      * <code>repeated string members = 1;</code>
      */
-    java.util.List<java.lang.String>
-    getMembersList();
+    com.google.protobuf.ProtocolStringList
+        getMembersList();
     /**
      * <code>repeated string members = 1;</code>
      */
@@ -31,12 +31,11 @@ public final class RaftEntry {
     com.google.protobuf.ByteString
         getMembersBytes(int index);
 
-    // repeated string proposed_members = 2;
     /**
      * <code>repeated string proposed_members = 2;</code>
      */
-    java.util.List<java.lang.String>
-    getProposedMembersList();
+    com.google.protobuf.ProtocolStringList
+        getProposedMembersList();
     /**
      * <code>repeated string proposed_members = 2;</code>
      */
@@ -55,8 +54,9 @@ public final class RaftEntry {
    * Protobuf type {@code Membership}
    */
   public static final class Membership extends
-      com.google.protobuf.GeneratedMessage
-      implements MembershipOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Membership)
+      MembershipOrBuilder {
     // Use Membership.newBuilder() to construct.
     private Membership(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -103,19 +103,21 @@ public final class RaftEntry {
               break;
             }
             case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 members_ = new com.google.protobuf.LazyStringArrayList();
                 mutable_bitField0_ |= 0x00000001;
               }
-              members_.add(input.readBytes());
+              members_.add(bs);
               break;
             }
             case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
                 proposedMembers_ = new com.google.protobuf.LazyStringArrayList();
                 mutable_bitField0_ |= 0x00000002;
               }
-              proposedMembers_.add(input.readBytes());
+              proposedMembers_.add(bs);
               break;
             }
           }
@@ -127,10 +129,10 @@ public final class RaftEntry {
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-          members_ = new com.google.protobuf.UnmodifiableLazyStringList(members_);
+          members_ = members_.getUnmodifiableView();
         }
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-          proposedMembers_ = new com.google.protobuf.UnmodifiableLazyStringList(proposedMembers_);
+          proposedMembers_ = proposedMembers_.getUnmodifiableView();
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -163,13 +165,12 @@ public final class RaftEntry {
       return PARSER;
     }
 
-    // repeated string members = 1;
     public static final int MEMBERS_FIELD_NUMBER = 1;
     private com.google.protobuf.LazyStringList members_;
     /**
      * <code>repeated string members = 1;</code>
      */
-    public java.util.List<java.lang.String>
+    public com.google.protobuf.ProtocolStringList
         getMembersList() {
       return members_;
     }
@@ -193,13 +194,12 @@ public final class RaftEntry {
       return members_.getByteString(index);
     }
 
-    // repeated string proposed_members = 2;
     public static final int PROPOSED_MEMBERS_FIELD_NUMBER = 2;
     private com.google.protobuf.LazyStringList proposedMembers_;
     /**
      * <code>repeated string proposed_members = 2;</code>
      */
-    public java.util.List<java.lang.String>
+    public com.google.protobuf.ProtocolStringList
         getProposedMembersList() {
       return proposedMembers_;
     }
@@ -230,7 +230,8 @@ public final class RaftEntry {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       memoizedIsInitialized = 1;
       return true;
@@ -354,8 +355,9 @@ public final class RaftEntry {
      * Protobuf type {@code Membership}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.RaftEntry.MembershipOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Membership)
+        org.robotninjas.barge.proto.RaftEntry.MembershipOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.RaftEntry.internal_static_Membership_descriptor;
@@ -420,14 +422,12 @@ public final class RaftEntry {
         org.robotninjas.barge.proto.RaftEntry.Membership result = new org.robotninjas.barge.proto.RaftEntry.Membership(this);
         int from_bitField0_ = bitField0_;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          members_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              members_);
+          members_ = members_.getUnmodifiableView();
           bitField0_ = (bitField0_ & ~0x00000001);
         }
         result.members_ = members_;
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          proposedMembers_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              proposedMembers_);
+          proposedMembers_ = proposedMembers_.getUnmodifiableView();
           bitField0_ = (bitField0_ & ~0x00000002);
         }
         result.proposedMembers_ = proposedMembers_;
@@ -493,7 +493,6 @@ public final class RaftEntry {
       }
       private int bitField0_;
 
-      // repeated string members = 1;
       private com.google.protobuf.LazyStringList members_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureMembersIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -504,9 +503,9 @@ public final class RaftEntry {
       /**
        * <code>repeated string members = 1;</code>
        */
-      public java.util.List<java.lang.String>
+      public com.google.protobuf.ProtocolStringList
           getMembersList() {
-        return java.util.Collections.unmodifiableList(members_);
+        return members_.getUnmodifiableView();
       }
       /**
        * <code>repeated string members = 1;</code>
@@ -559,7 +558,8 @@ public final class RaftEntry {
       public Builder addAllMembers(
           java.lang.Iterable<java.lang.String> values) {
         ensureMembersIsMutable();
-        super.addAll(values, members_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, members_);
         onChanged();
         return this;
       }
@@ -586,7 +586,6 @@ public final class RaftEntry {
         return this;
       }
 
-      // repeated string proposed_members = 2;
       private com.google.protobuf.LazyStringList proposedMembers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureProposedMembersIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
@@ -597,9 +596,9 @@ public final class RaftEntry {
       /**
        * <code>repeated string proposed_members = 2;</code>
        */
-      public java.util.List<java.lang.String>
+      public com.google.protobuf.ProtocolStringList
           getProposedMembersList() {
-        return java.util.Collections.unmodifiableList(proposedMembers_);
+        return proposedMembers_.getUnmodifiableView();
       }
       /**
        * <code>repeated string proposed_members = 2;</code>
@@ -652,7 +651,8 @@ public final class RaftEntry {
       public Builder addAllProposedMembers(
           java.lang.Iterable<java.lang.String> values) {
         ensureProposedMembersIsMutable();
-        super.addAll(values, proposedMembers_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, proposedMembers_);
         onChanged();
         return this;
       }
@@ -690,10 +690,10 @@ public final class RaftEntry {
     // @@protoc_insertion_point(class_scope:Membership)
   }
 
-  public interface EntryOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface EntryOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Entry)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 term = 1;
     /**
      * <code>required int64 term = 1;</code>
      */
@@ -703,7 +703,6 @@ public final class RaftEntry {
      */
     long getTerm();
 
-    // optional bytes command = 2;
     /**
      * <code>optional bytes command = 2;</code>
      */
@@ -713,7 +712,6 @@ public final class RaftEntry {
      */
     com.google.protobuf.ByteString getCommand();
 
-    // optional .Membership membership = 3;
     /**
      * <code>optional .Membership membership = 3;</code>
      */
@@ -731,8 +729,9 @@ public final class RaftEntry {
    * Protobuf type {@code Entry}
    */
   public static final class Entry extends
-      com.google.protobuf.GeneratedMessage
-      implements EntryOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Entry)
+      EntryOrBuilder {
     // Use Entry.newBuilder() to construct.
     private Entry(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -841,7 +840,6 @@ public final class RaftEntry {
     }
 
     private int bitField0_;
-    // required int64 term = 1;
     public static final int TERM_FIELD_NUMBER = 1;
     private long term_;
     /**
@@ -857,7 +855,6 @@ public final class RaftEntry {
       return term_;
     }
 
-    // optional bytes command = 2;
     public static final int COMMAND_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString command_;
     /**
@@ -873,7 +870,6 @@ public final class RaftEntry {
       return command_;
     }
 
-    // optional .Membership membership = 3;
     public static final int MEMBERSHIP_FIELD_NUMBER = 3;
     private org.robotninjas.barge.proto.RaftEntry.Membership membership_;
     /**
@@ -903,7 +899,8 @@ public final class RaftEntry {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTerm()) {
         memoizedIsInitialized = 0;
@@ -1028,8 +1025,9 @@ public final class RaftEntry {
      * Protobuf type {@code Entry}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.RaftEntry.EntryOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Entry)
+        org.robotninjas.barge.proto.RaftEntry.EntryOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.RaftEntry.internal_static_Entry_descriptor;
@@ -1173,7 +1171,6 @@ public final class RaftEntry {
       }
       private int bitField0_;
 
-      // required int64 term = 1;
       private long term_ ;
       /**
        * <code>required int64 term = 1;</code>
@@ -1206,7 +1203,6 @@ public final class RaftEntry {
         return this;
       }
 
-      // optional bytes command = 2;
       private com.google.protobuf.ByteString command_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>optional bytes command = 2;</code>
@@ -1242,7 +1238,6 @@ public final class RaftEntry {
         return this;
       }
 
-      // optional .Membership membership = 3;
       private org.robotninjas.barge.proto.RaftEntry.Membership membership_ = org.robotninjas.barge.proto.RaftEntry.Membership.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.robotninjas.barge.proto.RaftEntry.Membership, org.robotninjas.barge.proto.RaftEntry.Membership.Builder, org.robotninjas.barge.proto.RaftEntry.MembershipOrBuilder> membershipBuilder_;
@@ -1351,7 +1346,7 @@ public final class RaftEntry {
         if (membershipBuilder_ == null) {
           membershipBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               org.robotninjas.barge.proto.RaftEntry.Membership, org.robotninjas.barge.proto.RaftEntry.Membership.Builder, org.robotninjas.barge.proto.RaftEntry.MembershipOrBuilder>(
-                  membership_,
+                  getMembership(),
                   getParentForChildren(),
                   isClean());
           membership_ = null;
@@ -1370,16 +1365,678 @@ public final class RaftEntry {
     // @@protoc_insertion_point(class_scope:Entry)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
+  public interface ConfigTimeoutsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:ConfigTimeouts)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional int64 candidate_election_timeout = 1;</code>
+     *
+     * <pre>
+     * Time to wait for election as a candidate, before giving up
+     * </pre>
+     */
+    boolean hasCandidateElectionTimeout();
+    /**
+     * <code>optional int64 candidate_election_timeout = 1;</code>
+     *
+     * <pre>
+     * Time to wait for election as a candidate, before giving up
+     * </pre>
+     */
+    long getCandidateElectionTimeout();
+
+    /**
+     * <code>optional int64 follower_election_start_delay = 2;</code>
+     *
+     * <pre>
+     * Time to wait in follower state without a leader, before starting election
+     * Actually randomly chosen from [t, 2t)
+     * </pre>
+     */
+    boolean hasFollowerElectionStartDelay();
+    /**
+     * <code>optional int64 follower_election_start_delay = 2;</code>
+     *
+     * <pre>
+     * Time to wait in follower state without a leader, before starting election
+     * Actually randomly chosen from [t, 2t)
+     * </pre>
+     */
+    long getFollowerElectionStartDelay();
+
+    /**
+     * <code>optional int64 heartbeat_interval = 3;</code>
+     *
+     * <pre>
+     * Heartbeat interval: leader sends heartbeat if no message has happened in this time
+     * </pre>
+     */
+    boolean hasHeartbeatInterval();
+    /**
+     * <code>optional int64 heartbeat_interval = 3;</code>
+     *
+     * <pre>
+     * Heartbeat interval: leader sends heartbeat if no message has happened in this time
+     * </pre>
+     */
+    long getHeartbeatInterval();
+  }
+  /**
+   * Protobuf type {@code ConfigTimeouts}
+   */
+  public static final class ConfigTimeouts extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:ConfigTimeouts)
+      ConfigTimeoutsOrBuilder {
+    // Use ConfigTimeouts.newBuilder() to construct.
+    private ConfigTimeouts(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private ConfigTimeouts(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ConfigTimeouts defaultInstance;
+    public static ConfigTimeouts getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public ConfigTimeouts getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ConfigTimeouts(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              candidateElectionTimeout_ = input.readInt64();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              followerElectionStartDelay_ = input.readInt64();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              heartbeatInterval_ = input.readInt64();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.robotninjas.barge.proto.RaftEntry.internal_static_ConfigTimeouts_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.robotninjas.barge.proto.RaftEntry.internal_static_ConfigTimeouts_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts.class, org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<ConfigTimeouts> PARSER =
+        new com.google.protobuf.AbstractParser<ConfigTimeouts>() {
+      public ConfigTimeouts parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ConfigTimeouts(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ConfigTimeouts> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int CANDIDATE_ELECTION_TIMEOUT_FIELD_NUMBER = 1;
+    private long candidateElectionTimeout_;
+    /**
+     * <code>optional int64 candidate_election_timeout = 1;</code>
+     *
+     * <pre>
+     * Time to wait for election as a candidate, before giving up
+     * </pre>
+     */
+    public boolean hasCandidateElectionTimeout() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional int64 candidate_election_timeout = 1;</code>
+     *
+     * <pre>
+     * Time to wait for election as a candidate, before giving up
+     * </pre>
+     */
+    public long getCandidateElectionTimeout() {
+      return candidateElectionTimeout_;
+    }
+
+    public static final int FOLLOWER_ELECTION_START_DELAY_FIELD_NUMBER = 2;
+    private long followerElectionStartDelay_;
+    /**
+     * <code>optional int64 follower_election_start_delay = 2;</code>
+     *
+     * <pre>
+     * Time to wait in follower state without a leader, before starting election
+     * Actually randomly chosen from [t, 2t)
+     * </pre>
+     */
+    public boolean hasFollowerElectionStartDelay() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int64 follower_election_start_delay = 2;</code>
+     *
+     * <pre>
+     * Time to wait in follower state without a leader, before starting election
+     * Actually randomly chosen from [t, 2t)
+     * </pre>
+     */
+    public long getFollowerElectionStartDelay() {
+      return followerElectionStartDelay_;
+    }
+
+    public static final int HEARTBEAT_INTERVAL_FIELD_NUMBER = 3;
+    private long heartbeatInterval_;
+    /**
+     * <code>optional int64 heartbeat_interval = 3;</code>
+     *
+     * <pre>
+     * Heartbeat interval: leader sends heartbeat if no message has happened in this time
+     * </pre>
+     */
+    public boolean hasHeartbeatInterval() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional int64 heartbeat_interval = 3;</code>
+     *
+     * <pre>
+     * Heartbeat interval: leader sends heartbeat if no message has happened in this time
+     * </pre>
+     */
+    public long getHeartbeatInterval() {
+      return heartbeatInterval_;
+    }
+
+    private void initFields() {
+      candidateElectionTimeout_ = 0L;
+      followerElectionStartDelay_ = 0L;
+      heartbeatInterval_ = 0L;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt64(1, candidateElectionTimeout_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt64(2, followerElectionStartDelay_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeInt64(3, heartbeatInterval_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, candidateElectionTimeout_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, followerElectionStartDelay_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(3, heartbeatInterval_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code ConfigTimeouts}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:ConfigTimeouts)
+        org.robotninjas.barge.proto.RaftEntry.ConfigTimeoutsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_ConfigTimeouts_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_ConfigTimeouts_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts.class, org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts.Builder.class);
+      }
+
+      // Construct using org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        candidateElectionTimeout_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        followerElectionStartDelay_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        heartbeatInterval_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_ConfigTimeouts_descriptor;
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts getDefaultInstanceForType() {
+        return org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts.getDefaultInstance();
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts build() {
+        org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts buildPartial() {
+        org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts result = new org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.candidateElectionTimeout_ = candidateElectionTimeout_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.followerElectionStartDelay_ = followerElectionStartDelay_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.heartbeatInterval_ = heartbeatInterval_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts) {
+          return mergeFrom((org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts other) {
+        if (other == org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts.getDefaultInstance()) return this;
+        if (other.hasCandidateElectionTimeout()) {
+          setCandidateElectionTimeout(other.getCandidateElectionTimeout());
+        }
+        if (other.hasFollowerElectionStartDelay()) {
+          setFollowerElectionStartDelay(other.getFollowerElectionStartDelay());
+        }
+        if (other.hasHeartbeatInterval()) {
+          setHeartbeatInterval(other.getHeartbeatInterval());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private long candidateElectionTimeout_ ;
+      /**
+       * <code>optional int64 candidate_election_timeout = 1;</code>
+       *
+       * <pre>
+       * Time to wait for election as a candidate, before giving up
+       * </pre>
+       */
+      public boolean hasCandidateElectionTimeout() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional int64 candidate_election_timeout = 1;</code>
+       *
+       * <pre>
+       * Time to wait for election as a candidate, before giving up
+       * </pre>
+       */
+      public long getCandidateElectionTimeout() {
+        return candidateElectionTimeout_;
+      }
+      /**
+       * <code>optional int64 candidate_election_timeout = 1;</code>
+       *
+       * <pre>
+       * Time to wait for election as a candidate, before giving up
+       * </pre>
+       */
+      public Builder setCandidateElectionTimeout(long value) {
+        bitField0_ |= 0x00000001;
+        candidateElectionTimeout_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 candidate_election_timeout = 1;</code>
+       *
+       * <pre>
+       * Time to wait for election as a candidate, before giving up
+       * </pre>
+       */
+      public Builder clearCandidateElectionTimeout() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        candidateElectionTimeout_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long followerElectionStartDelay_ ;
+      /**
+       * <code>optional int64 follower_election_start_delay = 2;</code>
+       *
+       * <pre>
+       * Time to wait in follower state without a leader, before starting election
+       * Actually randomly chosen from [t, 2t)
+       * </pre>
+       */
+      public boolean hasFollowerElectionStartDelay() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int64 follower_election_start_delay = 2;</code>
+       *
+       * <pre>
+       * Time to wait in follower state without a leader, before starting election
+       * Actually randomly chosen from [t, 2t)
+       * </pre>
+       */
+      public long getFollowerElectionStartDelay() {
+        return followerElectionStartDelay_;
+      }
+      /**
+       * <code>optional int64 follower_election_start_delay = 2;</code>
+       *
+       * <pre>
+       * Time to wait in follower state without a leader, before starting election
+       * Actually randomly chosen from [t, 2t)
+       * </pre>
+       */
+      public Builder setFollowerElectionStartDelay(long value) {
+        bitField0_ |= 0x00000002;
+        followerElectionStartDelay_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 follower_election_start_delay = 2;</code>
+       *
+       * <pre>
+       * Time to wait in follower state without a leader, before starting election
+       * Actually randomly chosen from [t, 2t)
+       * </pre>
+       */
+      public Builder clearFollowerElectionStartDelay() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        followerElectionStartDelay_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long heartbeatInterval_ ;
+      /**
+       * <code>optional int64 heartbeat_interval = 3;</code>
+       *
+       * <pre>
+       * Heartbeat interval: leader sends heartbeat if no message has happened in this time
+       * </pre>
+       */
+      public boolean hasHeartbeatInterval() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional int64 heartbeat_interval = 3;</code>
+       *
+       * <pre>
+       * Heartbeat interval: leader sends heartbeat if no message has happened in this time
+       * </pre>
+       */
+      public long getHeartbeatInterval() {
+        return heartbeatInterval_;
+      }
+      /**
+       * <code>optional int64 heartbeat_interval = 3;</code>
+       *
+       * <pre>
+       * Heartbeat interval: leader sends heartbeat if no message has happened in this time
+       * </pre>
+       */
+      public Builder setHeartbeatInterval(long value) {
+        bitField0_ |= 0x00000004;
+        heartbeatInterval_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 heartbeat_interval = 3;</code>
+       *
+       * <pre>
+       * Heartbeat interval: leader sends heartbeat if no message has happened in this time
+       * </pre>
+       */
+      public Builder clearHeartbeatInterval() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        heartbeatInterval_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:ConfigTimeouts)
+    }
+
+    static {
+      defaultInstance = new ConfigTimeouts(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:ConfigTimeouts)
+  }
+
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Membership_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Membership_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Entry_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Entry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ConfigTimeouts_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_ConfigTimeouts_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1392,33 +2049,42 @@ public final class RaftEntry {
       "\n\013entry.proto\"7\n\nMembership\022\017\n\007members\030\001" +
       " \003(\t\022\030\n\020proposed_members\030\002 \003(\t\"G\n\005Entry\022" +
       "\014\n\004term\030\001 \002(\003\022\017\n\007command\030\002 \001(\014\022\037\n\nmember" +
-      "ship\030\003 \001(\0132\013.MembershipB(\n\033org.robotninj" +
-      "as.barge.protoB\tRaftEntry"
+      "ship\030\003 \001(\0132\013.Membership\"w\n\016ConfigTimeout" +
+      "s\022\"\n\032candidate_election_timeout\030\001 \001(\003\022%\n" +
+      "\035follower_election_start_delay\030\002 \001(\003\022\032\n\022" +
+      "heartbeat_interval\030\003 \001(\003B(\n\033org.robotnin" +
+      "jas.barge.protoB\tRaftEntry"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_Membership_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_Membership_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_Membership_descriptor,
-              new java.lang.String[] { "Members", "ProposedMembers", });
-          internal_static_Entry_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_Entry_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_Entry_descriptor,
-              new java.lang.String[] { "Term", "Command", "Membership", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_Membership_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_Membership_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Membership_descriptor,
+        new java.lang.String[] { "Members", "ProposedMembers", });
+    internal_static_Entry_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_Entry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Entry_descriptor,
+        new java.lang.String[] { "Term", "Command", "Membership", });
+    internal_static_ConfigTimeouts_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_ConfigTimeouts_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_ConfigTimeouts_descriptor,
+        new java.lang.String[] { "CandidateElectionTimeout", "FollowerElectionStartDelay", "HeartbeatInterval", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

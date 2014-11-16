@@ -3,7 +3,6 @@ package org.robotninjas.barge;
 import com.google.common.base.Optional;
 
 public class NotLeaderException extends RaftException {
-
   private final Optional<Replica> leader;
 
   public NotLeaderException(Optional<Replica> leader) {
@@ -12,5 +11,10 @@ public class NotLeaderException extends RaftException {
 
   public Optional<Replica> getLeader() {
     return leader;
+  }
+
+  @Override
+  public String toString() {
+    return "NotLeaderException [leader=" + leader + "]";
   }
 }

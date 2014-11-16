@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013-2014 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +26,7 @@ import org.robotninjas.barge.ClusterConfig;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
-import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 import org.robotninjas.barge.state.Raft;
 import org.robotninjas.barge.state.StateTransitionListener;
 
@@ -38,8 +39,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-
 import static org.robotninjas.barge.state.Raft.StateType;
 
 public class GroupOfCounters extends ExternalResource implements StateTransitionListener {
@@ -60,7 +59,8 @@ public class GroupOfCounters extends ExternalResource implements StateTransition
     for (int peer : peers) {
       allMembers.add(buildReplicaName(peer));
     }
-    ClusterConfig seedConfig = new ClusterConfig(self, allMembers, 500);
+    ConfigTimeouts timeouts = ClusterConfig.buildDefaultTimeouts();
+    ClusterConfig seedConfig = new ClusterConfig(self, allMembers, timeouts);
     SimpleCounterMachine server = new SimpleCounterMachine(id, seedConfig, this);
     servers.put(id, server);
 

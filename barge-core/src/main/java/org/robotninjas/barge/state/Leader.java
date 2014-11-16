@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,8 +68,6 @@ class Leader extends BaseState {
 
   private static final long HEALTH_TIMEOUT = TimeUnit.MINUTES.toNanos(1);
 
-  private final ScheduledExecutorService scheduler;
-  private final long electionTimeout;
   private final Map<Replica, ReplicaManager> replicaManagers = Maps.newHashMap();
   private long replicaManagersLastUpdated;
 
@@ -76,28 +75,22 @@ class Leader extends BaseState {
 
   private boolean isShutdown;
 
-  @Inject
-  Leader(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout) {
-    super(LEADER, log);
-
-    this.scheduler = checkNotNull(bargeThreadPools.getRaftScheduler());
-    checkArgument(electionTimeout > 0);
-    this.electionTimeout = electionTimeout;
-
+  Leader(RaftStateContext ctx) {
+    super(LEADER, ctx);
   }
 
   @Override
-  public void init(@Nonnull RaftStateContext ctx) {
-    sendRequests(ctx);
-    resetTimeout(ctx);
+  public void init() {
+    sendRequests();
+    resetTimeout();
   }
 
-  private ReplicaManager getManagerForReplica(RaftStateContext ctx, Replica replica) {
+  private ReplicaManager getManagerForReplica(Replica replica) {
     assert replica != ctx.getConfigurationState().self();
     ReplicaManager replicaManager = replicaManagers.get(replica);
     if (replicaManager == null) {
       // replicaManager = replicaManagerFactory.create(replica);
-      replicaManager = new ReplicaManager(ctx.getClientManager(), log, replica);
+      replicaManager = new ReplicaManager(ctx.getClientManager(), ctx.getLog(), replica);
       replicaManagers.put(replica, replicaManager);
     }
 
@@ -122,7 +115,7 @@ class Leader extends BaseState {
   }
 
   @Override
-  public void destroy(RaftStateContext ctx) {
+  public void destroy() {
     if (heartbeatTask != null) {
       heartbeatTask.cancel(false);
       heartbeatTask = null;
@@ -133,46 +126,49 @@ class Leader extends BaseState {
     }
   }
 
-  public void stepDown(RaftStateContext ctx, Optional<Replica> newLeader) {
+  public void stepDown(Optional<Replica> newLeader) {
     if (!this.isShutdown) {
       this.isShutdown = true;
       ctx.setState(this, ctx.buildStateFollower(newLeader));
     }
   }
 
-  void resetTimeout(@Nonnull final RaftStateContext ctx) {
+  void resetTimeout() {
 
     if (heartbeatTask != null) {
       heartbeatTask.cancel(false);
       heartbeatTask = null;
     }
 
+    long heartbeatInterval = ctx.getTimeouts().getHeartbeatInterval();
+
+    ScheduledExecutorService scheduler = ctx.getRaftScheduler();
+
     heartbeatTask = scheduler.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
         LOGGER.debug("Sending heartbeat");
-        sendRequests(ctx);
+        sendRequests();
       }
-    }, electionTimeout, electionTimeout, MILLISECONDS);
+    }, heartbeatInterval, heartbeatInterval, MILLISECONDS);
 
   }
 
   @Nonnull
   @Override
-  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation)
-      throws RaftException {
-    resetTimeout(ctx);
+  public ListenableFuture<Object> commitOperation(@Nonnull byte[] operation) throws RaftException {
+    resetTimeout();
     ListenableFuture<Object> result = getLog().append(operation, null);
-    sendRequests(ctx);
+    sendRequests();
     return result;
 
   }
 
-  ListenableFuture<Object> commitMembership(@Nonnull RaftStateContext ctx, @Nonnull Membership membership) {
-    resetTimeout(ctx);
+  ListenableFuture<Object> commitMembership(@Nonnull Membership membership) {
+    resetTimeout();
 
-    ListenableFuture<Object> result = log.append(null, membership);
-    sendRequests(ctx);
+    ListenableFuture<Object> result = ctx.getLog().append(null, membership);
+    sendRequests();
     return result;
   }
 
@@ -181,7 +177,9 @@ class Leader extends BaseState {
    * matchIndex values are greater and half are less than this value. So, at least half of the replicas have stored the
    * median value, this is the definition of committed.
    */
-  long getQuorumMatchIndex(RaftStateContext ctx, List<Replica> replicas) {
+  long getQuorumMatchIndex(List<Replica> replicas) {
+    RaftLog log = ctx.getLog();
+
     Replica self = log.self();
 
     List<Long> sorted = newArrayList();
@@ -189,7 +187,7 @@ class Leader extends BaseState {
       if (replica == self) {
         sorted.add(log.lastLogIndex());
       } else {
-        ReplicaManager replicaManager = getManagerForReplica(ctx, replica);
+        ReplicaManager replicaManager = getManagerForReplica(replica);
         if (replicaManager == null) {
           throw new IllegalStateException("No replica manager for server: " + replica);
         }
@@ -217,28 +215,29 @@ class Leader extends BaseState {
     return committed;
   }
 
-  long getQuorumMatchIndex(RaftStateContext ctx, ConfigurationState configurationState) {
+  long getQuorumMatchIndex(ConfigurationState configurationState) {
     if (configurationState.isTransitional()) {
-      return Math.min(getQuorumMatchIndex(ctx, configurationState.getCurrentMembers()),
-          getQuorumMatchIndex(ctx, configurationState.getProposedMembers()));
+      return Math.min(getQuorumMatchIndex(configurationState.getCurrentMembers()),
+          getQuorumMatchIndex(configurationState.getProposedMembers()));
     } else {
-      return getQuorumMatchIndex(ctx, configurationState.getCurrentMembers());
+      return getQuorumMatchIndex(configurationState.getCurrentMembers());
     }
   }
 
-  private void updateCommitted(RaftStateContext ctx) {
+  private void updateCommitted() {
+    RaftLog log = ctx.getLog();
     ConfigurationState configurationState = ctx.getConfigurationState();
 
-    long committed = getQuorumMatchIndex(ctx, configurationState);
+    long committed = getQuorumMatchIndex(configurationState);
     log.commitIndex(committed);
 
     if (committed >= configurationState.getId()) {
-      handleConfigurationUpdate(ctx);
+      handleConfigurationUpdate();
     }
 
   }
 
-  private void handleConfigurationUpdate(RaftStateContext ctx) {
+  private void handleConfigurationUpdate() {
     ConfigurationState configurationState = ctx.getConfigurationState();
 
     // Upon committing a configuration that excludes itself, the leader
@@ -246,7 +245,7 @@ class Leader extends BaseState {
     if (!configurationState.hasVote(configurationState.self())) {
       LOGGER.info("Don't have vote in new configuration; stepping down");
 
-      stepDown(ctx /* logcabin: currentTerm + 1 */, Optional.<Replica> absent());
+      stepDown( /* logcabin: currentTerm + 1 */ Optional.<Replica> absent());
       return;
     }
 
@@ -258,7 +257,7 @@ class Leader extends BaseState {
       Membership.Builder members = Membership.newBuilder();
       members.addAllMembers(membership.getProposedMembersList());
 
-      Futures.addCallback(commitMembership(ctx, members.build()), new FutureCallback<Object>() {
+      Futures.addCallback(commitMembership( members.build()), new FutureCallback<Object>() {
 
         @Override
         public void onSuccess(Object result) {
@@ -277,7 +276,8 @@ class Leader extends BaseState {
     }
   }
 
-  private void checkTermOnResponse(RaftStateContext ctx, AppendEntriesResponse response) {
+  private void checkTermOnResponse(AppendEntriesResponse response) {
+    RaftLog log = ctx.getLog();
 
     long currentTerm = log.currentTerm();
     if (response.getTerm() < currentTerm) {
@@ -290,7 +290,7 @@ class Leader extends BaseState {
       log.currentTerm(response.getTerm());
       Optional<Replica> newLeader = Optional.absent();
 
-      stepDown(ctx, newLeader);
+      stepDown(newLeader);
     }
 
   }
@@ -302,11 +302,11 @@ class Leader extends BaseState {
    */
   @Nonnull
   @VisibleForTesting
-  List<ListenableFuture<AppendEntriesResponse>> sendRequests(final RaftStateContext ctx) {
+  List<ListenableFuture<AppendEntriesResponse>> sendRequests() {
     if (ctx.shouldStop()) {
       LOGGER.info("Context stopping; stepping down");
 
-      stepDown(ctx, Optional.<Replica> absent());
+      stepDown(Optional.<Replica> absent());
       return null;
     }
 
@@ -320,14 +320,14 @@ class Leader extends BaseState {
       }
 
       boolean isVoting = configurationState.hasVote(replica);
-      ReplicaManager replicaManager = getManagerForReplica(ctx, replica);
+      ReplicaManager replicaManager = getManagerForReplica(replica);
       ListenableFuture<AppendEntriesResponse> response = replicaManager.requestUpdate();
       responses.add(response);
       Futures.addCallback(response, new FutureCallback<AppendEntriesResponse>() {
         @Override
         public void onSuccess(@Nullable AppendEntriesResponse result) {
-          updateCommitted(ctx);
-          checkTermOnResponse(ctx, result);
+          updateCommitted();
+          checkTermOnResponse(result);
         }
 
         @Override
@@ -341,15 +341,15 @@ class Leader extends BaseState {
 
     // Cope if we're the only node in the cluster.
     if (responses.isEmpty()) {
-      updateCommitted(ctx);
+      updateCommitted();
     }
 
     return responses;
   }
 
   @Override
-  public ListenableFuture<Boolean> setConfiguration(@Nonnull RaftStateContext ctx, RaftMembership oldMembership,
-      final RaftMembership newMembership) throws RaftException {
+  public ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, final RaftMembership newMembership)
+      throws RaftException {
     // TODO: Check quorums overlap?
 
     final Membership targetConfiguration;
@@ -388,7 +388,7 @@ class Leader extends BaseState {
       b.addAllProposedMembers(targetConfiguration.getMembersList());
       transitionalMembership = b.build();
     }
-    ListenableFuture<Object> transitionFuture = commitMembership(ctx, transitionalMembership);
+    ListenableFuture<Object> transitionFuture = commitMembership(transitionalMembership);
 
     return Futures.transform(transitionFuture, new AsyncFunction<Object, Boolean>() {
       // In response to the transitional configuration, the leader commits the final configuration
@@ -400,7 +400,7 @@ class Leader extends BaseState {
           return Futures.immediateFuture(Boolean.FALSE);
         }
 
-        return new PollFor<Boolean>(scheduler, 200, 200, TimeUnit.MILLISECONDS) {
+        return new PollFor<Boolean>(ctx.getRaftScheduler(), 200, 200, TimeUnit.MILLISECONDS) {
           @Override
           protected Optional<Boolean> poll() {
             if (!configuration.isTransitional()) {
@@ -421,7 +421,7 @@ class Leader extends BaseState {
   }
 
   @Override
-  public RaftClusterHealth getClusterHealth(final RaftStateContext ctx) {
+  public RaftClusterHealth getClusterHealth() {
     ConfigurationState configurationState = ctx.getConfigurationState();
     if (configurationState.isTransitional()) {
       return null;
@@ -429,13 +429,13 @@ class Leader extends BaseState {
 
     List<Replica> deadPeers = Lists.newArrayList();
 
-    Replica self = log.self();
+    Replica self = ctx.self();
     for (Replica replica : configurationState.getAllMembers()) {
       if (replica == self) {
         continue;
       }
 
-      ReplicaManager replicaManager = getManagerForReplica(ctx, replica);
+      ReplicaManager replicaManager = getManagerForReplica(replica);
       long now = System.nanoTime();
       long lastSeen = replicaManager.getLastProofOfLife();
       if ((now - lastSeen) > HEALTH_TIMEOUT) {
@@ -446,11 +446,6 @@ class Leader extends BaseState {
     RaftMembership membership = configurationState.getClusterMembership();
     RaftClusterHealth health = new RaftClusterHealth(membership, deadPeers);
     return health;
-  }
-
-  @Override
-  public String toString() {
-    return "Leader [" + log.getName() + " @ " + log.self() + "]";
   }
 
 }

@@ -17,13 +17,12 @@ import static org.robotninjas.barge.state.Raft.StateType.START;
 
 class Start extends BaseState {
 
-  @Inject
-  public Start(RaftLog log) {
-    super(START, log);
+  public Start(RaftStateContext ctx) {
+    super(START, ctx);
   }
 
   @Override
-  public void init(@Nonnull RaftStateContext ctx) {
+  public void init() {
     RaftLog log = getLog();
 
     MDC.put("state", Raft.StateType.START.name());
@@ -35,29 +34,29 @@ class Start extends BaseState {
 
   @Nonnull
   @Override
-  public RequestVoteResponse requestVote(@Nonnull RaftStateContext ctx, @Nonnull RequestVote request) {
+  public RequestVoteResponse requestVote(@Nonnull RequestVote request) {
     throw new RuntimeException("Service unavailable");
   }
 
   @Nonnull
   @Override
-  public AppendEntriesResponse appendEntries(@Nonnull RaftStateContext ctx, @Nonnull AppendEntries request) {
+  public AppendEntriesResponse appendEntries(@Nonnull AppendEntries request) {
     throw new RuntimeException("Service unavailable");
   }
 
   @Nonnull
   @Override
-  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
+  public ListenableFuture<Object> commitOperation( @Nonnull byte[] operation) throws RaftException {
     throw new RaftException("Service has not started yet");
   }
 
   @Override
-  public RaftClusterHealth getClusterHealth(@Nonnull RaftStateContext ctx) throws RaftException {
+  public RaftClusterHealth getClusterHealth() throws RaftException {
     throw new RaftException("Service has not started yet");
   }
   
   @Override
-  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership, RaftMembership newMembership) throws RaftException {
+  public ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, RaftMembership newMembership) throws RaftException {
     throw new RaftException("Service has not started yet");
   }
   

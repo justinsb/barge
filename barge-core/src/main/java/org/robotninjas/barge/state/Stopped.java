@@ -15,40 +15,39 @@ import static org.robotninjas.barge.state.Raft.StateType.STOPPED;
 
 class Stopped extends BaseState {
 
-  @Inject
-  public Stopped(RaftLog log) {
-    super(STOPPED, log);
+  public Stopped(RaftStateContext ctx) {
+    super(STOPPED, ctx);
   }
 
   @Override
-  public void init(RaftStateContext ctx) {
+  public void init() {
   }
 
   @Nonnull
   @Override
-  public RequestVoteResponse requestVote(@Nonnull RaftStateContext ctx, @Nonnull RequestVote request) {
+  public RequestVoteResponse requestVote(@Nonnull RequestVote request) {
     throw new RuntimeException("Service is stopped");
   }
 
   @Nonnull
   @Override
-  public AppendEntriesResponse appendEntries(@Nonnull RaftStateContext ctx, @Nonnull AppendEntries request) {
+  public AppendEntriesResponse appendEntries(@Nonnull AppendEntries request) {
     throw new RuntimeException("Service is stopped");
   }
 
   @Nonnull
   @Override
-  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
+  public ListenableFuture<Object> commitOperation(@Nonnull byte[] operation) throws RaftException {
     throw new RaftException("Service is stopped");
   }
 
   @Override
-  public RaftClusterHealth getClusterHealth(RaftStateContext raftStateContext) throws RaftException {
+  public RaftClusterHealth getClusterHealth() throws RaftException {
     throw new RaftException("Service is stopped");
   }
 
   @Override
-  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership, RaftMembership newMembership) throws RaftException {
+  public ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, RaftMembership newMembership) throws RaftException {
     throw new RaftException("Service is stopped");
   }
 

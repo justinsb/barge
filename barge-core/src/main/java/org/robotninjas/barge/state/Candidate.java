@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +25,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
-import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.NotLeaderException;
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
@@ -39,10 +39,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.inject.Inject;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -56,28 +54,20 @@ import static org.robotninjas.barge.state.RaftPredicates.voteGranted;
 class Candidate extends BaseState {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Candidate.class);
-  private static final Random RAND = new Random(System.nanoTime());
 
-  private final ScheduledExecutorService scheduler;
-  private final long electionTimeout;
-  private final RaftClientManager clientManager;
   private DeadlineTimer electionTimer;
   private ListenableFuture<Boolean> electionResult;
 
-  @Inject
-  Candidate(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout, RaftClientManager clientManager) {
-    super(CANDIDATE, log);
-    this.scheduler = bargeThreadPools.getRaftScheduler();
-    this.electionTimeout = electionTimeout;
-    this.clientManager = clientManager;
+  Candidate(RaftStateContext ctx) {
+    super(CANDIDATE, ctx);
   }
 
   @Override
-  public void init(@Nonnull final RaftStateContext ctx) {
-    electionResult = runElection(ctx);
+  public void init() {
+    electionResult = runElection();
   }
-  
-  ListenableFuture<Boolean> runElection(final RaftStateContext ctx) {
+
+  ListenableFuture<Boolean> runElection() {
     final SettableFuture<Boolean> result = SettableFuture.create();
     final RaftLog log = getLog();
 
@@ -85,7 +75,7 @@ class Candidate extends BaseState {
     log.votedFor(Optional.of(log.self()));
 
     ConfigurationState configurationState = ctx.getConfigurationState();
-    
+
     LOGGER.debug("Election starting for term {}", log.currentTerm());
 
     List<ListenableFuture<RequestVoteResponse>> responses = Lists.newArrayList();
@@ -96,15 +86,17 @@ class Candidate extends BaseState {
         // We always vote for ourselves
         responses.add(Futures.immediateFuture(RequestVoteResponse.newBuilder().setVoteGranted(true).buildPartial()));
       } else {
-        ListenableFuture<RequestVoteResponse> response = sendVoteRequest(ctx, replica);
-        Futures.addCallback(response, checkTerm(ctx));
+        ListenableFuture<RequestVoteResponse> response = sendVoteRequest(replica);
+        Futures.addCallback(response, checkTerm());
         responses.add(response);
       }
     }
 
     ListenableFuture<Boolean> majorityResponse = majorityResponse(responses, voteGranted());
 
-    long timeout = electionTimeout + (RAND.nextLong() % electionTimeout);
+    long timeout = ctx.getTimeouts().getCandidateElectionTimeout();
+    ScheduledExecutorService scheduler = ctx.getRaftScheduler();
+
     electionTimer = DeadlineTimer.start(scheduler, new Runnable() {
       @Override
       public void run() {
@@ -148,7 +140,7 @@ class Candidate extends BaseState {
   }
 
   @Override
-  public void destroy(RaftStateContext ctx) {
+  public void destroy() {
     if (electionResult != null) {
       electionResult.cancel(false);
     }
@@ -158,56 +150,50 @@ class Candidate extends BaseState {
   }
 
   @VisibleForTesting
-  ListenableFuture<RequestVoteResponse> sendVoteRequest(RaftStateContext ctx, Replica replica) {
+  ListenableFuture<RequestVoteResponse> sendVoteRequest(Replica replica) {
     ConfigurationState configurationState = ctx.getConfigurationState();
-    
-    RaftLog log = getLog();
-    RequestVote request =
-      RequestVote.newBuilder()
-        .setTerm(log.currentTerm())
-        .setCandidateId(configurationState.self().toString())
-        .setLastLogIndex(log.lastLogIndex())
-        .setLastLogTerm(log.lastLogTerm())
-        .build();
 
+    RaftLog log = getLog();
+    RequestVote request = RequestVote.newBuilder().setTerm(log.currentTerm())
+        .setCandidateId(configurationState.self().toString()).setLastLogIndex(log.lastLogIndex())
+        .setLastLogTerm(log.lastLogTerm()).build();
+
+    RaftClientManager clientManager = ctx.getClientManager();
     ListenableFuture<RequestVoteResponse> response = clientManager.requestVote(replica, request);
     return response;
   }
 
-  private FutureCallback<RequestVoteResponse> checkTerm(final RaftStateContext ctx) {
+  private FutureCallback<RequestVoteResponse> checkTerm() {
     return new FutureCallback<RequestVoteResponse>() {
       @Override
       public void onSuccess(@Nullable RequestVoteResponse response) {
         if (response.getTerm() > getLog().currentTerm()) {
           getLog().currentTerm(response.getTerm());
-          ctx.setState(Candidate.this, ctx.buildStateFollower(Optional.<Replica>absent()));
+          ctx.setState(Candidate.this, ctx.buildStateFollower(Optional.<Replica> absent()));
         }
       }
 
       @Override
-      public void onFailure(Throwable t) {}
+      public void onFailure(Throwable t) {
+      }
     };
-  }
-  
-  @Override
-  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership,  RaftMembership newMembership) throws RaftException {
-    throw new NotLeaderException(Optional.<Replica>absent());
   }
 
   @Override
-  public RaftClusterHealth getClusterHealth(@Nonnull RaftStateContext ctx) throws NotLeaderException {
-    throw new NotLeaderException(Optional.<Replica>absent());
+  public ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, RaftMembership newMembership)
+      throws RaftException {
+    throw new NotLeaderException(Optional.<Replica> absent());
+  }
+
+  @Override
+  public RaftClusterHealth getClusterHealth() throws NotLeaderException {
+    throw new NotLeaderException(Optional.<Replica> absent());
   }
 
   @Nonnull
   @Override
-  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
-    throw new NotLeaderException(Optional.<Replica>absent());
+  public ListenableFuture<Object> commitOperation(@Nonnull byte[] operation) throws RaftException {
+    throw new NotLeaderException(Optional.<Replica> absent());
   }
-  
-  @Override
-  public String toString() {
-    return "Candidate [" + log.getName() + " @ " + log.self() + "]";
-  }
-  
+
 }

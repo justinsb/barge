@@ -7,6 +7,7 @@ import org.robotninjas.barge.ClusterConfig;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
+import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.rpc.netty.NettyRaftService;
 import org.slf4j.Logger;
@@ -59,11 +60,11 @@ public class StartStopTest {
       raftService.stopAsync().awaitTerminated();
     }
 
-//    public void bootstrap() {
-//      Membership membership = Membership.newBuilder().addMembers(self.getKey()).build();
-//      this.raftService.bootstrap(membership);
-//    }
-    
+    // public void bootstrap() {
+    // Membership membership = Membership.newBuilder().addMembers(self.getKey()).build();
+    // this.raftService.bootstrap(membership);
+    // }
+
     public void setState(String s) throws RaftException, InterruptedException {
       raftService.commit(s.getBytes(Charsets.UTF_8));
     }
@@ -89,7 +90,8 @@ public class StartStopTest {
     ServerState state = new ServerState();
 
     Replica self = replicas[id];
-    ClusterConfig seedConfig = new ClusterConfig(self, Arrays.asList(self), ClusterConfig.DEFAULT_TIMEOUT);
+    ConfigTimeouts timeouts = ClusterConfig.buildDefaultTimeouts();
+    ClusterConfig seedConfig = new ClusterConfig(self, Arrays.asList(self), timeouts);
 
     NettyRaftService.Builder raftServiceBuilder = NettyRaftService.newBuilder();
     raftServiceBuilder.seedConfig = seedConfig;
@@ -110,9 +112,9 @@ public class StartStopTest {
       server.start();
 
       Thread.sleep(500);
-      
-//      server.bootstrap();
-      
+
+      // server.bootstrap();
+
       while (!server.isLeader()) {
         Thread.sleep(50);
       }
@@ -136,8 +138,6 @@ public class StartStopTest {
       server.stop();
     }
   }
-
-  
 
   @Before
   public void prepare() throws Exception {

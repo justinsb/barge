@@ -8,10 +8,10 @@ public final class LogProto {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface AppendOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface AppendOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Append)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 index = 1;
     /**
      * <code>required int64 index = 1;</code>
      */
@@ -21,7 +21,6 @@ public final class LogProto {
      */
     long getIndex();
 
-    // required .Entry entry = 2;
     /**
      * <code>required .Entry entry = 2;</code>
      */
@@ -39,8 +38,9 @@ public final class LogProto {
    * Protobuf type {@code Append}
    */
   public static final class Append extends
-      com.google.protobuf.GeneratedMessage
-      implements AppendOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Append)
+      AppendOrBuilder {
     // Use Append.newBuilder() to construct.
     private Append(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -144,7 +144,6 @@ public final class LogProto {
     }
 
     private int bitField0_;
-    // required int64 index = 1;
     public static final int INDEX_FIELD_NUMBER = 1;
     private long index_;
     /**
@@ -160,7 +159,6 @@ public final class LogProto {
       return index_;
     }
 
-    // required .Entry entry = 2;
     public static final int ENTRY_FIELD_NUMBER = 2;
     private org.robotninjas.barge.proto.RaftEntry.Entry entry_;
     /**
@@ -189,7 +187,8 @@ public final class LogProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasIndex()) {
         memoizedIsInitialized = 0;
@@ -315,8 +314,9 @@ public final class LogProto {
      * Protobuf type {@code Append}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.LogProto.AppendOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Append)
+        org.robotninjas.barge.proto.LogProto.AppendOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.LogProto.internal_static_Append_descriptor;
@@ -459,7 +459,6 @@ public final class LogProto {
       }
       private int bitField0_;
 
-      // required int64 index = 1;
       private long index_ ;
       /**
        * <code>required int64 index = 1;</code>
@@ -492,7 +491,6 @@ public final class LogProto {
         return this;
       }
 
-      // required .Entry entry = 2;
       private org.robotninjas.barge.proto.RaftEntry.Entry entry_ = org.robotninjas.barge.proto.RaftEntry.Entry.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.robotninjas.barge.proto.RaftEntry.Entry, org.robotninjas.barge.proto.RaftEntry.Entry.Builder, org.robotninjas.barge.proto.RaftEntry.EntryOrBuilder> entryBuilder_;
@@ -601,7 +599,7 @@ public final class LogProto {
         if (entryBuilder_ == null) {
           entryBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               org.robotninjas.barge.proto.RaftEntry.Entry, org.robotninjas.barge.proto.RaftEntry.Entry.Builder, org.robotninjas.barge.proto.RaftEntry.EntryOrBuilder>(
-                  entry_,
+                  getEntry(),
                   getParentForChildren(),
                   isClean());
           entry_ = null;
@@ -620,10 +618,10 @@ public final class LogProto {
     // @@protoc_insertion_point(class_scope:Append)
   }
 
-  public interface VoteOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface VoteOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Vote)
+      com.google.protobuf.MessageOrBuilder {
 
-    // optional string voted_for = 2;
     /**
      * <code>optional string voted_for = 2;</code>
      */
@@ -642,8 +640,9 @@ public final class LogProto {
    * Protobuf type {@code Vote}
    */
   public static final class Vote extends
-      com.google.protobuf.GeneratedMessage
-      implements VoteOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Vote)
+      VoteOrBuilder {
     // Use Vote.newBuilder() to construct.
     private Vote(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -690,8 +689,9 @@ public final class LogProto {
               break;
             }
             case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              votedFor_ = input.readBytes();
+              votedFor_ = bs;
               break;
             }
           }
@@ -734,7 +734,6 @@ public final class LogProto {
     }
 
     private int bitField0_;
-    // optional string voted_for = 2;
     public static final int VOTED_FOR_FIELD_NUMBER = 2;
     private java.lang.Object votedFor_;
     /**
@@ -783,7 +782,8 @@ public final class LogProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       memoizedIsInitialized = 1;
       return true;
@@ -890,8 +890,9 @@ public final class LogProto {
      * Protobuf type {@code Vote}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.LogProto.VoteOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Vote)
+        org.robotninjas.barge.proto.LogProto.VoteOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.LogProto.internal_static_Vote_descriptor;
@@ -1006,7 +1007,6 @@ public final class LogProto {
       }
       private int bitField0_;
 
-      // optional string voted_for = 2;
       private java.lang.Object votedFor_ = "";
       /**
        * <code>optional string voted_for = 2;</code>
@@ -1020,9 +1020,12 @@ public final class LogProto {
       public java.lang.String getVotedFor() {
         java.lang.Object ref = votedFor_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          votedFor_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            votedFor_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1091,10 +1094,10 @@ public final class LogProto {
     // @@protoc_insertion_point(class_scope:Vote)
   }
 
-  public interface TermOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface TermOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Term)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 term = 1;
     /**
      * <code>required int64 term = 1;</code>
      */
@@ -1108,8 +1111,9 @@ public final class LogProto {
    * Protobuf type {@code Term}
    */
   public static final class Term extends
-      com.google.protobuf.GeneratedMessage
-      implements TermOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Term)
+      TermOrBuilder {
     // Use Term.newBuilder() to construct.
     private Term(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -1200,7 +1204,6 @@ public final class LogProto {
     }
 
     private int bitField0_;
-    // required int64 term = 1;
     public static final int TERM_FIELD_NUMBER = 1;
     private long term_;
     /**
@@ -1222,7 +1225,8 @@ public final class LogProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTerm()) {
         memoizedIsInitialized = 0;
@@ -1333,8 +1337,9 @@ public final class LogProto {
      * Protobuf type {@code Term}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.LogProto.TermOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Term)
+        org.robotninjas.barge.proto.LogProto.TermOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.LogProto.internal_static_Term_descriptor;
@@ -1451,7 +1456,6 @@ public final class LogProto {
       }
       private int bitField0_;
 
-      // required int64 term = 1;
       private long term_ ;
       /**
        * <code>required int64 term = 1;</code>
@@ -1495,10 +1499,10 @@ public final class LogProto {
     // @@protoc_insertion_point(class_scope:Term)
   }
 
-  public interface CommitOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface CommitOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Commit)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 index = 1;
     /**
      * <code>required int64 index = 1;</code>
      */
@@ -1512,8 +1516,9 @@ public final class LogProto {
    * Protobuf type {@code Commit}
    */
   public static final class Commit extends
-      com.google.protobuf.GeneratedMessage
-      implements CommitOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Commit)
+      CommitOrBuilder {
     // Use Commit.newBuilder() to construct.
     private Commit(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -1604,7 +1609,6 @@ public final class LogProto {
     }
 
     private int bitField0_;
-    // required int64 index = 1;
     public static final int INDEX_FIELD_NUMBER = 1;
     private long index_;
     /**
@@ -1626,7 +1630,8 @@ public final class LogProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasIndex()) {
         memoizedIsInitialized = 0;
@@ -1737,8 +1742,9 @@ public final class LogProto {
      * Protobuf type {@code Commit}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.LogProto.CommitOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Commit)
+        org.robotninjas.barge.proto.LogProto.CommitOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.LogProto.internal_static_Commit_descriptor;
@@ -1855,7 +1861,6 @@ public final class LogProto {
       }
       private int bitField0_;
 
-      // required int64 index = 1;
       private long index_ ;
       /**
        * <code>required int64 index = 1;</code>
@@ -1899,10 +1904,10 @@ public final class LogProto {
     // @@protoc_insertion_point(class_scope:Commit)
   }
 
-  public interface SnapshotOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface SnapshotOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Snapshot)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 last_included_index = 1;
     /**
      * <code>required int64 last_included_index = 1;</code>
      */
@@ -1912,7 +1917,6 @@ public final class LogProto {
      */
     long getLastIncludedIndex();
 
-    // required int64 last_included_term = 2;
     /**
      * <code>required int64 last_included_term = 2;</code>
      */
@@ -1922,7 +1926,6 @@ public final class LogProto {
      */
     long getLastIncludedTerm();
 
-    // required string snapshot_file = 3;
     /**
      * <code>required string snapshot_file = 3;</code>
      */
@@ -1941,8 +1944,9 @@ public final class LogProto {
    * Protobuf type {@code Snapshot}
    */
   public static final class Snapshot extends
-      com.google.protobuf.GeneratedMessage
-      implements SnapshotOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Snapshot)
+      SnapshotOrBuilder {
     // Use Snapshot.newBuilder() to construct.
     private Snapshot(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -1999,8 +2003,9 @@ public final class LogProto {
               break;
             }
             case 26: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000004;
-              snapshotFile_ = input.readBytes();
+              snapshotFile_ = bs;
               break;
             }
           }
@@ -2043,7 +2048,6 @@ public final class LogProto {
     }
 
     private int bitField0_;
-    // required int64 last_included_index = 1;
     public static final int LAST_INCLUDED_INDEX_FIELD_NUMBER = 1;
     private long lastIncludedIndex_;
     /**
@@ -2059,7 +2063,6 @@ public final class LogProto {
       return lastIncludedIndex_;
     }
 
-    // required int64 last_included_term = 2;
     public static final int LAST_INCLUDED_TERM_FIELD_NUMBER = 2;
     private long lastIncludedTerm_;
     /**
@@ -2075,7 +2078,6 @@ public final class LogProto {
       return lastIncludedTerm_;
     }
 
-    // required string snapshot_file = 3;
     public static final int SNAPSHOT_FILE_FIELD_NUMBER = 3;
     private java.lang.Object snapshotFile_;
     /**
@@ -2126,7 +2128,8 @@ public final class LogProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasLastIncludedIndex()) {
         memoizedIsInitialized = 0;
@@ -2259,8 +2262,9 @@ public final class LogProto {
      * Protobuf type {@code Snapshot}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Snapshot)
+        org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.LogProto.internal_static_Snapshot_descriptor;
@@ -2405,7 +2409,6 @@ public final class LogProto {
       }
       private int bitField0_;
 
-      // required int64 last_included_index = 1;
       private long lastIncludedIndex_ ;
       /**
        * <code>required int64 last_included_index = 1;</code>
@@ -2438,7 +2441,6 @@ public final class LogProto {
         return this;
       }
 
-      // required int64 last_included_term = 2;
       private long lastIncludedTerm_ ;
       /**
        * <code>required int64 last_included_term = 2;</code>
@@ -2471,7 +2473,6 @@ public final class LogProto {
         return this;
       }
 
-      // required string snapshot_file = 3;
       private java.lang.Object snapshotFile_ = "";
       /**
        * <code>required string snapshot_file = 3;</code>
@@ -2485,9 +2486,12 @@ public final class LogProto {
       public java.lang.String getSnapshotFile() {
         java.lang.Object ref = snapshotFile_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          snapshotFile_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            snapshotFile_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -2556,10 +2560,10 @@ public final class LogProto {
     // @@protoc_insertion_point(class_scope:Snapshot)
   }
 
-  public interface JournalEntryOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface JournalEntryOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:JournalEntry)
+      com.google.protobuf.MessageOrBuilder {
 
-    // optional .Append append = 2;
     /**
      * <code>optional .Append append = 2;</code>
      */
@@ -2573,7 +2577,6 @@ public final class LogProto {
      */
     org.robotninjas.barge.proto.LogProto.AppendOrBuilder getAppendOrBuilder();
 
-    // optional .Vote vote = 4;
     /**
      * <code>optional .Vote vote = 4;</code>
      */
@@ -2587,7 +2590,6 @@ public final class LogProto {
      */
     org.robotninjas.barge.proto.LogProto.VoteOrBuilder getVoteOrBuilder();
 
-    // optional .Term term = 5;
     /**
      * <code>optional .Term term = 5;</code>
      */
@@ -2601,7 +2603,6 @@ public final class LogProto {
      */
     org.robotninjas.barge.proto.LogProto.TermOrBuilder getTermOrBuilder();
 
-    // optional .Commit commit = 6;
     /**
      * <code>optional .Commit commit = 6;</code>
      */
@@ -2615,7 +2616,6 @@ public final class LogProto {
      */
     org.robotninjas.barge.proto.LogProto.CommitOrBuilder getCommitOrBuilder();
 
-    // optional .Snapshot snapshot = 7;
     /**
      * <code>optional .Snapshot snapshot = 7;</code>
      */
@@ -2633,8 +2633,9 @@ public final class LogProto {
    * Protobuf type {@code JournalEntry}
    */
   public static final class JournalEntry extends
-      com.google.protobuf.GeneratedMessage
-      implements JournalEntryOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:JournalEntry)
+      JournalEntryOrBuilder {
     // Use JournalEntry.newBuilder() to construct.
     private JournalEntry(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -2785,7 +2786,6 @@ public final class LogProto {
     }
 
     private int bitField0_;
-    // optional .Append append = 2;
     public static final int APPEND_FIELD_NUMBER = 2;
     private org.robotninjas.barge.proto.LogProto.Append append_;
     /**
@@ -2807,7 +2807,6 @@ public final class LogProto {
       return append_;
     }
 
-    // optional .Vote vote = 4;
     public static final int VOTE_FIELD_NUMBER = 4;
     private org.robotninjas.barge.proto.LogProto.Vote vote_;
     /**
@@ -2829,7 +2828,6 @@ public final class LogProto {
       return vote_;
     }
 
-    // optional .Term term = 5;
     public static final int TERM_FIELD_NUMBER = 5;
     private org.robotninjas.barge.proto.LogProto.Term term_;
     /**
@@ -2851,7 +2849,6 @@ public final class LogProto {
       return term_;
     }
 
-    // optional .Commit commit = 6;
     public static final int COMMIT_FIELD_NUMBER = 6;
     private org.robotninjas.barge.proto.LogProto.Commit commit_;
     /**
@@ -2873,7 +2870,6 @@ public final class LogProto {
       return commit_;
     }
 
-    // optional .Snapshot snapshot = 7;
     public static final int SNAPSHOT_FIELD_NUMBER = 7;
     private org.robotninjas.barge.proto.LogProto.Snapshot snapshot_;
     /**
@@ -2905,7 +2901,8 @@ public final class LogProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (hasAppend()) {
         if (!getAppend().isInitialized()) {
@@ -3064,8 +3061,9 @@ public final class LogProto {
      * Protobuf type {@code JournalEntry}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.LogProto.JournalEntryOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:JournalEntry)
+        org.robotninjas.barge.proto.LogProto.JournalEntryOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.LogProto.internal_static_JournalEntry_descriptor;
@@ -3283,7 +3281,6 @@ public final class LogProto {
       }
       private int bitField0_;
 
-      // optional .Append append = 2;
       private org.robotninjas.barge.proto.LogProto.Append append_ = org.robotninjas.barge.proto.LogProto.Append.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.robotninjas.barge.proto.LogProto.Append, org.robotninjas.barge.proto.LogProto.Append.Builder, org.robotninjas.barge.proto.LogProto.AppendOrBuilder> appendBuilder_;
@@ -3392,7 +3389,7 @@ public final class LogProto {
         if (appendBuilder_ == null) {
           appendBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               org.robotninjas.barge.proto.LogProto.Append, org.robotninjas.barge.proto.LogProto.Append.Builder, org.robotninjas.barge.proto.LogProto.AppendOrBuilder>(
-                  append_,
+                  getAppend(),
                   getParentForChildren(),
                   isClean());
           append_ = null;
@@ -3400,7 +3397,6 @@ public final class LogProto {
         return appendBuilder_;
       }
 
-      // optional .Vote vote = 4;
       private org.robotninjas.barge.proto.LogProto.Vote vote_ = org.robotninjas.barge.proto.LogProto.Vote.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.robotninjas.barge.proto.LogProto.Vote, org.robotninjas.barge.proto.LogProto.Vote.Builder, org.robotninjas.barge.proto.LogProto.VoteOrBuilder> voteBuilder_;
@@ -3509,7 +3505,7 @@ public final class LogProto {
         if (voteBuilder_ == null) {
           voteBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               org.robotninjas.barge.proto.LogProto.Vote, org.robotninjas.barge.proto.LogProto.Vote.Builder, org.robotninjas.barge.proto.LogProto.VoteOrBuilder>(
-                  vote_,
+                  getVote(),
                   getParentForChildren(),
                   isClean());
           vote_ = null;
@@ -3517,7 +3513,6 @@ public final class LogProto {
         return voteBuilder_;
       }
 
-      // optional .Term term = 5;
       private org.robotninjas.barge.proto.LogProto.Term term_ = org.robotninjas.barge.proto.LogProto.Term.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.robotninjas.barge.proto.LogProto.Term, org.robotninjas.barge.proto.LogProto.Term.Builder, org.robotninjas.barge.proto.LogProto.TermOrBuilder> termBuilder_;
@@ -3626,7 +3621,7 @@ public final class LogProto {
         if (termBuilder_ == null) {
           termBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               org.robotninjas.barge.proto.LogProto.Term, org.robotninjas.barge.proto.LogProto.Term.Builder, org.robotninjas.barge.proto.LogProto.TermOrBuilder>(
-                  term_,
+                  getTerm(),
                   getParentForChildren(),
                   isClean());
           term_ = null;
@@ -3634,7 +3629,6 @@ public final class LogProto {
         return termBuilder_;
       }
 
-      // optional .Commit commit = 6;
       private org.robotninjas.barge.proto.LogProto.Commit commit_ = org.robotninjas.barge.proto.LogProto.Commit.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.robotninjas.barge.proto.LogProto.Commit, org.robotninjas.barge.proto.LogProto.Commit.Builder, org.robotninjas.barge.proto.LogProto.CommitOrBuilder> commitBuilder_;
@@ -3743,7 +3737,7 @@ public final class LogProto {
         if (commitBuilder_ == null) {
           commitBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               org.robotninjas.barge.proto.LogProto.Commit, org.robotninjas.barge.proto.LogProto.Commit.Builder, org.robotninjas.barge.proto.LogProto.CommitOrBuilder>(
-                  commit_,
+                  getCommit(),
                   getParentForChildren(),
                   isClean());
           commit_ = null;
@@ -3751,7 +3745,6 @@ public final class LogProto {
         return commitBuilder_;
       }
 
-      // optional .Snapshot snapshot = 7;
       private org.robotninjas.barge.proto.LogProto.Snapshot snapshot_ = org.robotninjas.barge.proto.LogProto.Snapshot.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.robotninjas.barge.proto.LogProto.Snapshot, org.robotninjas.barge.proto.LogProto.Snapshot.Builder, org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder> snapshotBuilder_;
@@ -3860,7 +3853,7 @@ public final class LogProto {
         if (snapshotBuilder_ == null) {
           snapshotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               org.robotninjas.barge.proto.LogProto.Snapshot, org.robotninjas.barge.proto.LogProto.Snapshot.Builder, org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder>(
-                  snapshot_,
+                  getSnapshot(),
                   getParentForChildren(),
                   isClean());
           snapshot_ = null;
@@ -3879,32 +3872,32 @@ public final class LogProto {
     // @@protoc_insertion_point(class_scope:JournalEntry)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Append_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Append_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Vote_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Vote_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Term_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Term_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Commit_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Commit_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Snapshot_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Snapshot_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_JournalEntry_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -3931,54 +3924,55 @@ public final class LogProto {
       "e.protoB\010LogProto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_Append_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_Append_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_Append_descriptor,
-              new java.lang.String[] { "Index", "Entry", });
-          internal_static_Vote_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_Vote_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_Vote_descriptor,
-              new java.lang.String[] { "VotedFor", });
-          internal_static_Term_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_Term_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_Term_descriptor,
-              new java.lang.String[] { "Term", });
-          internal_static_Commit_descriptor =
-            getDescriptor().getMessageTypes().get(3);
-          internal_static_Commit_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_Commit_descriptor,
-              new java.lang.String[] { "Index", });
-          internal_static_Snapshot_descriptor =
-            getDescriptor().getMessageTypes().get(4);
-          internal_static_Snapshot_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_Snapshot_descriptor,
-              new java.lang.String[] { "LastIncludedIndex", "LastIncludedTerm", "SnapshotFile", });
-          internal_static_JournalEntry_descriptor =
-            getDescriptor().getMessageTypes().get(5);
-          internal_static_JournalEntry_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_JournalEntry_descriptor,
-              new java.lang.String[] { "Append", "Vote", "Term", "Commit", "Snapshot", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           org.robotninjas.barge.proto.RaftEntry.getDescriptor(),
         }, assigner);
+    internal_static_Append_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_Append_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Append_descriptor,
+        new java.lang.String[] { "Index", "Entry", });
+    internal_static_Vote_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_Vote_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Vote_descriptor,
+        new java.lang.String[] { "VotedFor", });
+    internal_static_Term_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_Term_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Term_descriptor,
+        new java.lang.String[] { "Term", });
+    internal_static_Commit_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_Commit_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Commit_descriptor,
+        new java.lang.String[] { "Index", });
+    internal_static_Snapshot_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_Snapshot_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Snapshot_descriptor,
+        new java.lang.String[] { "LastIncludedIndex", "LastIncludedTerm", "SnapshotFile", });
+    internal_static_JournalEntry_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_JournalEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_JournalEntry_descriptor,
+        new java.lang.String[] { "Append", "Vote", "Term", "Commit", "Snapshot", });
+    org.robotninjas.barge.proto.RaftEntry.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

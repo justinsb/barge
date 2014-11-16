@@ -4,16 +4,25 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-public class ClusterConfig implements Serializable {
-  public static final long DEFAULT_TIMEOUT = 225;
+import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 
+public class ClusterConfig implements Serializable {
   public final Replica self;
   public final List<Replica> allMembers;
-  public final long electionTimeout;
+
+  public final ConfigTimeouts timeouts;
   
-  public ClusterConfig(Replica self, List<Replica> allMembers, long electionTimeout) {
+  public ClusterConfig(Replica self, List<Replica> allMembers, ConfigTimeouts timeouts) {
     this.self = self;
-    this.electionTimeout = electionTimeout;
+    this.timeouts = timeouts;
     this.allMembers = Collections.unmodifiableList(allMembers);
+  }
+
+  public static ConfigTimeouts buildDefaultTimeouts() {
+    ConfigTimeouts.Builder b = ConfigTimeouts.newBuilder();
+    b.setHeartbeatInterval(50);
+    b.setFollowerElectionStartDelay(1000);
+    b.setCandidateElectionTimeout(1000);
+    return b.build();
   }
 }

@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +42,7 @@ public class StateModule extends AbstractModule {
     bind(Raft.class).to(RaftStateContext.class).asEagerSingleton();
     // expose(Raft.class);
 
-    bind(ConfigurationState.class).toInstance(new ConfigurationState(self, seedConfig.allMembers, seedConfig.electionTimeout));
+    bind(ConfigurationState.class).toInstance(new ConfigurationState(self, seedConfig.allMembers, seedConfig.timeouts));
     // expose(ConfigurationState.class);
 
   }

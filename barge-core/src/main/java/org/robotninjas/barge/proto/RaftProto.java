@@ -8,10 +8,10 @@ public final class RaftProto {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface RequestVoteOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface RequestVoteOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:RequestVote)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 term = 1;
     /**
      * <code>required int64 term = 1;</code>
      */
@@ -21,7 +21,6 @@ public final class RaftProto {
      */
     long getTerm();
 
-    // required string candidate_id = 2;
     /**
      * <code>required string candidate_id = 2;</code>
      */
@@ -36,7 +35,6 @@ public final class RaftProto {
     com.google.protobuf.ByteString
         getCandidateIdBytes();
 
-    // required int64 last_log_index = 3;
     /**
      * <code>required int64 last_log_index = 3;</code>
      */
@@ -46,7 +44,6 @@ public final class RaftProto {
      */
     long getLastLogIndex();
 
-    // required int64 last_log_term = 4;
     /**
      * <code>required int64 last_log_term = 4;</code>
      */
@@ -60,8 +57,9 @@ public final class RaftProto {
    * Protobuf type {@code RequestVote}
    */
   public static final class RequestVote extends
-      com.google.protobuf.GeneratedMessage
-      implements RequestVoteOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:RequestVote)
+      RequestVoteOrBuilder {
     // Use RequestVote.newBuilder() to construct.
     private RequestVote(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -113,8 +111,9 @@ public final class RaftProto {
               break;
             }
             case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              candidateId_ = input.readBytes();
+              candidateId_ = bs;
               break;
             }
             case 24: {
@@ -167,7 +166,6 @@ public final class RaftProto {
     }
 
     private int bitField0_;
-    // required int64 term = 1;
     public static final int TERM_FIELD_NUMBER = 1;
     private long term_;
     /**
@@ -183,7 +181,6 @@ public final class RaftProto {
       return term_;
     }
 
-    // required string candidate_id = 2;
     public static final int CANDIDATE_ID_FIELD_NUMBER = 2;
     private java.lang.Object candidateId_;
     /**
@@ -226,7 +223,6 @@ public final class RaftProto {
       }
     }
 
-    // required int64 last_log_index = 3;
     public static final int LAST_LOG_INDEX_FIELD_NUMBER = 3;
     private long lastLogIndex_;
     /**
@@ -242,7 +238,6 @@ public final class RaftProto {
       return lastLogIndex_;
     }
 
-    // required int64 last_log_term = 4;
     public static final int LAST_LOG_TERM_FIELD_NUMBER = 4;
     private long lastLogTerm_;
     /**
@@ -267,7 +262,8 @@ public final class RaftProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTerm()) {
         memoizedIsInitialized = 0;
@@ -411,8 +407,9 @@ public final class RaftProto {
      * Protobuf type {@code RequestVote}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.RaftProto.RequestVoteOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:RequestVote)
+        org.robotninjas.barge.proto.RaftProto.RequestVoteOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.RaftProto.internal_static_RequestVote_descriptor;
@@ -570,7 +567,6 @@ public final class RaftProto {
       }
       private int bitField0_;
 
-      // required int64 term = 1;
       private long term_ ;
       /**
        * <code>required int64 term = 1;</code>
@@ -603,7 +599,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required string candidate_id = 2;
       private java.lang.Object candidateId_ = "";
       /**
        * <code>required string candidate_id = 2;</code>
@@ -617,9 +612,12 @@ public final class RaftProto {
       public java.lang.String getCandidateId() {
         java.lang.Object ref = candidateId_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          candidateId_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            candidateId_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -677,7 +675,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required int64 last_log_index = 3;
       private long lastLogIndex_ ;
       /**
        * <code>required int64 last_log_index = 3;</code>
@@ -710,7 +707,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required int64 last_log_term = 4;
       private long lastLogTerm_ ;
       /**
        * <code>required int64 last_log_term = 4;</code>
@@ -754,10 +750,10 @@ public final class RaftProto {
     // @@protoc_insertion_point(class_scope:RequestVote)
   }
 
-  public interface RequestVoteResponseOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface RequestVoteResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:RequestVoteResponse)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 term = 1;
     /**
      * <code>required int64 term = 1;</code>
      */
@@ -767,7 +763,6 @@ public final class RaftProto {
      */
     long getTerm();
 
-    // required bool vote_granted = 2;
     /**
      * <code>required bool vote_granted = 2;</code>
      */
@@ -781,8 +776,9 @@ public final class RaftProto {
    * Protobuf type {@code RequestVoteResponse}
    */
   public static final class RequestVoteResponse extends
-      com.google.protobuf.GeneratedMessage
-      implements RequestVoteResponseOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:RequestVoteResponse)
+      RequestVoteResponseOrBuilder {
     // Use RequestVoteResponse.newBuilder() to construct.
     private RequestVoteResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -878,7 +874,6 @@ public final class RaftProto {
     }
 
     private int bitField0_;
-    // required int64 term = 1;
     public static final int TERM_FIELD_NUMBER = 1;
     private long term_;
     /**
@@ -894,7 +889,6 @@ public final class RaftProto {
       return term_;
     }
 
-    // required bool vote_granted = 2;
     public static final int VOTE_GRANTED_FIELD_NUMBER = 2;
     private boolean voteGranted_;
     /**
@@ -917,7 +911,8 @@ public final class RaftProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTerm()) {
         memoizedIsInitialized = 0;
@@ -1039,8 +1034,9 @@ public final class RaftProto {
      * Protobuf type {@code RequestVoteResponse}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.RaftProto.RequestVoteResponseOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:RequestVoteResponse)
+        org.robotninjas.barge.proto.RaftProto.RequestVoteResponseOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.RaftProto.internal_static_RequestVoteResponse_descriptor;
@@ -1170,7 +1166,6 @@ public final class RaftProto {
       }
       private int bitField0_;
 
-      // required int64 term = 1;
       private long term_ ;
       /**
        * <code>required int64 term = 1;</code>
@@ -1203,7 +1198,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required bool vote_granted = 2;
       private boolean voteGranted_ ;
       /**
        * <code>required bool vote_granted = 2;</code>
@@ -1247,10 +1241,10 @@ public final class RaftProto {
     // @@protoc_insertion_point(class_scope:RequestVoteResponse)
   }
 
-  public interface AppendEntriesOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface AppendEntriesOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:AppendEntries)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 term = 1;
     /**
      * <code>required int64 term = 1;</code>
      */
@@ -1260,7 +1254,6 @@ public final class RaftProto {
      */
     long getTerm();
 
-    // required string leader_id = 2;
     /**
      * <code>required string leader_id = 2;</code>
      */
@@ -1275,7 +1268,6 @@ public final class RaftProto {
     com.google.protobuf.ByteString
         getLeaderIdBytes();
 
-    // required int64 prev_log_index = 3;
     /**
      * <code>required int64 prev_log_index = 3;</code>
      */
@@ -1285,7 +1277,6 @@ public final class RaftProto {
      */
     long getPrevLogIndex();
 
-    // required int64 prev_log_term = 4;
     /**
      * <code>required int64 prev_log_term = 4;</code>
      */
@@ -1295,7 +1286,6 @@ public final class RaftProto {
      */
     long getPrevLogTerm();
 
-    // required int64 commit_index = 5;
     /**
      * <code>required int64 commit_index = 5;</code>
      */
@@ -1305,7 +1295,6 @@ public final class RaftProto {
      */
     long getCommitIndex();
 
-    // repeated .Entry entries = 6;
     /**
      * <code>repeated .Entry entries = 6;</code>
      */
@@ -1334,8 +1323,9 @@ public final class RaftProto {
    * Protobuf type {@code AppendEntries}
    */
   public static final class AppendEntries extends
-      com.google.protobuf.GeneratedMessage
-      implements AppendEntriesOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:AppendEntries)
+      AppendEntriesOrBuilder {
     // Use AppendEntries.newBuilder() to construct.
     private AppendEntries(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -1387,8 +1377,9 @@ public final class RaftProto {
               break;
             }
             case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              leaderId_ = input.readBytes();
+              leaderId_ = bs;
               break;
             }
             case 24: {
@@ -1457,7 +1448,6 @@ public final class RaftProto {
     }
 
     private int bitField0_;
-    // required int64 term = 1;
     public static final int TERM_FIELD_NUMBER = 1;
     private long term_;
     /**
@@ -1473,7 +1463,6 @@ public final class RaftProto {
       return term_;
     }
 
-    // required string leader_id = 2;
     public static final int LEADER_ID_FIELD_NUMBER = 2;
     private java.lang.Object leaderId_;
     /**
@@ -1516,7 +1505,6 @@ public final class RaftProto {
       }
     }
 
-    // required int64 prev_log_index = 3;
     public static final int PREV_LOG_INDEX_FIELD_NUMBER = 3;
     private long prevLogIndex_;
     /**
@@ -1532,7 +1520,6 @@ public final class RaftProto {
       return prevLogIndex_;
     }
 
-    // required int64 prev_log_term = 4;
     public static final int PREV_LOG_TERM_FIELD_NUMBER = 4;
     private long prevLogTerm_;
     /**
@@ -1548,7 +1535,6 @@ public final class RaftProto {
       return prevLogTerm_;
     }
 
-    // required int64 commit_index = 5;
     public static final int COMMIT_INDEX_FIELD_NUMBER = 5;
     private long commitIndex_;
     /**
@@ -1564,7 +1550,6 @@ public final class RaftProto {
       return commitIndex_;
     }
 
-    // repeated .Entry entries = 6;
     public static final int ENTRIES_FIELD_NUMBER = 6;
     private java.util.List<org.robotninjas.barge.proto.RaftEntry.Entry> entries_;
     /**
@@ -1611,7 +1596,8 @@ public final class RaftProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTerm()) {
         memoizedIsInitialized = 0;
@@ -1779,8 +1765,9 @@ public final class RaftProto {
      * Protobuf type {@code AppendEntries}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.RaftProto.AppendEntriesOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:AppendEntries)
+        org.robotninjas.barge.proto.RaftProto.AppendEntriesOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.RaftProto.internal_static_AppendEntries_descriptor;
@@ -1999,7 +1986,6 @@ public final class RaftProto {
       }
       private int bitField0_;
 
-      // required int64 term = 1;
       private long term_ ;
       /**
        * <code>required int64 term = 1;</code>
@@ -2032,7 +2018,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required string leader_id = 2;
       private java.lang.Object leaderId_ = "";
       /**
        * <code>required string leader_id = 2;</code>
@@ -2046,9 +2031,12 @@ public final class RaftProto {
       public java.lang.String getLeaderId() {
         java.lang.Object ref = leaderId_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          leaderId_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            leaderId_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -2106,7 +2094,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required int64 prev_log_index = 3;
       private long prevLogIndex_ ;
       /**
        * <code>required int64 prev_log_index = 3;</code>
@@ -2139,7 +2126,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required int64 prev_log_term = 4;
       private long prevLogTerm_ ;
       /**
        * <code>required int64 prev_log_term = 4;</code>
@@ -2172,7 +2158,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required int64 commit_index = 5;
       private long commitIndex_ ;
       /**
        * <code>required int64 commit_index = 5;</code>
@@ -2205,7 +2190,6 @@ public final class RaftProto {
         return this;
       }
 
-      // repeated .Entry entries = 6;
       private java.util.List<org.robotninjas.barge.proto.RaftEntry.Entry> entries_ =
         java.util.Collections.emptyList();
       private void ensureEntriesIsMutable() {
@@ -2347,7 +2331,8 @@ public final class RaftProto {
           java.lang.Iterable<? extends org.robotninjas.barge.proto.RaftEntry.Entry> values) {
         if (entriesBuilder_ == null) {
           ensureEntriesIsMutable();
-          super.addAll(values, entries_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, entries_);
           onChanged();
         } else {
           entriesBuilder_.addAllMessages(values);
@@ -2456,10 +2441,10 @@ public final class RaftProto {
     // @@protoc_insertion_point(class_scope:AppendEntries)
   }
 
-  public interface AppendEntriesResponseOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface AppendEntriesResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:AppendEntriesResponse)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 term = 1;
     /**
      * <code>required int64 term = 1;</code>
      */
@@ -2469,7 +2454,6 @@ public final class RaftProto {
      */
     long getTerm();
 
-    // required bool success = 2;
     /**
      * <code>required bool success = 2;</code>
      */
@@ -2479,7 +2463,6 @@ public final class RaftProto {
      */
     boolean getSuccess();
 
-    // optional int64 last_log_index = 3;
     /**
      * <code>optional int64 last_log_index = 3;</code>
      */
@@ -2489,7 +2472,6 @@ public final class RaftProto {
      */
     long getLastLogIndex();
 
-    // optional .AppendEntriesResponse.TermInfo term_info = 4;
     /**
      * <code>optional .AppendEntriesResponse.TermInfo term_info = 4;</code>
      */
@@ -2507,8 +2489,9 @@ public final class RaftProto {
    * Protobuf type {@code AppendEntriesResponse}
    */
   public static final class AppendEntriesResponse extends
-      com.google.protobuf.GeneratedMessage
-      implements AppendEntriesResponseOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:AppendEntriesResponse)
+      AppendEntriesResponseOrBuilder {
     // Use AppendEntriesResponse.newBuilder() to construct.
     private AppendEntriesResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -2621,10 +2604,10 @@ public final class RaftProto {
       return PARSER;
     }
 
-    public interface TermInfoOrBuilder
-        extends com.google.protobuf.MessageOrBuilder {
+    public interface TermInfoOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:AppendEntriesResponse.TermInfo)
+        com.google.protobuf.MessageOrBuilder {
 
-      // required int64 term = 1;
       /**
        * <code>required int64 term = 1;</code>
        */
@@ -2634,7 +2617,6 @@ public final class RaftProto {
        */
       long getTerm();
 
-      // required int64 begin_index = 2;
       /**
        * <code>required int64 begin_index = 2;</code>
        */
@@ -2644,7 +2626,6 @@ public final class RaftProto {
        */
       long getBeginIndex();
 
-      // required int64 end_index = 3;
       /**
        * <code>required int64 end_index = 3;</code>
        */
@@ -2658,8 +2639,9 @@ public final class RaftProto {
      * Protobuf type {@code AppendEntriesResponse.TermInfo}
      */
     public static final class TermInfo extends
-        com.google.protobuf.GeneratedMessage
-        implements TermInfoOrBuilder {
+        com.google.protobuf.GeneratedMessage implements
+        // @@protoc_insertion_point(message_implements:AppendEntriesResponse.TermInfo)
+        TermInfoOrBuilder {
       // Use TermInfo.newBuilder() to construct.
       private TermInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
@@ -2760,7 +2742,6 @@ public final class RaftProto {
       }
 
       private int bitField0_;
-      // required int64 term = 1;
       public static final int TERM_FIELD_NUMBER = 1;
       private long term_;
       /**
@@ -2776,7 +2757,6 @@ public final class RaftProto {
         return term_;
       }
 
-      // required int64 begin_index = 2;
       public static final int BEGIN_INDEX_FIELD_NUMBER = 2;
       private long beginIndex_;
       /**
@@ -2792,7 +2772,6 @@ public final class RaftProto {
         return beginIndex_;
       }
 
-      // required int64 end_index = 3;
       public static final int END_INDEX_FIELD_NUMBER = 3;
       private long endIndex_;
       /**
@@ -2816,7 +2795,8 @@ public final class RaftProto {
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
-        if (isInitialized != -1) return isInitialized == 1;
+        if (isInitialized == 1) return true;
+        if (isInitialized == 0) return false;
 
         if (!hasTerm()) {
           memoizedIsInitialized = 0;
@@ -2949,8 +2929,9 @@ public final class RaftProto {
        * Protobuf type {@code AppendEntriesResponse.TermInfo}
        */
       public static final class Builder extends
-          com.google.protobuf.GeneratedMessage.Builder<Builder>
-         implements org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfoOrBuilder {
+          com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+          // @@protoc_insertion_point(builder_implements:AppendEntriesResponse.TermInfo)
+          org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfoOrBuilder {
         public static final com.google.protobuf.Descriptors.Descriptor
             getDescriptor() {
           return org.robotninjas.barge.proto.RaftProto.internal_static_AppendEntriesResponse_TermInfo_descriptor;
@@ -3093,7 +3074,6 @@ public final class RaftProto {
         }
         private int bitField0_;
 
-        // required int64 term = 1;
         private long term_ ;
         /**
          * <code>required int64 term = 1;</code>
@@ -3126,7 +3106,6 @@ public final class RaftProto {
           return this;
         }
 
-        // required int64 begin_index = 2;
         private long beginIndex_ ;
         /**
          * <code>required int64 begin_index = 2;</code>
@@ -3159,7 +3138,6 @@ public final class RaftProto {
           return this;
         }
 
-        // required int64 end_index = 3;
         private long endIndex_ ;
         /**
          * <code>required int64 end_index = 3;</code>
@@ -3204,7 +3182,6 @@ public final class RaftProto {
     }
 
     private int bitField0_;
-    // required int64 term = 1;
     public static final int TERM_FIELD_NUMBER = 1;
     private long term_;
     /**
@@ -3220,7 +3197,6 @@ public final class RaftProto {
       return term_;
     }
 
-    // required bool success = 2;
     public static final int SUCCESS_FIELD_NUMBER = 2;
     private boolean success_;
     /**
@@ -3236,7 +3212,6 @@ public final class RaftProto {
       return success_;
     }
 
-    // optional int64 last_log_index = 3;
     public static final int LAST_LOG_INDEX_FIELD_NUMBER = 3;
     private long lastLogIndex_;
     /**
@@ -3252,7 +3227,6 @@ public final class RaftProto {
       return lastLogIndex_;
     }
 
-    // optional .AppendEntriesResponse.TermInfo term_info = 4;
     public static final int TERM_INFO_FIELD_NUMBER = 4;
     private org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfo termInfo_;
     /**
@@ -3283,7 +3257,8 @@ public final class RaftProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTerm()) {
         memoizedIsInitialized = 0;
@@ -3425,8 +3400,9 @@ public final class RaftProto {
      * Protobuf type {@code AppendEntriesResponse}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.RaftProto.AppendEntriesResponseOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:AppendEntriesResponse)
+        org.robotninjas.barge.proto.RaftProto.AppendEntriesResponseOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.RaftProto.internal_static_AppendEntriesResponse_descriptor;
@@ -3589,7 +3565,6 @@ public final class RaftProto {
       }
       private int bitField0_;
 
-      // required int64 term = 1;
       private long term_ ;
       /**
        * <code>required int64 term = 1;</code>
@@ -3622,7 +3597,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required bool success = 2;
       private boolean success_ ;
       /**
        * <code>required bool success = 2;</code>
@@ -3655,7 +3629,6 @@ public final class RaftProto {
         return this;
       }
 
-      // optional int64 last_log_index = 3;
       private long lastLogIndex_ ;
       /**
        * <code>optional int64 last_log_index = 3;</code>
@@ -3688,7 +3661,6 @@ public final class RaftProto {
         return this;
       }
 
-      // optional .AppendEntriesResponse.TermInfo term_info = 4;
       private org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfo termInfo_ = org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfo.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfo, org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfo.Builder, org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfoOrBuilder> termInfoBuilder_;
@@ -3797,7 +3769,7 @@ public final class RaftProto {
         if (termInfoBuilder_ == null) {
           termInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfo, org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfo.Builder, org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse.TermInfoOrBuilder>(
-                  termInfo_,
+                  getTermInfo(),
                   getParentForChildren(),
                   isClean());
           termInfo_ = null;
@@ -3816,10 +3788,10 @@ public final class RaftProto {
     // @@protoc_insertion_point(class_scope:AppendEntriesResponse)
   }
 
-  public interface InstallSnapshotOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface InstallSnapshotOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:InstallSnapshot)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 term = 1;
     /**
      * <code>required int64 term = 1;</code>
      */
@@ -3829,7 +3801,6 @@ public final class RaftProto {
      */
     long getTerm();
 
-    // required int64 last_included_index = 2;
     /**
      * <code>required int64 last_included_index = 2;</code>
      */
@@ -3839,7 +3810,6 @@ public final class RaftProto {
      */
     long getLastIncludedIndex();
 
-    // required int64 last_included_term = 3;
     /**
      * <code>required int64 last_included_term = 3;</code>
      */
@@ -3849,7 +3819,6 @@ public final class RaftProto {
      */
     long getLastIncludedTerm();
 
-    // required bytes snapshot_data = 4;
     /**
      * <code>required bytes snapshot_data = 4;</code>
      */
@@ -3863,8 +3832,9 @@ public final class RaftProto {
    * Protobuf type {@code InstallSnapshot}
    */
   public static final class InstallSnapshot extends
-      com.google.protobuf.GeneratedMessage
-      implements InstallSnapshotOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:InstallSnapshot)
+      InstallSnapshotOrBuilder {
     // Use InstallSnapshot.newBuilder() to construct.
     private InstallSnapshot(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -3970,7 +3940,6 @@ public final class RaftProto {
     }
 
     private int bitField0_;
-    // required int64 term = 1;
     public static final int TERM_FIELD_NUMBER = 1;
     private long term_;
     /**
@@ -3986,7 +3955,6 @@ public final class RaftProto {
       return term_;
     }
 
-    // required int64 last_included_index = 2;
     public static final int LAST_INCLUDED_INDEX_FIELD_NUMBER = 2;
     private long lastIncludedIndex_;
     /**
@@ -4002,7 +3970,6 @@ public final class RaftProto {
       return lastIncludedIndex_;
     }
 
-    // required int64 last_included_term = 3;
     public static final int LAST_INCLUDED_TERM_FIELD_NUMBER = 3;
     private long lastIncludedTerm_;
     /**
@@ -4018,7 +3985,6 @@ public final class RaftProto {
       return lastIncludedTerm_;
     }
 
-    // required bytes snapshot_data = 4;
     public static final int SNAPSHOT_DATA_FIELD_NUMBER = 4;
     private com.google.protobuf.ByteString snapshotData_;
     /**
@@ -4043,7 +4009,8 @@ public final class RaftProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTerm()) {
         memoizedIsInitialized = 0;
@@ -4187,8 +4154,9 @@ public final class RaftProto {
      * Protobuf type {@code InstallSnapshot}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.RaftProto.InstallSnapshotOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:InstallSnapshot)
+        org.robotninjas.barge.proto.RaftProto.InstallSnapshotOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.RaftProto.internal_static_InstallSnapshot_descriptor;
@@ -4344,7 +4312,6 @@ public final class RaftProto {
       }
       private int bitField0_;
 
-      // required int64 term = 1;
       private long term_ ;
       /**
        * <code>required int64 term = 1;</code>
@@ -4377,7 +4344,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required int64 last_included_index = 2;
       private long lastIncludedIndex_ ;
       /**
        * <code>required int64 last_included_index = 2;</code>
@@ -4410,7 +4376,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required int64 last_included_term = 3;
       private long lastIncludedTerm_ ;
       /**
        * <code>required int64 last_included_term = 3;</code>
@@ -4443,7 +4408,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required bytes snapshot_data = 4;
       private com.google.protobuf.ByteString snapshotData_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes snapshot_data = 4;</code>
@@ -4490,10 +4454,10 @@ public final class RaftProto {
     // @@protoc_insertion_point(class_scope:InstallSnapshot)
   }
 
-  public interface InstallSnapshotResponseOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface InstallSnapshotResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:InstallSnapshotResponse)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 term = 1;
     /**
      * <code>required int64 term = 1;</code>
      */
@@ -4503,7 +4467,6 @@ public final class RaftProto {
      */
     long getTerm();
 
-    // required bool success = 2;
     /**
      * <code>required bool success = 2;</code>
      */
@@ -4517,8 +4480,9 @@ public final class RaftProto {
    * Protobuf type {@code InstallSnapshotResponse}
    */
   public static final class InstallSnapshotResponse extends
-      com.google.protobuf.GeneratedMessage
-      implements InstallSnapshotResponseOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:InstallSnapshotResponse)
+      InstallSnapshotResponseOrBuilder {
     // Use InstallSnapshotResponse.newBuilder() to construct.
     private InstallSnapshotResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -4614,7 +4578,6 @@ public final class RaftProto {
     }
 
     private int bitField0_;
-    // required int64 term = 1;
     public static final int TERM_FIELD_NUMBER = 1;
     private long term_;
     /**
@@ -4630,7 +4593,6 @@ public final class RaftProto {
       return term_;
     }
 
-    // required bool success = 2;
     public static final int SUCCESS_FIELD_NUMBER = 2;
     private boolean success_;
     /**
@@ -4653,7 +4615,8 @@ public final class RaftProto {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTerm()) {
         memoizedIsInitialized = 0;
@@ -4775,8 +4738,9 @@ public final class RaftProto {
      * Protobuf type {@code InstallSnapshotResponse}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.robotninjas.barge.proto.RaftProto.InstallSnapshotResponseOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:InstallSnapshotResponse)
+        org.robotninjas.barge.proto.RaftProto.InstallSnapshotResponseOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.robotninjas.barge.proto.RaftProto.internal_static_InstallSnapshotResponse_descriptor;
@@ -4906,7 +4870,6 @@ public final class RaftProto {
       }
       private int bitField0_;
 
-      // required int64 term = 1;
       private long term_ ;
       /**
        * <code>required int64 term = 1;</code>
@@ -4939,7 +4902,6 @@ public final class RaftProto {
         return this;
       }
 
-      // required bool success = 2;
       private boolean success_ ;
       /**
        * <code>required bool success = 2;</code>
@@ -5286,37 +5248,37 @@ public final class RaftProto {
     // @@protoc_insertion_point(class_scope:RaftService)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_RequestVote_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_RequestVote_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_RequestVoteResponse_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_RequestVoteResponse_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_AppendEntries_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_AppendEntries_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_AppendEntriesResponse_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_AppendEntriesResponse_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_AppendEntriesResponse_TermInfo_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_AppendEntriesResponse_TermInfo_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_InstallSnapshot_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_InstallSnapshot_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_InstallSnapshotResponse_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -5354,60 +5316,61 @@ public final class RaftProto {
       "barge.protoB\tRaftProto\210\001\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_RequestVote_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_RequestVote_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_RequestVote_descriptor,
-              new java.lang.String[] { "Term", "CandidateId", "LastLogIndex", "LastLogTerm", });
-          internal_static_RequestVoteResponse_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_RequestVoteResponse_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_RequestVoteResponse_descriptor,
-              new java.lang.String[] { "Term", "VoteGranted", });
-          internal_static_AppendEntries_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_AppendEntries_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_AppendEntries_descriptor,
-              new java.lang.String[] { "Term", "LeaderId", "PrevLogIndex", "PrevLogTerm", "CommitIndex", "Entries", });
-          internal_static_AppendEntriesResponse_descriptor =
-            getDescriptor().getMessageTypes().get(3);
-          internal_static_AppendEntriesResponse_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_AppendEntriesResponse_descriptor,
-              new java.lang.String[] { "Term", "Success", "LastLogIndex", "TermInfo", });
-          internal_static_AppendEntriesResponse_TermInfo_descriptor =
-            internal_static_AppendEntriesResponse_descriptor.getNestedTypes().get(0);
-          internal_static_AppendEntriesResponse_TermInfo_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_AppendEntriesResponse_TermInfo_descriptor,
-              new java.lang.String[] { "Term", "BeginIndex", "EndIndex", });
-          internal_static_InstallSnapshot_descriptor =
-            getDescriptor().getMessageTypes().get(4);
-          internal_static_InstallSnapshot_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_InstallSnapshot_descriptor,
-              new java.lang.String[] { "Term", "LastIncludedIndex", "LastIncludedTerm", "SnapshotData", });
-          internal_static_InstallSnapshotResponse_descriptor =
-            getDescriptor().getMessageTypes().get(5);
-          internal_static_InstallSnapshotResponse_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_InstallSnapshotResponse_descriptor,
-              new java.lang.String[] { "Term", "Success", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           org.robotninjas.barge.proto.RaftEntry.getDescriptor(),
         }, assigner);
+    internal_static_RequestVote_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_RequestVote_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_RequestVote_descriptor,
+        new java.lang.String[] { "Term", "CandidateId", "LastLogIndex", "LastLogTerm", });
+    internal_static_RequestVoteResponse_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_RequestVoteResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_RequestVoteResponse_descriptor,
+        new java.lang.String[] { "Term", "VoteGranted", });
+    internal_static_AppendEntries_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_AppendEntries_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_AppendEntries_descriptor,
+        new java.lang.String[] { "Term", "LeaderId", "PrevLogIndex", "PrevLogTerm", "CommitIndex", "Entries", });
+    internal_static_AppendEntriesResponse_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_AppendEntriesResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_AppendEntriesResponse_descriptor,
+        new java.lang.String[] { "Term", "Success", "LastLogIndex", "TermInfo", });
+    internal_static_AppendEntriesResponse_TermInfo_descriptor =
+      internal_static_AppendEntriesResponse_descriptor.getNestedTypes().get(0);
+    internal_static_AppendEntriesResponse_TermInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_AppendEntriesResponse_TermInfo_descriptor,
+        new java.lang.String[] { "Term", "BeginIndex", "EndIndex", });
+    internal_static_InstallSnapshot_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_InstallSnapshot_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_InstallSnapshot_descriptor,
+        new java.lang.String[] { "Term", "LastIncludedIndex", "LastIncludedTerm", "SnapshotData", });
+    internal_static_InstallSnapshotResponse_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_InstallSnapshotResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_InstallSnapshotResponse_descriptor,
+        new java.lang.String[] { "Term", "Success", });
+    org.robotninjas.barge.proto.RaftEntry.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

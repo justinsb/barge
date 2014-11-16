@@ -5,8 +5,10 @@ import java.util.concurrent.ScheduledFuture;
 
 import com.google.common.base.Optional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -19,8 +21,8 @@ class DeadlineTimer {
   private boolean started = false;
   private Optional<ScheduledFuture> future;
 
-  DeadlineTimer(ScheduledExecutorService scheduler, Runnable action, long timeout) {
-    this.scheduler = scheduler;
+  DeadlineTimer(@Nonnull ScheduledExecutorService scheduler, Runnable action, long timeout) {
+    this.scheduler = checkNotNull(scheduler);
     this.action = action;
     this.timeout = timeout;
     this.future = Optional.absent();

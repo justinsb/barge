@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 import org.robotninjas.barge.proto.RaftEntry.Entry;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 
@@ -38,11 +39,11 @@ public class ConfigurationState {
 
   private RaftMembership clusterMembership;
 
-  private final long electionTimeout;
+  private ConfigTimeouts timeouts;
 
-  public ConfigurationState(Replica self, List<Replica> seedMembers, long electionTimeout) {
+  public ConfigurationState(Replica self, List<Replica> seedMembers, ConfigTimeouts timeouts) {
     this.self = self;
-    this.electionTimeout = electionTimeout;
+    this.timeouts = timeouts;
 
     // The starting configuration is _no_ configuration.
     // We must (externally) create an initial configuration log entry which will be replayed
@@ -189,7 +190,7 @@ public class ConfigurationState {
     return allMembers;
   }
 
-  public long getElectionTimeout() {
-    return electionTimeout;
+  public ConfigTimeouts getTimeouts() {
+    return timeouts;
   }
 }

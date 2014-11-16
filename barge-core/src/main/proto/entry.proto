@@ -27,3 +27,15 @@ message Entry {
 	optional bytes command = 2;
 	optional Membership membership = 3;
 }
+
+message ConfigTimeouts {
+	// Time to wait for election as a candidate, before giving up
+	optional int64 candidate_election_timeout = 1;
+	
+	// Time to wait in follower state without a leader, before starting election
+	// Actually randomly chosen from [t, 2t)
+	optional int64 follower_election_start_delay = 2;
+
+	// Heartbeat interval: leader sends heartbeat if no message has happened in this time
+	optional int64 heartbeat_interval = 3;
+}	

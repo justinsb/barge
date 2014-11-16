@@ -20,25 +20,14 @@ package org.robotninjas.barge.state;
 import java.util.concurrent.ScheduledExecutorService;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.inject.Inject;
-
 import org.robotninjas.barge.*;
-import org.robotninjas.barge.log.RaftLog;
-import org.robotninjas.barge.state.Raft.StateType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.robotninjas.barge.proto.RaftProto.*;
-import static org.robotninjas.barge.state.Raft.StateType.CANDIDATE;
 import static org.robotninjas.barge.state.Raft.StateType.FOLLOWER;
 
 @NotThreadSafe
@@ -46,45 +35,42 @@ class Follower extends BaseState {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Follower.class);
 
-  private final ScheduledExecutorService scheduler;
-  private final long electionTimeout;
   private DeadlineTimer electionTimeoutTimer;
 
-  Follower(RaftLog log, BargeThreadPools threadPools, long electionTimeout, Optional<Replica> leader) {
-    super(FOLLOWER, log);
+  Follower(RaftStateContext ctx, Optional<Replica> leader) {
+    super(FOLLOWER, ctx);
 
     this.leader = leader;
-    
-    this.scheduler = checkNotNull(threadPools.getRaftScheduler());
-    checkArgument(electionTimeout >= 0);
-    this.electionTimeout = electionTimeout;
   }
 
   @Override
-  public void init(@Nonnull final RaftStateContext ctx) {
+  public void init() {
     LOGGER.debug("Init on follower: {}", this);
 
-//    Raft uses randomized election timeouts to ensure that
-//    split votes are rare and that they are resolved quickly. To
-//    prevent split votes in the first place, election timeouts are
-//    chosen randomly from a fixed interval (e.g., 150–300ms).
+    // Raft uses randomized election timeouts to ensure that
+    // split votes are rare and that they are resolved quickly. To
+    // prevent split votes in the first place, election timeouts are
+    // chosen randomly from a fixed interval (e.g., 150–300ms).
 
-    int t = (int) (electionTimeout * (1.0 + ctx.random().nextFloat()));
+    long timeout = ctx.getTimeouts().getFollowerElectionStartDelay();
+    timeout = timeout + (ctx.random().nextLong() % timeout);
+
+    ScheduledExecutorService scheduler = ctx.getRaftScheduler();
+
     electionTimeoutTimer = DeadlineTimer.start(scheduler, new Runnable() {
       @Override
       public void run() {
         LOGGER.debug("DeadlineTimer expired, starting election");
         ctx.setState(Follower.this, ctx.buildStateCandidate());
       }
-    }, t);
+    }, timeout);
   }
 
   @Override
-  public void destroy(RaftStateContext ctx) {
+  public void destroy() {
     LOGGER.debug("destroy on follower: {}", this);
     electionTimeoutTimer.cancel();
   }
-
 
   protected void resetTimer() {
     LOGGER.debug("resetTimer on follower: {}", this);
@@ -93,31 +79,23 @@ class Follower extends BaseState {
 
   @Nonnull
   @Override
-  public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation)
-      throws RaftException {
+  public ListenableFuture<Object> commitOperation(@Nonnull byte[] operation) throws RaftException {
     throw throwMustBeLeader();
   }
 
   protected RuntimeException throwMustBeLeader() throws RaftException {
-      throw new NotLeaderException(leader);
+    throw new NotLeaderException(leader);
   }
 
   @Override
-  public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership,
-      RaftMembership newMembership) throws RaftException {
+  public ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, RaftMembership newMembership)
+      throws RaftException {
     throw throwMustBeLeader();
   }
-  
 
   @Override
-  public RaftClusterHealth getClusterHealth(@Nonnull RaftStateContext ctx) throws RaftException {
-    throw  throwMustBeLeader();
+  public RaftClusterHealth getClusterHealth() throws RaftException {
+    throw throwMustBeLeader();
   }
-  
-  
-  @Override
-  public String toString() {
-    return "Follower [" + log.getName() + " @ " + log.self() + "]";
-  }
-   
+
 }
