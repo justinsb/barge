@@ -23,6 +23,8 @@ import com.google.common.net.HostAndPort;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
+
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -32,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Immutable
 @ThreadSafe
-public class Replica {
+public class Replica implements Serializable {
 
   private final String key;
   private InetSocketAddress address;

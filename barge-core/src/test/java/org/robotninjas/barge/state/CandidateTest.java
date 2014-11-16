@@ -113,8 +113,8 @@ public class CandidateTest {
 
     verify(mockRaftLog, never()).commitIndex(anyLong());
 
-    verify(mockRaftStateContext, times(1)).setState(any(Candidate.class), eq(Raft.StateType.FOLLOWER));
-    verify(mockRaftStateContext, times(1)).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
+    verify(mockRaftStateContext, times(1)).setState(any(Candidate.class), any(Follower.class));
+    verify(mockRaftStateContext, times(1)).setState(any(Candidate.class), any(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(2)).type();
     verifyNoMoreInteractions(mockRaftStateContext);
@@ -149,7 +149,7 @@ public class CandidateTest {
 
     verify(mockRaftLog, never()).commitIndex(anyLong());
 
-    verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
+    verify(mockRaftStateContext).setState(any(Candidate.class), any(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
     
@@ -182,7 +182,7 @@ public class CandidateTest {
 
     verify(mockRaftLog, never()).commitIndex(anyLong());
 
-    verify(mockRaftStateContext).setState(any(State.class), any(RaftStateContext.StateType.class));
+    verify(mockRaftStateContext).setState(any(State.class), any(State.class));
 
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
@@ -218,8 +218,8 @@ public class CandidateTest {
 
     verify(mockRaftLog, times(1)).commitIndex(anyLong());
 
-    verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.FOLLOWER));
-    verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
+    verify(mockRaftStateContext).setState(any(Candidate.class), any(Follower.class));
+    verify(mockRaftStateContext).setState(any(Candidate.class), any(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(2)).type();
     verifyNoMoreInteractions(mockRaftStateContext);
@@ -255,7 +255,7 @@ public class CandidateTest {
 
     verify(mockRaftLog, never()).commitIndex(anyLong());
 
-    verify(mockRaftStateContext).setState(any(Candidate.class), eq(Raft.StateType.LEADER));
+    verify(mockRaftStateContext).setState(any(Candidate.class), any(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
     
@@ -288,7 +288,7 @@ public class CandidateTest {
 
     verify(mockRaftLog, times(1)).commitIndex(anyLong());
 
-    verify(mockRaftStateContext).setState(any(Candidate.class), eq(LEADER));
+    verify(mockRaftStateContext).setState(any(Candidate.class), any(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verifyNoMoreInteractions(mockRaftStateContext);
     

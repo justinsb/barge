@@ -41,6 +41,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.inject.Inject;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -65,7 +66,7 @@ class Leader extends BaseState {
   private static final Logger LOGGER = LoggerFactory.getLogger(Leader.class);
 
   private static final long HEALTH_TIMEOUT = TimeUnit.MINUTES.toNanos(1);
-  
+
   private final ScheduledExecutorService scheduler;
   private final long electionTimeout;
   private final Map<Replica, ReplicaManager> replicaManagers = Maps.newHashMap();
@@ -73,9 +74,10 @@ class Leader extends BaseState {
 
   private ScheduledFuture<?> heartbeatTask;
 
+  private boolean isShutdown;
+
   @Inject
   Leader(RaftLog log, BargeThreadPools bargeThreadPools, long electionTimeout) {
-
     super(LEADER, log);
 
     this.scheduler = checkNotNull(bargeThreadPools.getRaftScheduler());
@@ -86,17 +88,15 @@ class Leader extends BaseState {
 
   @Override
   public void init(@Nonnull RaftStateContext ctx) {
-
     sendRequests(ctx);
     resetTimeout(ctx);
-
   }
 
-  private ReplicaManager getReplicaManager(RaftStateContext ctx, Replica replica) {
+  private ReplicaManager getManagerForReplica(RaftStateContext ctx, Replica replica) {
     assert replica != ctx.getConfigurationState().self();
     ReplicaManager replicaManager = replicaManagers.get(replica);
     if (replicaManager == null) {
-//      replicaManager = replicaManagerFactory.create(replica);
+      // replicaManager = replicaManagerFactory.create(replica);
       replicaManager = new ReplicaManager(ctx.getClientManager(), log, replica);
       replicaManagers.put(replica, replicaManager);
     }
@@ -122,12 +122,7 @@ class Leader extends BaseState {
   }
 
   @Override
-  public void doStop(RaftStateContext ctx) {
-    destroy(ctx);
-    super.doStop(ctx);
-  }
-
-  public void stepDown(RaftStateContext ctx) {
+  public void destroy(RaftStateContext ctx) {
     if (heartbeatTask != null) {
       heartbeatTask.cancel(false);
       heartbeatTask = null;
@@ -136,7 +131,13 @@ class Leader extends BaseState {
     for (ReplicaManager mgr : replicaManagers.values()) {
       mgr.shutdown();
     }
-    ctx.setState(this, FOLLOWER);
+  }
+
+  public void stepDown(RaftStateContext ctx, Optional<Replica> newLeader) {
+    if (!this.isShutdown) {
+      this.isShutdown = true;
+      ctx.setState(this, ctx.buildStateFollower(newLeader));
+    }
   }
 
   void resetTimeout(@Nonnull final RaftStateContext ctx) {
@@ -188,7 +189,7 @@ class Leader extends BaseState {
       if (replica == self) {
         sorted.add(log.lastLogIndex());
       } else {
-        ReplicaManager replicaManager = getReplicaManager(ctx, replica);
+        ReplicaManager replicaManager = getManagerForReplica(ctx, replica);
         if (replicaManager == null) {
           throw new IllegalStateException("No replica manager for server: " + replica);
         }
@@ -243,7 +244,9 @@ class Leader extends BaseState {
     // Upon committing a configuration that excludes itself, the leader
     // steps down.
     if (!configurationState.hasVote(configurationState.self())) {
-      stepDown(ctx /* logcabin: currentTerm + 1 */);
+      LOGGER.info("Don't have vote in new configuration; stepping down");
+
+      stepDown(ctx /* logcabin: currentTerm + 1 */, Optional.<Replica> absent());
       return;
     }
 
@@ -278,13 +281,16 @@ class Leader extends BaseState {
 
     long currentTerm = log.currentTerm();
     if (response.getTerm() < currentTerm) {
-      LOGGER.info("Caller has out-of-date term; ignoring response: {}", response);
+      LOGGER.info("Responder has out-of-date term; ignoring response: {}", response);
     }
 
     if (response.getTerm() > currentTerm) {
+      LOGGER.debug("Got response with greater term; stepping down: {}", response);
+
       log.currentTerm(response.getTerm());
-      stepDown(ctx);
-      ctx.setState(this, FOLLOWER);
+      Optional<Replica> newLeader = Optional.absent();
+
+      stepDown(ctx, newLeader);
     }
 
   }
@@ -298,7 +304,9 @@ class Leader extends BaseState {
   @VisibleForTesting
   List<ListenableFuture<AppendEntriesResponse>> sendRequests(final RaftStateContext ctx) {
     if (ctx.shouldStop()) {
-      stepDown(ctx);
+      LOGGER.info("Context stopping; stepping down");
+
+      stepDown(ctx, Optional.<Replica> absent());
       return null;
     }
 
@@ -312,7 +320,7 @@ class Leader extends BaseState {
       }
 
       boolean isVoting = configurationState.hasVote(replica);
-      ReplicaManager replicaManager = getReplicaManager(ctx, replica);
+      ReplicaManager replicaManager = getManagerForReplica(ctx, replica);
       ListenableFuture<AppendEntriesResponse> response = replicaManager.requestUpdate();
       responses.add(response);
       Futures.addCallback(response, new FutureCallback<AppendEntriesResponse>() {
@@ -427,7 +435,7 @@ class Leader extends BaseState {
         continue;
       }
 
-      ReplicaManager replicaManager = getReplicaManager(ctx, replica);
+      ReplicaManager replicaManager = getManagerForReplica(ctx, replica);
       long now = System.nanoTime();
       long lastSeen = replicaManager.getLastProofOfLife();
       if ((now - lastSeen) > HEALTH_TIMEOUT) {
@@ -439,7 +447,7 @@ class Leader extends BaseState {
     RaftClusterHealth health = new RaftClusterHealth(membership, deadPeers);
     return health;
   }
-  
+
   @Override
   public String toString() {
     return "Leader [" + log.getName() + " @ " + log.self() + "]";

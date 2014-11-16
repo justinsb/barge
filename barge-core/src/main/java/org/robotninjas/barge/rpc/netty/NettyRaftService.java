@@ -18,11 +18,11 @@ package org.robotninjas.barge.rpc.netty;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.protobuf.Service;
 
 import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.ClusterConfig;
-import org.robotninjas.barge.NoLeaderException;
 import org.robotninjas.barge.NotLeaderException;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftService;
@@ -52,12 +52,13 @@ import static com.google.common.base.Throwables.propagateIfInstanceOf;
 public class NettyRaftService extends RaftService {
 
   private final RpcServer rpcServer;
-  
+
   @Inject
-  NettyRaftService(@Nonnull RpcServer rpcServer, @Nonnull BargeThreadPools bargeThreadPools, @Nonnull RaftStateContext ctx, @Nonnull RaftLog raftLog) {
+  NettyRaftService(@Nonnull RpcServer rpcServer, @Nonnull BargeThreadPools bargeThreadPools,
+      @Nonnull RaftStateContext ctx, @Nonnull RaftLog raftLog) {
 
     super(bargeThreadPools, ctx, raftLog);
-    
+
     this.rpcServer = checkNotNull(rpcServer);
 
   }
@@ -120,7 +121,6 @@ public class NettyRaftService extends RaftService {
       return commitAsync(operation).get();
     } catch (ExecutionException e) {
       propagateIfInstanceOf(e.getCause(), NotLeaderException.class);
-      propagateIfInstanceOf(e.getCause(), NoLeaderException.class);
       throw propagate(e.getCause());
     }
   }
@@ -139,35 +139,34 @@ public class NettyRaftService extends RaftService {
 
   public static class Builder {
 
-//    private final NettyClusterConfig config;
-    public Replica self;
+    // private final NettyClusterConfig config;
     public ClusterConfig seedConfig;
     public File logDir;
     public StateTransitionListener listener;
     public StateMachine stateMachine;
 
-//    protected Builder(NettyClusterConfig config) {
-//      this.config = config;
-//    }
-//
-//    public Builder timeout(long timeout) {
-//      this.timeout = timeout;
-//      return this;
-//    }
-//
-//    public Builder logDir(File logDir) {
-//      this.logDir = logDir;
-//      return this;
-//    }
+    // protected Builder(NettyClusterConfig config) {
+    // this.config = config;
+    // }
+    //
+    // public Builder timeout(long timeout) {
+    // this.timeout = timeout;
+    // return this;
+    // }
+    //
+    // public Builder logDir(File logDir) {
+    // this.logDir = logDir;
+    // return this;
+    // }
 
     public NettyRaftService build() {
-//      logDir = Files.createTempDir();
+      // logDir = Files.createTempDir();
       checkNotNull(logDir);
-      checkNotNull(self);
       checkNotNull(seedConfig);
+      checkNotNull(seedConfig.self);
 
-      NettyRaftService nettyRaftService = Guice.createInjector(new NettyRaftModule(self, seedConfig, logDir, stateMachine)).getInstance(
-          NettyRaftService.class);
+      Injector injector = Guice.createInjector(new NettyRaftModule(seedConfig, logDir, stateMachine));
+      NettyRaftService nettyRaftService = injector.getInstance(NettyRaftService.class);
 
       if (listener != null) {
         nettyRaftService.addTransitionListener(listener);
@@ -176,10 +175,10 @@ public class NettyRaftService extends RaftService {
       return nettyRaftService;
     }
 
-//    public Builder transitionListener(StateTransitionListener listener) {
-//      this.listener = listener;
-//      return this;
-//    }
+    // public Builder transitionListener(StateTransitionListener listener) {
+    // this.listener = listener;
+    // return this;
+    // }
   }
 
 }

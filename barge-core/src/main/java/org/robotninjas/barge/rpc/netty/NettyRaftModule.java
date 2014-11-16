@@ -16,8 +16,8 @@ public class NettyRaftModule extends PrivateModule {
   private final StateMachine stateMachine;
   private final ClusterConfig seedConfig;
 
-  public NettyRaftModule(Replica self, ClusterConfig seedConfig, File logDir, StateMachine stateMachine) {
-    this.self = self;
+  public NettyRaftModule(ClusterConfig seedConfig, File logDir, StateMachine stateMachine) {
+    this.self = seedConfig.self;
     this.seedConfig = seedConfig;
     this.logDir = logDir;
     this.stateMachine = stateMachine;
@@ -31,12 +31,11 @@ public class NettyRaftModule extends PrivateModule {
     options.seedConfig = seedConfig;
     options.logDir = logDir;
     options.stateMachine = stateMachine;
-//                                .withTimeout(timeout)
-//                                .withSelf(self
-//                                .withLogDir(logDir)
-//                                .withStateMachine(stateMachine);
-                                
-    
+    // .withTimeout(timeout)
+    // .withSelf(self
+    // .withLogDir(logDir)
+    // .withStateMachine(stateMachine);
+
     install(options.build());
 
     install(new RaftProtoRpcModule(options));

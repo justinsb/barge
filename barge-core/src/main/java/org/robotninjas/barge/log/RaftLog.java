@@ -71,4 +71,6 @@ public interface RaftLog {
 
   public void load();
 
+  boolean isEmpty();
+
 }

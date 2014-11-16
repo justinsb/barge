@@ -92,7 +92,6 @@ public class StartStopTest {
     ClusterConfig seedConfig = new ClusterConfig(self, Arrays.asList(self), ClusterConfig.DEFAULT_TIMEOUT);
 
     NettyRaftService.Builder raftServiceBuilder = NettyRaftService.newBuilder();
-    raftServiceBuilder.self = self;
     raftServiceBuilder.seedConfig = seedConfig;
     raftServiceBuilder.logDir = logDir;
     raftServiceBuilder.stateMachine = state;

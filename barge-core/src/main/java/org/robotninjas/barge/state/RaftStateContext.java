@@ -16,8 +16,10 @@
 
 package org.robotninjas.barge.state;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
@@ -25,6 +27,7 @@ import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
+import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.rpc.RaftClientManager;
 import org.slf4j.Logger;
@@ -36,6 +39,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.inject.Inject;
 
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -51,8 +55,7 @@ public class RaftStateContext implements Raft {
   private final Executor executor;
   private final Set<StateTransitionListener> listeners = Sets.newConcurrentHashSet();
 
-  private volatile StateType state;
-  private volatile State delegate;
+  private volatile State state;
 
   private boolean stop;
 
@@ -64,12 +67,16 @@ public class RaftStateContext implements Raft {
 
   private final BargeThreadPools threadPools;
 
+  private final Random random = new Random();
+  
   @Inject
-  RaftStateContext(RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState, BargeThreadPools threadPools) {
+  RaftStateContext(RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState,
+      BargeThreadPools threadPools) {
     this(log.self().toString(), log, clientManager, configurationState, threadPools);
   }
 
-  RaftStateContext(String name, RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState, BargeThreadPools threadPools) {
+  RaftStateContext(String name, RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState,
+      BargeThreadPools threadPools) {
     this.configurationState = configurationState;
     this.log = log;
     MDC.put("self", name);
@@ -81,12 +88,12 @@ public class RaftStateContext implements Raft {
   }
 
   @Override
-  public ListenableFuture init() {
+  public ListenableFuture<Void> init() {
 
-    ListenableFutureTask init = ListenableFutureTask.create(new Callable() {
+    ListenableFutureTask<Void> init = ListenableFutureTask.create(new Callable<Void>() {
       @Override
-      public Object call() {
-        setState(null, StateType.START);
+      public Void call() throws RaftException {
+        setState(null, buildStateStart());
         return null;
       }
     });
@@ -97,18 +104,20 @@ public class RaftStateContext implements Raft {
 
   }
 
+
   @Override
   @Nonnull
   public RequestVoteResponse requestVote(@Nonnull final RequestVote request) {
 
     checkNotNull(request);
 
-    ListenableFutureTask<RequestVoteResponse> response = ListenableFutureTask.create(new Callable<RequestVoteResponse>() {
-      @Override
-      public RequestVoteResponse call() throws Exception {
-        return delegate.requestVote(RaftStateContext.this, request);
-      }
-    });
+    ListenableFutureTask<RequestVoteResponse> response = ListenableFutureTask
+        .create(new Callable<RequestVoteResponse>() {
+          @Override
+          public RequestVoteResponse call() throws Exception {
+            return state.requestVote(RaftStateContext.this, request);
+          }
+        });
 
     executor.execute(response);
 
@@ -126,12 +135,13 @@ public class RaftStateContext implements Raft {
 
     checkNotNull(request);
 
-    ListenableFutureTask<AppendEntriesResponse> response = ListenableFutureTask.create(new Callable<AppendEntriesResponse>() {
-      @Override
-      public AppendEntriesResponse call() throws Exception {
-        return delegate.appendEntries(RaftStateContext.this, request);
-      }
-    });
+    ListenableFutureTask<AppendEntriesResponse> response = ListenableFutureTask
+        .create(new Callable<AppendEntriesResponse>() {
+          @Override
+          public AppendEntriesResponse call() throws Exception {
+            return state.appendEntries(RaftStateContext.this, request);
+          }
+        });
 
     executor.execute(response);
 
@@ -149,69 +159,81 @@ public class RaftStateContext implements Raft {
 
     checkNotNull(op);
 
-    ListenableFutureTask<Object> response = ListenableFutureTask.create(new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        return delegate.commitOperation(RaftStateContext.this, op);
-      }
-    });
+    ListenableFutureTask<ListenableFuture<Object>> response = ListenableFutureTask
+        .create(new Callable<ListenableFuture<Object>>() {
+          @Override
+          public ListenableFuture<Object> call() throws Exception {
+            return state.commitOperation(RaftStateContext.this, op);
+          }
+        });
 
     executor.execute(response);
 
-    return response;
+    return Futures.dereference(response);
 
   }
 
   @Nonnull
-  public ListenableFuture<Boolean> setConfiguration(@Nonnull RaftMembership oldMembership, @Nonnull RaftMembership newMembership) throws RaftException {
+  public ListenableFuture<Boolean> setConfiguration(@Nonnull RaftMembership oldMembership,
+      @Nonnull RaftMembership newMembership) throws RaftException {
     checkNotNull(oldMembership);
     checkNotNull(newMembership);
-    return delegate.setConfiguration(this, oldMembership, newMembership);
+    return state.setConfiguration(this, oldMembership, newMembership);
   }
 
-  public synchronized void setState(State oldState, @Nonnull StateType state) {
+  public synchronized void setState(State oldState, @Nonnull State newState) {
 
-    if (this.delegate != oldState) {
-      LOGGER.info("Previous state was not correct (transitioning to {}). Expected {}, was {}", state, oldState, this.delegate);
+    if (this.state != oldState) {
+      LOGGER.info("Previous state was not correct (transitioning to {}). Expected {}, was {}", newState, state, oldState);
       notifiesInvalidTransition(oldState);
       throw new IllegalStateException();
     }
 
-    StateType newState;
-    if (stop) {
-      newState = StateType.STOPPED;
-      LOGGER.info("Service stopping; replaced state with {}", state);
-    } else {
-      newState = checkNotNull(state);
+//    StateType newState;
+    if (stop && state.type() != StateType.STOPPED) {
+      newState = buildStateStopped();
+      LOGGER.info("Service stopping; replaced state with {}", newState);
+//    } else {
+//      newState = checkNotNull(state);
     }
 
     LOGGER.info("Transition: old state: {}, new state: {}", this.state, newState);
-    if (this.delegate != null) {
-      this.delegate.destroy(this);
+    if (this.state != null) {
+      this.state.destroy(this);
     }
 
     this.state = checkNotNull(newState);
-
-    delegate = makeState(state);
 
     MDC.put("state", this.state.toString());
 
     notifiesChangeState(oldState);
 
-    if (delegate != null) {
-      delegate.init(this);
+    if (state != null) {
+      state.init(this);
     }
+
+//    if (this.state.type() == StateType.LEADER) {
+//      if (log.isEmpty()) {
+//        RaftMembership initialMembership = getConfigurationState().getClusterMembership();
+//        try {
+//          state.setConfiguration(this, null, initialMembership);
+//        } catch (RaftException e) {
+//          LOGGER.error("Error during bootstrap", e);
+//          throw new IllegalStateException("Error during bootstrap", e);
+//        }
+//      }
+//    }
   }
 
   private void notifiesInvalidTransition(State oldState) {
     for (StateTransitionListener listener : listeners) {
-      listener.invalidTransition(this, state, oldState == null ? null : oldState.type());
+      listener.invalidTransition(this, state.type(), oldState == null ? null : oldState.type());
     }
   }
 
   private void notifiesChangeState(State oldState) {
     for (StateTransitionListener listener : listeners) {
-      listener.changeState(this, oldState == null ? null : oldState.type(), state);
+      listener.changeState(this, oldState == null ? null : oldState.type(), state.type());
     }
   }
 
@@ -223,13 +245,13 @@ public class RaftStateContext implements Raft {
   @Override
   @Nonnull
   public StateType type() {
-    return state;
+    return state.type();
   }
 
   public synchronized void stop() {
     stop = true;
-    if (this.delegate != null) {
-      this.delegate.doStop(this);
+    if (this.state != null) {
+      this.state.doStop(this);
     }
   }
 
@@ -241,7 +263,8 @@ public class RaftStateContext implements Raft {
 
     @Override
     public void invalidTransition(@Nonnull Raft context, @Nonnull StateType actual, @Nullable StateType expected) {
-      LOGGER.warn("LogListener: State transition from incorrect previous state.  Expected {}, was {}", actual, expected);
+      LOGGER
+          .warn("LogListener: State transition from incorrect previous state.  Expected {}, was {}", actual, expected);
     }
   }
 
@@ -255,40 +278,51 @@ public class RaftStateContext implements Raft {
   }
 
   public synchronized boolean isStopped() {
-    return this.state == StateType.STOPPED;
+    return this.state.type() == StateType.STOPPED;
   }
 
   public boolean isLeader() {
-    return this.state == StateType.LEADER;
+    return this.state.type() == StateType.LEADER;
   }
 
   public RaftClusterHealth getClusterHealth() throws RaftException {
-    return delegate.getClusterHealth(this);
+    return state.getClusterHealth(this);
   }
 
   public RaftClientManager getClientManager() {
     return clientManager;
   }
 
-  State makeState(RaftStateContext.StateType state) {
-    switch (state) {
-    case START:
-      return new Start(log);
-    case FOLLOWER:
-      return new Follower(log, threadPools, configurationState.getElectionTimeout());
-    case LEADER:
-      return new Leader(log, threadPools, configurationState.getElectionTimeout());
-    case CANDIDATE:
-      return new Candidate(log, threadPools, configurationState.getElectionTimeout(), clientManager);
-    case STOPPED:
-      return new Stopped(log);
-    default:
-      throw new IllegalStateException("the impossible happpened, unknown state type " + state);
-    }
-  }
   @Override
   public String toString() {
     return "RaftStateContext [state=" + state + ", configurationState=" + configurationState + "]";
   }
 
+  Follower buildStateFollower(Optional<Replica> leader) {
+    return new Follower(log, threadPools, configurationState.getElectionTimeout() * 3, leader);
+  }
+
+  Start buildStateStart() {
+    return new Start(log);
+  }
+
+  Stopped buildStateStopped() {
+    return new Stopped(log);
+  }
+
+  Candidate buildStateCandidate() {
+    return new Candidate(log, threadPools, configurationState.getElectionTimeout() * 3, clientManager);
+  }
+  
+  Leader buildStateLeader() {
+    return new Leader(log, threadPools, configurationState.getElectionTimeout());
+  }
+
+  public Replica self() {
+    return this.log.self();
+  }
+
+  Random random() {
+    return random;
+  }
 }

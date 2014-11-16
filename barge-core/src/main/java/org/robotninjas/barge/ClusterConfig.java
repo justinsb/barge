@@ -1,9 +1,10 @@
 package org.robotninjas.barge;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-public class ClusterConfig {
+public class ClusterConfig implements Serializable {
   public static final long DEFAULT_TIMEOUT = 225;
 
   public final Replica self;

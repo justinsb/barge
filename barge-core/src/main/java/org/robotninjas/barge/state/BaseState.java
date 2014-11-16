@@ -26,6 +26,7 @@ public abstract class BaseState implements State {
   protected BaseState(@Nullable StateType type, @Nonnull RaftLog log) {
     this.log = checkNotNull(log);
     this.type = type;
+    this.leader = Optional.absent();
   }
 
   @Nullable
@@ -99,7 +100,9 @@ public abstract class BaseState implements State {
         log.currentTerm(request.getTerm());
 
         if (ctx.type().equals(LEADER) || ctx.type().equals(CANDIDATE)) {
-          ctx.setState(this, FOLLOWER);
+          Follower follower = ctx.buildStateFollower(Optional.of(Replica.fromString(request.getLeaderId())));
+          ctx.setState(this, follower);
+          // TODO: Do we really want to append to log here?
         }
 
       }
@@ -145,7 +148,7 @@ public abstract class BaseState implements State {
         log.currentTerm(term);
 
         if (ctx.type().equals(LEADER) || ctx.type().equals(CANDIDATE)) {
-          ctx.setState(this, FOLLOWER);
+          ctx.setState(this, ctx.buildStateFollower(Optional.<Replica>absent()));
         }
 
       }
@@ -181,8 +184,15 @@ public abstract class BaseState implements State {
   
   @Override
   public void doStop(RaftStateContext ctx) {
-    ctx.setState(this, STOPPED);
+    ctx.setState(this, ctx.buildStateStopped());
   }
 
+  @Override
+  public String toString() {
+    return type.toString() + " [" + log.getName() + " @ " + log.self() + "]";
+  }
+   
+
+  
 
 }

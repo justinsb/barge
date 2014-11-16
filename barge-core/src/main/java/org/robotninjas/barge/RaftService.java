@@ -21,32 +21,33 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 /**
  * An instance of a set of replica managed through Raft protocol.
  * <p>
- *   A {@link RaftService} instance is constructed by specific builders depending on: Communication protocol used,
- *   persistent storage, network characteristics...
+ * A {@link RaftService} instance is constructed by specific builders depending on: Communication protocol used,
+ * persistent storage, network characteristics...
  * </p>
  */
 public abstract class RaftService extends AbstractService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RaftService.class);
-  
+
   private final ListeningExecutorService executor;
-//  private final RpcServer rpcServer;
+  // private final RpcServer rpcServer;
   protected final RaftStateContext ctx;
   protected final RaftLog raftLog;
 
   protected final BargeThreadPools bargeThreadPools;
-  
+
   @Inject
-  protected RaftService(@Nonnull BargeThreadPools bargeThreadPools, @Nonnull RaftStateContext ctx, @Nonnull RaftLog raftLog) {
+  protected RaftService(@Nonnull BargeThreadPools bargeThreadPools, @Nonnull RaftStateContext ctx,
+      @Nonnull RaftLog raftLog) {
 
     this.bargeThreadPools = checkNotNull(bargeThreadPools);
     this.executor = checkNotNull(bargeThreadPools.getRaftExecutor());
-//    this.rpcServer = checkNotNull(rpcServer);
+    // this.rpcServer = checkNotNull(rpcServer);
     this.ctx = checkNotNull(ctx);
     this.raftLog = raftLog;
 
   }
-  
+
   public RaftClusterHealth getClusterHealth() throws RaftException {
 
     // Make sure this happens on the Barge thread
@@ -59,18 +60,18 @@ public abstract class RaftService extends AbstractService {
 
     return Futures.get(response, RaftException.class);
   }
-    
+
   /**
    * Asynchronously executes an operation on the state machine managed by barge.
    * <p>
-   * When the result becomes available, the operation is guaranteed to have been committed to the Raft
-   * cluster in such a way that it is permanent and will be seen, eventually, by all present and
-   * future members of the cluster.
+   * When the result becomes available, the operation is guaranteed to have been committed to the Raft cluster in such a
+   * way that it is permanent and will be seen, eventually, by all present and future members of the cluster.
    * </p>
    *
-   * @param operation an arbitrary operation to be sent to the <em>state machine</em> managed by Raft.
-   * @return the result of executing the operation, wrapped in a {@link ListenableFuture}, that can be retrieved
-   *         at a later point in time.
+   * @param operation
+   *          an arbitrary operation to be sent to the <em>state machine</em> managed by Raft.
+   * @return the result of executing the operation, wrapped in a {@link ListenableFuture}, that can be retrieved at a
+   *         later point in time.
    * @throws org.robotninjas.barge.RaftException
    */
   public abstract ListenableFuture<Object> commitAsync(byte[] operation) throws RaftException;
@@ -80,26 +81,29 @@ public abstract class RaftService extends AbstractService {
    * <p>
    * This method is semantically equivalent to:
    * </p>
+   * 
    * <pre>
-   *     commitAsync(op).get();
+   * commitAsync(op).get();
    * </pre>
    *
-   * @param operation an arbitrary operation to be sent to the <em>state machine</em> managed by Raft.
+   * @param operation
+   *          an arbitrary operation to be sent to the <em>state machine</em> managed by Raft.
    * @return the result of executing the operation, as returned by the state machine.
    * @throws RaftException
-   * @throws InterruptedException if current thread is interrupted while waiting for the result to be available.
+   * @throws InterruptedException
+   *           if current thread is interrupted while waiting for the result to be available.
    */
   public abstract Object commit(byte[] operation) throws RaftException, InterruptedException;
-  
-//  // TODO: This should probably take a RaftMembership
-//  public void bootstrap(Membership membership) {
-//    LOGGER.info("Bootstrapping log with {}", membership);
-//    if (!raftLog.isEmpty()) {
-//      LOGGER.warn("Cannot bootstrap, as raft log already contains data");
-//      throw new IllegalStateException();
-//    }
-//    raftLog.append(null, membership);
-//  }
+
+  // TODO: This should probably take a RaftMembership
+  public void bootstrap(Membership membership) {
+    LOGGER.info("Bootstrapping log with {}", membership);
+    if (!raftLog.isEmpty()) {
+      LOGGER.warn("Cannot bootstrap, as raft log already contains data");
+      throw new IllegalStateException();
+    }
+    raftLog.append(null, membership);
+  }
 
   public ListenableFuture<Boolean> setConfiguration(final RaftMembership oldMembership,
       final RaftMembership newMembership) {
@@ -132,6 +136,9 @@ public abstract class RaftService extends AbstractService {
   public String toString() {
     return "RaftService [log=" + raftLog + ", ctx=" + ctx + "]";
   }
-  
-  
+
+  public Replica self() {
+    return ctx.self();
+  }
+
 }

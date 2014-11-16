@@ -161,7 +161,7 @@ public class JournalRaftLog implements RaftLog {
   }
 
   private SettableFuture<Object> storeEntry(final long index, @Nonnull Entry entry) {
-    LOGGER.debug("{} storing {}", config.self(), entry);
+//    LOGGER.debug("{} storing {}", config.self(), entry);
     RaftJournal.Mark mark = journal.appendEntry(entry, index);
     log.put(index, mark);
     
@@ -285,8 +285,8 @@ public class JournalRaftLog implements RaftLog {
           throw new IllegalStateException();
         }
         Entry entry = journal.get(mark);
-        final SettableFuture<Object> returnedResult = operationResults.remove(i);
-        assert returnedResult != null;
+        final SettableFuture<Object> operationResult = operationResults.remove(i);
+        assert operationResult != null;
 
         if (entry.hasCommand()) {
           ByteString command = entry.getCommand();
@@ -296,17 +296,12 @@ public class JournalRaftLog implements RaftLog {
           final ByteBuffer operation = command.asReadOnlyByteBuffer();
 
           ListenableFuture<Object> result = stateMachine.dispatchOperation(operation);
-          Futures.addCallback(result, new PromiseBridge<Object>(returnedResult));
-        }
-
-        if (!entry.hasMembership() && !entry.hasCommand()) {
-          if (returnedResult != null) {
-            Futures.addCallback(returnedResult, new PromiseBridge<Object>(returnedResult));
+          if (operationResult != null) {
+            Futures.addCallback(result, new PromiseBridge<Object>(operationResult));
           }
-          // TODO: If this fails during replay, what should we do?
         } else if (entry.hasMembership()) {
-          if (returnedResult != null) {
-            returnedResult.set(Boolean.TRUE);
+          if (operationResult != null) {
+            operationResult.set(Boolean.TRUE);
           }
         } else {
           LOGGER.warn("Ignoring unusual log entry: {}", entry);
@@ -389,6 +384,7 @@ public class JournalRaftLog implements RaftLog {
     private final SettableFuture<V> promise;
 
     private PromiseBridge(SettableFuture<V> promise) {
+      checkNotNull(promise);
       this.promise = promise;
     }
 

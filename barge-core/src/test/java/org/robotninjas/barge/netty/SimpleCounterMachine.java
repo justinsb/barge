@@ -7,7 +7,6 @@ import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
-import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.rpc.netty.NettyRaftService;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -71,7 +70,6 @@ public class SimpleCounterMachine implements StateMachine {
 //    NettyClusterConfig config1 = NettyClusterConfig.from(replicas.get(id % clusterSize), configuration);
 
     NettyRaftService.Builder b = NettyRaftService.newBuilder();
-    b.self = self;
     b.seedConfig = seedConfig;
     b.logDir = logDirectory;
     b.listener = groupOfCounters;

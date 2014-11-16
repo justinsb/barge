@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +19,7 @@ package org.robotninjas.barge.state;
 
 import java.util.concurrent.ScheduledExecutorService;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -48,9 +50,11 @@ class Follower extends BaseState {
   private final long electionTimeout;
   private DeadlineTimer electionTimeoutTimer;
 
-  Follower(RaftLog log, BargeThreadPools threadPools, long electionTimeout) {
+  Follower(RaftLog log, BargeThreadPools threadPools, long electionTimeout, Optional<Replica> leader) {
     super(FOLLOWER, log);
 
+    this.leader = leader;
+    
     this.scheduler = checkNotNull(threadPools.getRaftScheduler());
     checkArgument(electionTimeout >= 0);
     this.electionTimeout = electionTimeout;
@@ -59,14 +63,20 @@ class Follower extends BaseState {
   @Override
   public void init(@Nonnull final RaftStateContext ctx) {
     LOGGER.debug("Init on follower: {}", this);
-    
+
+//    Raft uses randomized election timeouts to ensure that
+//    split votes are rare and that they are resolved quickly. To
+//    prevent split votes in the first place, election timeouts are
+//    chosen randomly from a fixed interval (e.g., 150–300ms).
+
+    int t = (int) (electionTimeout * (1.0 + ctx.random().nextFloat()));
     electionTimeoutTimer = DeadlineTimer.start(scheduler, new Runnable() {
       @Override
       public void run() {
         LOGGER.debug("DeadlineTimer expired, starting election");
-        ctx.setState(Follower.this, CANDIDATE);
+        ctx.setState(Follower.this, ctx.buildStateCandidate());
       }
-    }, electionTimeout * 2);
+    }, t);
   }
 
   @Override
@@ -81,13 +91,6 @@ class Follower extends BaseState {
     electionTimeoutTimer.reset();
   }
 
-  @Override
-  public void doStop(RaftStateContext ctx) {
-    LOGGER.debug("doStop on follower: {}", this);
-    electionTimeoutTimer.cancel();
-    super.doStop(ctx);
-  }
-
   @Nonnull
   @Override
   public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation)
@@ -96,11 +99,7 @@ class Follower extends BaseState {
   }
 
   protected RuntimeException throwMustBeLeader() throws RaftException {
-    if (leader.isPresent()) {
-      throw new NotLeaderException(leader.get());
-    } else {
-      throw new NoLeaderException();
-    }
+      throw new NotLeaderException(leader);
   }
 
   @Override

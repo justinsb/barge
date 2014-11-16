@@ -30,7 +30,7 @@ class Start extends BaseState {
     MDC.put("term", Long.toString(log.currentTerm()));
     MDC.put("self", log.self().toString());
     log.load();
-    ctx.setState(this, FOLLOWER);
+    ctx.setState(this, ctx.buildStateFollower(leader));
   }
 
   @Nonnull
@@ -60,5 +60,5 @@ class Start extends BaseState {
   public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership, RaftMembership newMembership) throws RaftException {
     throw new RaftException("Service has not started yet");
   }
-
+  
 }

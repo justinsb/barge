@@ -22,9 +22,10 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 
 import org.robotninjas.barge.BargeThreadPools;
-import org.robotninjas.barge.NoLeaderException;
+import org.robotninjas.barge.NotLeaderException;
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
@@ -73,19 +74,17 @@ class Candidate extends BaseState {
 
   @Override
   public void init(@Nonnull final RaftStateContext ctx) {
-
+    electionResult = runElection(ctx);
+  }
+  
+  ListenableFuture<Boolean> runElection(final RaftStateContext ctx) {
+    final SettableFuture<Boolean> result = SettableFuture.create();
     final RaftLog log = getLog();
 
     log.currentTerm(log.currentTerm() + 1);
     log.votedFor(Optional.of(log.self()));
 
     ConfigurationState configurationState = ctx.getConfigurationState();
-    
-    if (configurationState.getAllVotingMembers().isEmpty()) {
-      // If there is nobody to vote in an election, we can't run it...
-      LOGGER.debug("No voting members; won't run election");
-      return;
-    }
     
     LOGGER.debug("Election starting for term {}", log.currentTerm());
 
@@ -103,36 +102,49 @@ class Candidate extends BaseState {
       }
     }
 
-    electionResult = majorityResponse(responses, voteGranted());
+    ListenableFuture<Boolean> majorityResponse = majorityResponse(responses, voteGranted());
 
     long timeout = electionTimeout + (RAND.nextLong() % electionTimeout);
     electionTimer = DeadlineTimer.start(scheduler, new Runnable() {
       @Override
       public void run() {
-        LOGGER.debug("Election timeout");
-        ctx.setState(Candidate.this, CANDIDATE);
+        synchronized (result) {
+          if (!result.isDone()) {
+            LOGGER.debug("Election timeout");
+            result.set(null);
+            ctx.setState(Candidate.this, ctx.buildStateCandidate());
+          }
+        }
       }
     }, timeout);
 
-    addCallback(electionResult, new FutureCallback<Boolean>() {
+    addCallback(majorityResponse, new FutureCallback<Boolean>() {
       @Override
       public void onSuccess(@Nullable Boolean elected) {
-        checkNotNull(elected);
-        //noinspection ConstantConditions
-        if (elected) {
-          ctx.setState(Candidate.this, LEADER);
+        synchronized (result) {
+          checkNotNull(elected);
+          if (!result.isDone()) {
+            result.set(elected);
+            if (elected) {
+              ctx.setState(Candidate.this, ctx.buildStateLeader());
+            }
+          }
         }
       }
 
       @Override
       public void onFailure(Throwable t) {
-        if (!electionResult.isCancelled()) {
-          LOGGER.debug("Election failed with exception:", t);
+        synchronized (result) {
+          if (!result.isDone()) {
+            LOGGER.debug("Election failed with exception:", t);
+            result.setException(t);
+          }
         }
       }
 
     });
 
+    return result;
   }
 
   @Override
@@ -159,8 +171,6 @@ class Candidate extends BaseState {
         .build();
 
     ListenableFuture<RequestVoteResponse> response = clientManager.requestVote(replica, request);
-    Futures.addCallback(response, checkTerm(ctx));
-
     return response;
   }
 
@@ -170,7 +180,7 @@ class Candidate extends BaseState {
       public void onSuccess(@Nullable RequestVoteResponse response) {
         if (response.getTerm() > getLog().currentTerm()) {
           getLog().currentTerm(response.getTerm());
-          ctx.setState(Candidate.this, FOLLOWER);
+          ctx.setState(Candidate.this, ctx.buildStateFollower(Optional.<Replica>absent()));
         }
       }
 
@@ -181,18 +191,18 @@ class Candidate extends BaseState {
   
   @Override
   public ListenableFuture<Boolean> setConfiguration(RaftStateContext ctx, RaftMembership oldMembership,  RaftMembership newMembership) throws RaftException {
-    throw new NoLeaderException();
+    throw new NotLeaderException(Optional.<Replica>absent());
   }
 
   @Override
-  public RaftClusterHealth getClusterHealth(@Nonnull RaftStateContext ctx) throws NoLeaderException {
-    throw new NoLeaderException();
+  public RaftClusterHealth getClusterHealth(@Nonnull RaftStateContext ctx) throws NotLeaderException {
+    throw new NotLeaderException(Optional.<Replica>absent());
   }
 
   @Nonnull
   @Override
   public ListenableFuture<Object> commitOperation(@Nonnull RaftStateContext ctx, @Nonnull byte[] operation) throws RaftException {
-    throw new NoLeaderException();
+    throw new NotLeaderException(Optional.<Replica>absent());
   }
   
   @Override
