@@ -14,7 +14,7 @@ public class RaftMembership {
   final long id;
   final ImmutableList<String> members;
 
-  public RaftMembership(long id, Collection<String> members) {
+  public RaftMembership(long id, Iterable<String> members) {
     this.id = id;
     List<String> sorted = Lists.newArrayList(members);
     Collections.sort(sorted);

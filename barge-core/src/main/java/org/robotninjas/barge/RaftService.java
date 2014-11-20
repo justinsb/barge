@@ -13,6 +13,7 @@ import org.robotninjas.barge.state.RaftStateContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractService;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -139,6 +140,10 @@ public abstract class RaftService extends AbstractService {
 
   public Replica self() {
     return ctx.self();
+  }
+
+  public Optional<Replica> getLeader() {
+    return ctx.getLeader();
   }
 
 }

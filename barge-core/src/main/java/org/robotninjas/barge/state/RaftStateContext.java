@@ -340,4 +340,8 @@ public class RaftStateContext implements Raft {
   ConfigTimeouts getTimeouts() {
     return configurationState.getTimeouts();
   }
+
+  public Optional<Replica> getLeader() {
+    return this.state.leader;
+  }
 }
