@@ -77,6 +77,8 @@ class Leader extends BaseState {
 
   Leader(RaftStateContext ctx) {
     super(LEADER, ctx);
+
+    this.leader = Optional.of(ctx.self());
   }
 
   @Override
@@ -245,7 +247,7 @@ class Leader extends BaseState {
     if (!configurationState.hasVote(configurationState.self())) {
       LOGGER.info("Don't have vote in new configuration; stepping down");
 
-      stepDown( /* logcabin: currentTerm + 1 */ Optional.<Replica> absent());
+      stepDown( /* logcabin: currentTerm + 1 */Optional.<Replica> absent());
       return;
     }
 
@@ -257,7 +259,7 @@ class Leader extends BaseState {
       Membership.Builder members = Membership.newBuilder();
       members.addAllMembers(membership.getProposedMembersList());
 
-      Futures.addCallback(commitMembership( members.build()), new FutureCallback<Object>() {
+      Futures.addCallback(commitMembership(members.build()), new FutureCallback<Object>() {
 
         @Override
         public void onSuccess(Object result) {

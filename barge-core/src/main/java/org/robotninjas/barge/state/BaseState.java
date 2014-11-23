@@ -204,4 +204,8 @@ public abstract class BaseState {
       throws RaftException;
 
   public abstract RaftClusterHealth getClusterHealth() throws RaftException;
+
+  public Optional<Replica> getLeader() {
+    return leader;
+  }
 }

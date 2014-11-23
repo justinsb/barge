@@ -342,6 +342,6 @@ public class RaftStateContext implements Raft {
   }
 
   public Optional<Replica> getLeader() {
-    return this.state.leader;
+    return this.state.getLeader();
   }
 }
