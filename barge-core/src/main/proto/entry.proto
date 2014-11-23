@@ -38,4 +38,15 @@ message ConfigTimeouts {
 
 	// Heartbeat interval: leader sends heartbeat if no message has happened in this time
 	optional int64 heartbeat_interval = 3;
-}	
+}
+
+message SnapshotFileInfo {
+	optional string key = 1;
+	optional string location = 2;
+}
+
+message SnapshotInfo {
+	required int64 last_included_index = 1;
+	required int64 last_included_term = 2;
+	repeated SnapshotFileInfo files = 3;
+}

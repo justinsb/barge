@@ -1,8 +1,11 @@
 package org.robotninjas.barge;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.base.Throwables.propagateIfInstanceOf;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -75,7 +78,9 @@ public abstract class RaftService extends AbstractService {
    *         later point in time.
    * @throws org.robotninjas.barge.RaftException
    */
-  public abstract ListenableFuture<Object> commitAsync(byte[] operation) throws RaftException;
+  public ListenableFuture<Object> commitAsync(byte[] operation) throws RaftException {
+    return ctx.commitOperation(operation);
+  }
 
   /**
    * Synchronously executes and operation on the state machine managed by barge.
@@ -94,8 +99,15 @@ public abstract class RaftService extends AbstractService {
    * @throws InterruptedException
    *           if current thread is interrupted while waiting for the result to be available.
    */
-  public abstract Object commit(byte[] operation) throws RaftException, InterruptedException;
-
+  public Object commit(final byte[] operation) throws RaftException, InterruptedException {
+    try {
+      return commitAsync(operation).get();
+    } catch (ExecutionException e) {
+      propagateIfInstanceOf(e.getCause(), NotLeaderException.class);
+      throw propagate(e.getCause());
+    }
+  }
+  
   // TODO: This should probably take a RaftMembership
   public void bootstrap(Membership membership) {
     LOGGER.info("Bootstrapping log with {}", membership);
@@ -145,5 +157,6 @@ public abstract class RaftService extends AbstractService {
   public Optional<Replica> getLeader() {
     return ctx.getLeader();
   }
+
 
 }

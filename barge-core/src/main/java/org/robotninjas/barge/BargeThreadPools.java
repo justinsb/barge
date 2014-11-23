@@ -16,8 +16,6 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 
 public class BargeThreadPools implements Closeable {
 
-  private static final int NUM_THREADS = 1;
-
   boolean closed;
   final NioEventLoopGroup raftEventLoop;
   final boolean closeEventLoop;

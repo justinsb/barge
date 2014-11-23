@@ -17,23 +17,21 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.robotninjas.barge.proto.RaftProto.*;
-import static org.robotninjas.barge.state.Raft.StateType.*;
-import static org.robotninjas.barge.state.RaftStateContext.StateType;
 
 public abstract class BaseState {
   private static final Logger LOGGER = LoggerFactory.getLogger(BaseState.class);
 
-  private final StateType type;
+  private final RaftState type;
   protected final RaftStateContext ctx;
   protected Optional<Replica> leader;
 
-  protected BaseState(@Nonnull StateType type, @Nonnull RaftStateContext ctx) {
+  protected BaseState(@Nonnull RaftState type, @Nonnull RaftStateContext ctx) {
     this.ctx = checkNotNull(ctx);
     this.type = checkNotNull(type);
     this.leader = Optional.absent();
   }
 
-  public StateType type() {
+  public RaftState type() {
     return type;
   }
 
@@ -103,7 +101,7 @@ public abstract class BaseState {
 
         log.currentTerm(request.getTerm());
 
-        if (ctx.type().equals(LEADER) || ctx.type().equals(CANDIDATE)) {
+        if (ctx.type().equals(RaftState.LEADER) || ctx.type().equals(RaftState.CANDIDATE)) {
           Follower follower = ctx.buildStateFollower(Optional.of(Replica.fromString(request.getLeaderId())));
           ctx.setState(this, follower);
           // TODO: Do we really want to append to log here?
@@ -149,7 +147,7 @@ public abstract class BaseState {
 
         log.currentTerm(term);
 
-        if (ctx.type().equals(LEADER) || ctx.type().equals(CANDIDATE)) {
+        if (ctx.type().equals(RaftState.LEADER) || ctx.type().equals(RaftState.CANDIDATE)) {
           ctx.setState(this, ctx.buildStateFollower(Optional.<Replica> absent()));
         }
 
@@ -191,7 +189,7 @@ public abstract class BaseState {
   public String toString() {
     RaftLog log = getLog();
 
-    return type.toString() + " [" + log.getName() + " @ " + log.self() + "]";
+    return type.toString() + " [" + log.getName() + " @ " + self() + "]";
   }
 
   public void init() {
@@ -207,5 +205,9 @@ public abstract class BaseState {
 
   public Optional<Replica> getLeader() {
     return leader;
+  }
+  
+  protected Replica self() {
+    return ctx.self();
   }
 }

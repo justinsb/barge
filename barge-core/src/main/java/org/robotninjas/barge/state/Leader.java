@@ -58,8 +58,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.robotninjas.barge.proto.RaftProto.*;
-import static org.robotninjas.barge.state.Raft.StateType.FOLLOWER;
-import static org.robotninjas.barge.state.Raft.StateType.LEADER;
 
 @NotThreadSafe
 class Leader extends BaseState {
@@ -76,7 +74,7 @@ class Leader extends BaseState {
   private boolean isShutdown;
 
   Leader(RaftStateContext ctx) {
-    super(LEADER, ctx);
+    super(RaftState.LEADER, ctx);
 
     this.leader = Optional.of(ctx.self());
   }
@@ -182,7 +180,7 @@ class Leader extends BaseState {
   long getQuorumMatchIndex(List<Replica> replicas) {
     RaftLog log = ctx.getLog();
 
-    Replica self = log.self();
+    Replica self = self();
 
     List<Long> sorted = newArrayList();
     for (Replica replica : replicas) {

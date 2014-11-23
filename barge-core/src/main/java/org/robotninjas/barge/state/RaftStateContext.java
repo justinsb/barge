@@ -19,7 +19,6 @@ package org.robotninjas.barge.state;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
@@ -37,12 +36,9 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.inject.Inject;
 
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,7 +52,6 @@ public class RaftStateContext implements Raft {
   private static final Logger LOGGER = LoggerFactory.getLogger(RaftStateContext.class);
 
   private final Executor executor;
-  private final Set<StateTransitionListener> listeners = Sets.newConcurrentHashSet();
 
   private volatile BaseState state;
 
@@ -72,12 +67,6 @@ public class RaftStateContext implements Raft {
 
   private final Random random = new Random();
 
-  @Inject
-  RaftStateContext(RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState,
-      BargeThreadPools threadPools) {
-    this(log.self().toString(), log, clientManager, configurationState, threadPools);
-  }
-
   RaftStateContext(String name, RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState,
       BargeThreadPools threadPools) {
     this.configurationState = configurationState;
@@ -86,12 +75,10 @@ public class RaftStateContext implements Raft {
 
     this.executor = threadPools.getRaftExecutor();
     this.threadPools = threadPools;
-    this.listeners.add(new LogListener());
     this.clientManager = clientManager;
   }
 
-  @Override
-  public ListenableFuture<Void> init() {
+  public ListenableFutureTask<Void> init() {
 
     ListenableFutureTask<Void> init = ListenableFutureTask.create(new Callable<Void>() {
       @Override
@@ -155,7 +142,6 @@ public class RaftStateContext implements Raft {
 
   }
 
-  @Override
   @Nonnull
   public ListenableFuture<Object> commitOperation(@Nonnull final byte[] op) throws RaftException {
 
@@ -188,12 +174,11 @@ public class RaftStateContext implements Raft {
     if (this.state != oldState) {
       LOGGER.info("Previous state was not correct (transitioning to {}). Expected {}, was {}", newState, state,
           oldState);
-      notifiesInvalidTransition(oldState);
       throw new IllegalStateException();
     }
 
     // StateType newState;
-    if (stop && state.type() != StateType.STOPPED) {
+    if (stop && state.type() != RaftState.STOPPED) {
       newState = buildStateStopped();
       LOGGER.info("Service stopping; replaced state with {}", newState);
       // } else {
@@ -208,8 +193,6 @@ public class RaftStateContext implements Raft {
     this.state = checkNotNull(newState);
 
     MDC.put("state", this.state.toString());
-
-    notifiesChangeState(oldState);
 
     if (state != null) {
       state.init();
@@ -228,26 +211,8 @@ public class RaftStateContext implements Raft {
     // }
   }
 
-  private void notifiesInvalidTransition(BaseState oldState) {
-    for (StateTransitionListener listener : listeners) {
-      listener.invalidTransition(this, state.type(), oldState == null ? null : oldState.type());
-    }
-  }
-
-  private void notifiesChangeState(BaseState oldState) {
-    for (StateTransitionListener listener : listeners) {
-      listener.changeState(this, oldState == null ? null : oldState.type(), state.type());
-    }
-  }
-
-  @Override
-  public void addTransitionListener(@Nonnull StateTransitionListener transitionListener) {
-    listeners.add(transitionListener);
-  }
-
-  @Override
   @Nonnull
-  public StateType type() {
+  public RaftState type() {
     return state.type();
   }
 
@@ -255,19 +220,6 @@ public class RaftStateContext implements Raft {
     stop = true;
     if (this.state != null) {
       this.state.doStop();
-    }
-  }
-
-  private class LogListener implements StateTransitionListener {
-    @Override
-    public void changeState(@Nonnull Raft context, @Nullable StateType from, @Nonnull StateType to) {
-      LOGGER.info("LogListener: old state: {}, new state: {}", from, to);
-    }
-
-    @Override
-    public void invalidTransition(@Nonnull Raft context, @Nonnull StateType actual, @Nullable StateType expected) {
-      LOGGER
-          .warn("LogListener: State transition from incorrect previous state.  Expected {}, was {}", actual, expected);
     }
   }
 
@@ -281,11 +233,11 @@ public class RaftStateContext implements Raft {
   }
 
   public synchronized boolean isStopped() {
-    return this.state.type() == StateType.STOPPED;
+    return this.state.type() == RaftState.STOPPED;
   }
 
   public boolean isLeader() {
-    return this.state.type() == StateType.LEADER;
+    return this.state.type() == RaftState.LEADER;
   }
 
   public RaftClusterHealth getClusterHealth() throws RaftException {

@@ -39,13 +39,11 @@ public interface RaftLog {
 
   public String getName();
 
+  public long lastLogTerm();
   public long lastLogIndex();
 
   public long commitIndex();
-
   public void commitIndex(long index);
-
-  public long lastLogTerm();
 
   // TODO: Remove?
   public Replica self();
@@ -57,9 +55,6 @@ public interface RaftLog {
   // TODO: This seems wrong / should have a term?
   // TODO: Create one append method?
   public void votedFor(@Nonnull Optional<Replica> vote);
-
-  // TODO: Create one append method?
-  public ListenableFuture<Object> append(@Nonnull byte[] operation);
 
   // TODO: Create one append method?
   public ListenableFuture<Object> append(@Nonnull byte[] operation, @Nonnull Membership membership);

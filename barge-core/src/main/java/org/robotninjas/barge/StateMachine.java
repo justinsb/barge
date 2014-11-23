@@ -1,4 +1,5 @@
 /**
+ * Copyright 2013 Justin Santa Barbara
  * Copyright 2013 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +18,21 @@
 package org.robotninjas.barge;
 
 import javax.annotation.Nonnull;
+
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
+
 import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutionException;
 
 public interface StateMachine {
 
   Object applyOperation(@Nonnull ByteBuffer entry);
 
-//  void takeSnapshot(@Nonnull OutputStream snapshot);
+  Snapshotter prepareSnapshot(long currentTerm, long currentIndex);
 
-//  void installSnapshot(@Nonnull InputStream snapshot);
+  // void installSnapshot(@Nonnull InputStream snapshot);
 
+  public interface Snapshotter {
+    SnapshotInfo finishSnapshot() throws InterruptedException, ExecutionException;
+  }
 }

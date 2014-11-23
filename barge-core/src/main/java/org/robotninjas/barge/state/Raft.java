@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013-2014 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +16,6 @@
  */
 package org.robotninjas.barge.state;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import org.robotninjas.barge.RaftException;
-
 import javax.annotation.Nonnull;
 
 import static org.robotninjas.barge.proto.RaftProto.*;
@@ -27,7 +25,7 @@ import static org.robotninjas.barge.proto.RaftProto.*;
  */
 public interface Raft {
 
-  ListenableFuture init();
+//  ListenableFuture init();
 
   @Nonnull
   RequestVoteResponse requestVote(@Nonnull RequestVote request);
@@ -35,15 +33,14 @@ public interface Raft {
   @Nonnull
   AppendEntriesResponse appendEntries(@Nonnull AppendEntries request);
 
-  @Nonnull
-  ListenableFuture<Object> commitOperation(@Nonnull byte[] op) throws RaftException;
-
-  void addTransitionListener(@Nonnull StateTransitionListener transitionListener);
-
-  @Nonnull
-  StateType type();
-
-  public static enum StateType {START, FOLLOWER, CANDIDATE, LEADER, STOPPED }
-
-  void stop();
+//  @Nonnull
+//  ListenableFuture<Object> commitOperation(@Nonnull byte[] op) throws RaftException;
+//
+//  void addTransitionListener(@Nonnull StateTransitionListener transitionListener);
+//
+//  @Nonnull
+//  StateType type();
+//
+//
+//  void stop();
 }

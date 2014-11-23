@@ -28,6 +28,7 @@ import java.util.List;
 
 import static org.robotninjas.barge.proto.RaftEntry.Entry;
 
+// TODO: Why isn't this defined as a protobuf?
 @Immutable
 @ThreadSafe
 public class GetEntriesResult {

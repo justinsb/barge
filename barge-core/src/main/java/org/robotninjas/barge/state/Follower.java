@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import static org.robotninjas.barge.state.Raft.StateType.FOLLOWER;
 
 @NotThreadSafe
 class Follower extends BaseState {
@@ -38,7 +37,7 @@ class Follower extends BaseState {
   private DeadlineTimer electionTimeoutTimer;
 
   Follower(RaftStateContext ctx, Optional<Replica> leader) {
-    super(FOLLOWER, ctx);
+    super(RaftState.FOLLOWER, ctx);
 
     this.leader = leader;
   }

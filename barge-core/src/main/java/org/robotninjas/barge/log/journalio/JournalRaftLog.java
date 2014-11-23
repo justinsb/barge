@@ -1,4 +1,5 @@
 /**
+ * Copyright 2014 Justin Santa Barbara
  * Copyright 2013 David Rusek <dave dot rusek at gmail dot com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,11 +34,13 @@ import journal.io.api.Journal;
 
 import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.StateMachine.Snapshotter;
 import org.robotninjas.barge.log.GetEntriesResult;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.log.StateMachineProxy;
 import org.robotninjas.barge.log.journalio.RaftJournal.Mark;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.state.ConfigurationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,21 +177,6 @@ public class JournalRaftLog implements RaftLog {
     return result;
   }
 
-  public ListenableFuture<Object> append(@Nonnull byte[] operation) {
-
-    long index = ++lastLogIndex;
-    lastLogTerm = currentTerm;
-
-    Entry entry =
-        Entry.newBuilder()
-            .setCommand(ByteString.copyFrom(operation))
-            .setTerm(currentTerm)
-            .build();
-
-    return storeEntry(index, entry);
-
-  }
-
   public ListenableFuture<Object> append(@Nonnull byte[] operation,
       @Nonnull Membership membership) {
     long index = ++lastLogIndex;
@@ -204,7 +192,7 @@ public class JournalRaftLog implements RaftLog {
     } else {
       checkArgument(false);
     }
-
+    
     return storeEntry(index, entry.build());
 
   }
@@ -265,8 +253,19 @@ public class JournalRaftLog implements RaftLog {
 
   }
 
+//  SnapshotInfo doSnapshot() {
+//    Snapshotter snapshotter;
+//    synchronized (this) {
+//      ListenableFuture<Snapshotter> snapshotterFuture = stateMachine.prepareSnapshot(currentTerm, index);
+//      snapshotter = snapshotterFuture.get();
+//    }
+//    
+//    SnapshotInfo snapshotInfo = snapshotter.finishSnapshot();
+//    return snapshotInfo;
+//  }
+  
   void fireComitted() {
-    try {
+    synchronized (this) {
       for (long i = lastApplied + 1; i <= Math.min(commitIndex, lastLogIndex); ++i, ++lastApplied) {
         // Entry entry = journal.get(log.get(i));
         // byte[] rawCommand = entry.getCommand().toByteArray();
@@ -308,8 +307,6 @@ public class JournalRaftLog implements RaftLog {
         }
 
       }
-    } catch (Exception e) {
-      throw propagate(e);
     }
   }
 

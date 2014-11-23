@@ -2022,6 +2022,1490 @@ public final class RaftEntry {
     // @@protoc_insertion_point(class_scope:ConfigTimeouts)
   }
 
+  public interface SnapshotFileInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:SnapshotFileInfo)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional string key = 1;</code>
+     */
+    boolean hasKey();
+    /**
+     * <code>optional string key = 1;</code>
+     */
+    java.lang.String getKey();
+    /**
+     * <code>optional string key = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getKeyBytes();
+
+    /**
+     * <code>optional string location = 2;</code>
+     */
+    boolean hasLocation();
+    /**
+     * <code>optional string location = 2;</code>
+     */
+    java.lang.String getLocation();
+    /**
+     * <code>optional string location = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getLocationBytes();
+  }
+  /**
+   * Protobuf type {@code SnapshotFileInfo}
+   */
+  public static final class SnapshotFileInfo extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:SnapshotFileInfo)
+      SnapshotFileInfoOrBuilder {
+    // Use SnapshotFileInfo.newBuilder() to construct.
+    private SnapshotFileInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private SnapshotFileInfo(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final SnapshotFileInfo defaultInstance;
+    public static SnapshotFileInfo getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public SnapshotFileInfo getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private SnapshotFileInfo(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              key_ = bs;
+              break;
+            }
+            case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000002;
+              location_ = bs;
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotFileInfo_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotFileInfo_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.class, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<SnapshotFileInfo> PARSER =
+        new com.google.protobuf.AbstractParser<SnapshotFileInfo>() {
+      public SnapshotFileInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SnapshotFileInfo(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SnapshotFileInfo> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int KEY_FIELD_NUMBER = 1;
+    private java.lang.Object key_;
+    /**
+     * <code>optional string key = 1;</code>
+     */
+    public boolean hasKey() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string key = 1;</code>
+     */
+    public java.lang.String getKey() {
+      java.lang.Object ref = key_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          key_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string key = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getKeyBytes() {
+      java.lang.Object ref = key_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        key_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LOCATION_FIELD_NUMBER = 2;
+    private java.lang.Object location_;
+    /**
+     * <code>optional string location = 2;</code>
+     */
+    public boolean hasLocation() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional string location = 2;</code>
+     */
+    public java.lang.String getLocation() {
+      java.lang.Object ref = location_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          location_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string location = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getLocationBytes() {
+      java.lang.Object ref = location_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        location_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private void initFields() {
+      key_ = "";
+      location_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getKeyBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, getLocationBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getKeyBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getLocationBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code SnapshotFileInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:SnapshotFileInfo)
+        org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotFileInfo_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotFileInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.class, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder.class);
+      }
+
+      // Construct using org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        key_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        location_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotFileInfo_descriptor;
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo getDefaultInstanceForType() {
+        return org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.getDefaultInstance();
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo build() {
+        org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo buildPartial() {
+        org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo result = new org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.key_ = key_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.location_ = location_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo) {
+          return mergeFrom((org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo other) {
+        if (other == org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.getDefaultInstance()) return this;
+        if (other.hasKey()) {
+          bitField0_ |= 0x00000001;
+          key_ = other.key_;
+          onChanged();
+        }
+        if (other.hasLocation()) {
+          bitField0_ |= 0x00000002;
+          location_ = other.location_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object key_ = "";
+      /**
+       * <code>optional string key = 1;</code>
+       */
+      public boolean hasKey() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional string key = 1;</code>
+       */
+      public java.lang.String getKey() {
+        java.lang.Object ref = key_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            key_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string key = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getKeyBytes() {
+        java.lang.Object ref = key_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          key_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string key = 1;</code>
+       */
+      public Builder setKey(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        key_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string key = 1;</code>
+       */
+      public Builder clearKey() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        key_ = getDefaultInstance().getKey();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string key = 1;</code>
+       */
+      public Builder setKeyBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        key_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object location_ = "";
+      /**
+       * <code>optional string location = 2;</code>
+       */
+      public boolean hasLocation() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional string location = 2;</code>
+       */
+      public java.lang.String getLocation() {
+        java.lang.Object ref = location_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            location_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string location = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getLocationBytes() {
+        java.lang.Object ref = location_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          location_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string location = 2;</code>
+       */
+      public Builder setLocation(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        location_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string location = 2;</code>
+       */
+      public Builder clearLocation() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        location_ = getDefaultInstance().getLocation();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string location = 2;</code>
+       */
+      public Builder setLocationBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        location_ = value;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:SnapshotFileInfo)
+    }
+
+    static {
+      defaultInstance = new SnapshotFileInfo(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:SnapshotFileInfo)
+  }
+
+  public interface SnapshotInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:SnapshotInfo)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required int64 last_included_index = 1;</code>
+     */
+    boolean hasLastIncludedIndex();
+    /**
+     * <code>required int64 last_included_index = 1;</code>
+     */
+    long getLastIncludedIndex();
+
+    /**
+     * <code>required int64 last_included_term = 2;</code>
+     */
+    boolean hasLastIncludedTerm();
+    /**
+     * <code>required int64 last_included_term = 2;</code>
+     */
+    long getLastIncludedTerm();
+
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    java.util.List<org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo> 
+        getFilesList();
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo getFiles(int index);
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    int getFilesCount();
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    java.util.List<? extends org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder> 
+        getFilesOrBuilderList();
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder getFilesOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code SnapshotInfo}
+   */
+  public static final class SnapshotInfo extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:SnapshotInfo)
+      SnapshotInfoOrBuilder {
+    // Use SnapshotInfo.newBuilder() to construct.
+    private SnapshotInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private SnapshotInfo(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final SnapshotInfo defaultInstance;
+    public static SnapshotInfo getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public SnapshotInfo getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private SnapshotInfo(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              lastIncludedIndex_ = input.readInt64();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              lastIncludedTerm_ = input.readInt64();
+              break;
+            }
+            case 26: {
+              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+                files_ = new java.util.ArrayList<org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo>();
+                mutable_bitField0_ |= 0x00000004;
+              }
+              files_.add(input.readMessage(org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+          files_ = java.util.Collections.unmodifiableList(files_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotInfo_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotInfo_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.robotninjas.barge.proto.RaftEntry.SnapshotInfo.class, org.robotninjas.barge.proto.RaftEntry.SnapshotInfo.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<SnapshotInfo> PARSER =
+        new com.google.protobuf.AbstractParser<SnapshotInfo>() {
+      public SnapshotInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SnapshotInfo(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SnapshotInfo> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int LAST_INCLUDED_INDEX_FIELD_NUMBER = 1;
+    private long lastIncludedIndex_;
+    /**
+     * <code>required int64 last_included_index = 1;</code>
+     */
+    public boolean hasLastIncludedIndex() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required int64 last_included_index = 1;</code>
+     */
+    public long getLastIncludedIndex() {
+      return lastIncludedIndex_;
+    }
+
+    public static final int LAST_INCLUDED_TERM_FIELD_NUMBER = 2;
+    private long lastIncludedTerm_;
+    /**
+     * <code>required int64 last_included_term = 2;</code>
+     */
+    public boolean hasLastIncludedTerm() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>required int64 last_included_term = 2;</code>
+     */
+    public long getLastIncludedTerm() {
+      return lastIncludedTerm_;
+    }
+
+    public static final int FILES_FIELD_NUMBER = 3;
+    private java.util.List<org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo> files_;
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    public java.util.List<org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo> getFilesList() {
+      return files_;
+    }
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    public java.util.List<? extends org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder> 
+        getFilesOrBuilderList() {
+      return files_;
+    }
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    public int getFilesCount() {
+      return files_.size();
+    }
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo getFiles(int index) {
+      return files_.get(index);
+    }
+    /**
+     * <code>repeated .SnapshotFileInfo files = 3;</code>
+     */
+    public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder getFilesOrBuilder(
+        int index) {
+      return files_.get(index);
+    }
+
+    private void initFields() {
+      lastIncludedIndex_ = 0L;
+      lastIncludedTerm_ = 0L;
+      files_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasLastIncludedIndex()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasLastIncludedTerm()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt64(1, lastIncludedIndex_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt64(2, lastIncludedTerm_);
+      }
+      for (int i = 0; i < files_.size(); i++) {
+        output.writeMessage(3, files_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, lastIncludedIndex_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, lastIncludedTerm_);
+      }
+      for (int i = 0; i < files_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, files_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.robotninjas.barge.proto.RaftEntry.SnapshotInfo prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code SnapshotInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:SnapshotInfo)
+        org.robotninjas.barge.proto.RaftEntry.SnapshotInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotInfo_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.robotninjas.barge.proto.RaftEntry.SnapshotInfo.class, org.robotninjas.barge.proto.RaftEntry.SnapshotInfo.Builder.class);
+      }
+
+      // Construct using org.robotninjas.barge.proto.RaftEntry.SnapshotInfo.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getFilesFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        lastIncludedIndex_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        lastIncludedTerm_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        if (filesBuilder_ == null) {
+          files_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+        } else {
+          filesBuilder_.clear();
+        }
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.robotninjas.barge.proto.RaftEntry.internal_static_SnapshotInfo_descriptor;
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotInfo getDefaultInstanceForType() {
+        return org.robotninjas.barge.proto.RaftEntry.SnapshotInfo.getDefaultInstance();
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotInfo build() {
+        org.robotninjas.barge.proto.RaftEntry.SnapshotInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotInfo buildPartial() {
+        org.robotninjas.barge.proto.RaftEntry.SnapshotInfo result = new org.robotninjas.barge.proto.RaftEntry.SnapshotInfo(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.lastIncludedIndex_ = lastIncludedIndex_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.lastIncludedTerm_ = lastIncludedTerm_;
+        if (filesBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) == 0x00000004)) {
+            files_ = java.util.Collections.unmodifiableList(files_);
+            bitField0_ = (bitField0_ & ~0x00000004);
+          }
+          result.files_ = files_;
+        } else {
+          result.files_ = filesBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.robotninjas.barge.proto.RaftEntry.SnapshotInfo) {
+          return mergeFrom((org.robotninjas.barge.proto.RaftEntry.SnapshotInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.robotninjas.barge.proto.RaftEntry.SnapshotInfo other) {
+        if (other == org.robotninjas.barge.proto.RaftEntry.SnapshotInfo.getDefaultInstance()) return this;
+        if (other.hasLastIncludedIndex()) {
+          setLastIncludedIndex(other.getLastIncludedIndex());
+        }
+        if (other.hasLastIncludedTerm()) {
+          setLastIncludedTerm(other.getLastIncludedTerm());
+        }
+        if (filesBuilder_ == null) {
+          if (!other.files_.isEmpty()) {
+            if (files_.isEmpty()) {
+              files_ = other.files_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+            } else {
+              ensureFilesIsMutable();
+              files_.addAll(other.files_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.files_.isEmpty()) {
+            if (filesBuilder_.isEmpty()) {
+              filesBuilder_.dispose();
+              filesBuilder_ = null;
+              files_ = other.files_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+              filesBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getFilesFieldBuilder() : null;
+            } else {
+              filesBuilder_.addAllMessages(other.files_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasLastIncludedIndex()) {
+          
+          return false;
+        }
+        if (!hasLastIncludedTerm()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.robotninjas.barge.proto.RaftEntry.SnapshotInfo parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.robotninjas.barge.proto.RaftEntry.SnapshotInfo) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private long lastIncludedIndex_ ;
+      /**
+       * <code>required int64 last_included_index = 1;</code>
+       */
+      public boolean hasLastIncludedIndex() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required int64 last_included_index = 1;</code>
+       */
+      public long getLastIncludedIndex() {
+        return lastIncludedIndex_;
+      }
+      /**
+       * <code>required int64 last_included_index = 1;</code>
+       */
+      public Builder setLastIncludedIndex(long value) {
+        bitField0_ |= 0x00000001;
+        lastIncludedIndex_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int64 last_included_index = 1;</code>
+       */
+      public Builder clearLastIncludedIndex() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        lastIncludedIndex_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long lastIncludedTerm_ ;
+      /**
+       * <code>required int64 last_included_term = 2;</code>
+       */
+      public boolean hasLastIncludedTerm() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>required int64 last_included_term = 2;</code>
+       */
+      public long getLastIncludedTerm() {
+        return lastIncludedTerm_;
+      }
+      /**
+       * <code>required int64 last_included_term = 2;</code>
+       */
+      public Builder setLastIncludedTerm(long value) {
+        bitField0_ |= 0x00000002;
+        lastIncludedTerm_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int64 last_included_term = 2;</code>
+       */
+      public Builder clearLastIncludedTerm() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        lastIncludedTerm_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo> files_ =
+        java.util.Collections.emptyList();
+      private void ensureFilesIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          files_ = new java.util.ArrayList<org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo>(files_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder> filesBuilder_;
+
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public java.util.List<org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo> getFilesList() {
+        if (filesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(files_);
+        } else {
+          return filesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public int getFilesCount() {
+        if (filesBuilder_ == null) {
+          return files_.size();
+        } else {
+          return filesBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo getFiles(int index) {
+        if (filesBuilder_ == null) {
+          return files_.get(index);
+        } else {
+          return filesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder setFiles(
+          int index, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo value) {
+        if (filesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFilesIsMutable();
+          files_.set(index, value);
+          onChanged();
+        } else {
+          filesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder setFiles(
+          int index, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder builderForValue) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          files_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          filesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder addFiles(org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo value) {
+        if (filesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFilesIsMutable();
+          files_.add(value);
+          onChanged();
+        } else {
+          filesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder addFiles(
+          int index, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo value) {
+        if (filesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFilesIsMutable();
+          files_.add(index, value);
+          onChanged();
+        } else {
+          filesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder addFiles(
+          org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder builderForValue) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          files_.add(builderForValue.build());
+          onChanged();
+        } else {
+          filesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder addFiles(
+          int index, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder builderForValue) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          files_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          filesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder addAllFiles(
+          java.lang.Iterable<? extends org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo> values) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, files_);
+          onChanged();
+        } else {
+          filesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder clearFiles() {
+        if (filesBuilder_ == null) {
+          files_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+          onChanged();
+        } else {
+          filesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public Builder removeFiles(int index) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          files_.remove(index);
+          onChanged();
+        } else {
+          filesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder getFilesBuilder(
+          int index) {
+        return getFilesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder getFilesOrBuilder(
+          int index) {
+        if (filesBuilder_ == null) {
+          return files_.get(index);  } else {
+          return filesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public java.util.List<? extends org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder> 
+           getFilesOrBuilderList() {
+        if (filesBuilder_ != null) {
+          return filesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(files_);
+        }
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder addFilesBuilder() {
+        return getFilesFieldBuilder().addBuilder(
+            org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder addFilesBuilder(
+          int index) {
+        return getFilesFieldBuilder().addBuilder(
+            index, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .SnapshotFileInfo files = 3;</code>
+       */
+      public java.util.List<org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder> 
+           getFilesBuilderList() {
+        return getFilesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder> 
+          getFilesFieldBuilder() {
+        if (filesBuilder_ == null) {
+          filesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo.Builder, org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfoOrBuilder>(
+                  files_,
+                  ((bitField0_ & 0x00000004) == 0x00000004),
+                  getParentForChildren(),
+                  isClean());
+          files_ = null;
+        }
+        return filesBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:SnapshotInfo)
+    }
+
+    static {
+      defaultInstance = new SnapshotInfo(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:SnapshotInfo)
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Membership_descriptor;
   private static
@@ -2037,6 +3521,16 @@ public final class RaftEntry {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_ConfigTimeouts_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_SnapshotFileInfo_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_SnapshotFileInfo_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_SnapshotInfo_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_SnapshotInfo_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2052,8 +3546,12 @@ public final class RaftEntry {
       "ship\030\003 \001(\0132\013.Membership\"w\n\016ConfigTimeout" +
       "s\022\"\n\032candidate_election_timeout\030\001 \001(\003\022%\n" +
       "\035follower_election_start_delay\030\002 \001(\003\022\032\n\022" +
-      "heartbeat_interval\030\003 \001(\003B(\n\033org.robotnin" +
-      "jas.barge.protoB\tRaftEntry"
+      "heartbeat_interval\030\003 \001(\003\"1\n\020SnapshotFile" +
+      "Info\022\013\n\003key\030\001 \001(\t\022\020\n\010location\030\002 \001(\t\"i\n\014S" +
+      "napshotInfo\022\033\n\023last_included_index\030\001 \002(\003" +
+      "\022\032\n\022last_included_term\030\002 \002(\003\022 \n\005files\030\003 ",
+      "\003(\0132\021.SnapshotFileInfoB(\n\033org.robotninja" +
+      "s.barge.protoB\tRaftEntry"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2085,6 +3583,18 @@ public final class RaftEntry {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_ConfigTimeouts_descriptor,
         new java.lang.String[] { "CandidateElectionTimeout", "FollowerElectionStartDelay", "HeartbeatInterval", });
+    internal_static_SnapshotFileInfo_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_SnapshotFileInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_SnapshotFileInfo_descriptor,
+        new java.lang.String[] { "Key", "Location", });
+    internal_static_SnapshotInfo_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_SnapshotInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_SnapshotInfo_descriptor,
+        new java.lang.String[] { "LastIncludedIndex", "LastIncludedTerm", "Files", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

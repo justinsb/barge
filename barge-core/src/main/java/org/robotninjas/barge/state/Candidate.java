@@ -47,7 +47,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.util.concurrent.Futures.addCallback;
 import static org.robotninjas.barge.proto.RaftProto.RequestVote;
 import static org.robotninjas.barge.state.MajorityCollector.majorityResponse;
-import static org.robotninjas.barge.state.Raft.StateType.*;
 import static org.robotninjas.barge.state.RaftPredicates.voteGranted;
 
 @NotThreadSafe
@@ -59,7 +58,7 @@ class Candidate extends BaseState {
   private ListenableFuture<Boolean> electionResult;
 
   Candidate(RaftStateContext ctx) {
-    super(CANDIDATE, ctx);
+    super(RaftState.CANDIDATE, ctx);
   }
 
   @Override
@@ -72,7 +71,7 @@ class Candidate extends BaseState {
     final RaftLog log = getLog();
 
     log.currentTerm(log.currentTerm() + 1);
-    log.votedFor(Optional.of(log.self()));
+    log.votedFor(Optional.of(self()));
 
     ConfigurationState configurationState = ctx.getConfigurationState();
 

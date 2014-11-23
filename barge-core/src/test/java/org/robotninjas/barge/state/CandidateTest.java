@@ -25,7 +25,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.robotninjas.barge.proto.RaftProto.AppendEntries;
 import static org.robotninjas.barge.proto.RaftProto.RequestVote;
-import static org.robotninjas.barge.state.Raft.StateType.CANDIDATE;
 
 public class CandidateTest {
 
@@ -62,7 +61,7 @@ public class CandidateTest {
     when(mockRaftStateContext.random()).thenReturn(new Random());
     when(mockRaftStateContext.getRaftScheduler()).thenReturn(mockRaftScheduler);
     
-    when(mockRaftStateContext.type()).thenReturn(CANDIDATE);
+    when(mockRaftStateContext.type()).thenReturn(RaftState.CANDIDATE);
     when(mockRaftStateContext.self()).thenReturn(self);
     Leader stateLeader = new Leader(mockRaftStateContext);
     when(mockRaftStateContext.buildStateLeader()).thenReturn(stateLeader);

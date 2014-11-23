@@ -28,7 +28,6 @@ import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 import org.robotninjas.barge.state.Raft;
-import org.robotninjas.barge.state.StateTransitionListener;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,14 +38,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import static org.robotninjas.barge.state.Raft.StateType;
 
-public class GroupOfCounters extends ExternalResource implements StateTransitionListener {
+public class GroupOfCounters extends ExternalResource  {
 
   // private final List<Replica> replicas;
   final Map<Integer, SimpleCounterMachine> servers = Maps.newHashMap();
   private final File target;
-  private final Map<Raft, StateType> states = Maps.newConcurrentMap();
 
   public GroupOfCounters(File target) {
     this.target = target;
@@ -127,46 +124,29 @@ public class GroupOfCounters extends ExternalResource implements StateTransition
 
   private Boolean thereIsOneLeader() {
     int numberOfLeaders = 0;
-    int numberOfFollowers = 0;
-    for (StateType stateType : states.values()) {
-      switch (stateType) {
-      case LEADER:
+    for (SimpleCounterMachine server : servers.values()) {
+      if (server.isLeader()) {
         numberOfLeaders++;
-        break;
-      case FOLLOWER:
-        numberOfFollowers++;
-        break;
       }
     }
 
     return numberOfLeaders == 1;
   }
 
-  int clusterMemberCount() {
-    int clusterMembers = 0;
-    for (StateType stateType : states.values()) {
-      switch (stateType) {
-      case LEADER:
-        clusterMembers++;
-        break;
-      case FOLLOWER:
-        clusterMembers++;
-        break;
-      }
-    }
-
-    return clusterMembers;
-  }
-
-  @Override
-  public void changeState(@Nonnull Raft context, @Nullable StateType from, @Nonnull StateType to) {
-    states.put(context, to);
-  }
-
-  @Override
-  public void invalidTransition(@Nonnull Raft context, @Nonnull StateType actual, @Nullable StateType expected) {
-    // IGNORED
-  }
+//  int clusterMemberCount() {
+//    int clusterMembers = 0;
+//    for (SimpleCounterMachine server : servers.values()) {
+//      if (server.isLeader()) {
+//        clusterMembers++;
+//      } else if         break;
+//      case FOLLOWER:
+//        clusterMembers++;
+//        break;
+//      }
+//    }
+//
+//    return clusterMembers;
+//  }
 
 //  public void bootstrap(int id) {
 //    SimpleCounterMachine seed = servers.get(id);

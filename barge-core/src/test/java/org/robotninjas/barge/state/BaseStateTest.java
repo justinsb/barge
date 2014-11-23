@@ -16,7 +16,6 @@ import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto;
-import org.robotninjas.barge.state.Raft.StateType;
 
 import javax.annotation.Nonnull;
 
@@ -149,7 +148,7 @@ public class BaseStateTest {
 
   static class EmptyState extends BaseState {
     protected EmptyState(RaftStateContext ctx) {
-      super(StateType.START, ctx);
+      super(RaftState.START, ctx);
     }
 
     @Override

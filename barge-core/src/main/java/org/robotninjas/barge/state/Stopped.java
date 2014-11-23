@@ -11,12 +11,11 @@ import org.robotninjas.barge.log.RaftLog;
 import javax.annotation.Nonnull;
 
 import static org.robotninjas.barge.proto.RaftProto.*;
-import static org.robotninjas.barge.state.Raft.StateType.STOPPED;
 
 class Stopped extends BaseState {
 
   public Stopped(RaftStateContext ctx) {
-    super(STOPPED, ctx);
+    super(RaftState.STOPPED, ctx);
   }
 
   @Override
