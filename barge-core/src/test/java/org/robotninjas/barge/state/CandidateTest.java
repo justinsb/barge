@@ -63,9 +63,12 @@ public class CandidateTest {
     when(mockRaftStateContext.getRaftScheduler()).thenReturn(mockRaftScheduler);
     
     when(mockRaftStateContext.type()).thenReturn(CANDIDATE);
-    when(mockRaftStateContext.buildStateLeader()).thenReturn(new Leader(mockRaftStateContext));
-    when(mockRaftStateContext.buildStateFollower(any(Optional.class))).thenReturn(new Follower(mockRaftStateContext, Optional.<Replica>absent()));
-
+    when(mockRaftStateContext.self()).thenReturn(self);
+    Leader stateLeader = new Leader(mockRaftStateContext);
+    when(mockRaftStateContext.buildStateLeader()).thenReturn(stateLeader);
+    Follower stateFollower = new Follower(mockRaftStateContext, Optional.<Replica>absent());
+    when(mockRaftStateContext.buildStateFollower(any(Optional.class))).thenReturn(stateFollower);
+    
     when(mockRaftLog.self()).thenReturn(self);
     when(mockRaftLog.votedFor()).thenReturn(Optional.<Replica>absent());
     when(mockRaftLog.lastLogTerm()).thenReturn(0L);
@@ -123,6 +126,7 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).setState(isA(Candidate.class), isA(Follower.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(2)).type();
+    verify(mockRaftStateContext, times(1)).self();
     verify(mockRaftStateContext, times(3)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
     verify(mockRaftStateContext, times(1)).getRaftScheduler();
@@ -162,6 +166,7 @@ public class CandidateTest {
 
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
+    verify(mockRaftStateContext, times(1)).self();
     verify(mockRaftStateContext, times(2)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
     verify(mockRaftStateContext, times(1)).getRaftScheduler();
@@ -199,6 +204,7 @@ public class CandidateTest {
 
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Leader.class));
 
+    verify(mockRaftStateContext, times(1)).self();
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(3)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
@@ -240,6 +246,7 @@ public class CandidateTest {
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Leader.class));
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Follower.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
+    verify(mockRaftStateContext, times(1)).self();
     verify(mockRaftStateContext, times(2)).type();
     verify(mockRaftStateContext, times(2)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
@@ -282,6 +289,7 @@ public class CandidateTest {
     verify(mockRaftStateContext).setState(any(Candidate.class), any(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(1)).getConfigurationState();
+    verify(mockRaftStateContext, times(1)).self();
     verify(mockRaftStateContext, times(2)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
     verify(mockRaftStateContext, times(1)).getRaftScheduler();
@@ -320,6 +328,7 @@ public class CandidateTest {
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(2)).getLog();
+    verify(mockRaftStateContext, times(1)).self();
     verify(mockRaftStateContext, times(1)).getTimeouts();
     verify(mockRaftStateContext, times(1)).getRaftScheduler();
     verify(mockRaftStateContext, times(1)).buildStateLeader();
