@@ -5,9 +5,11 @@ import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
+import org.robotninjas.barge.log.journalio.JournalRaftLog;
 import org.robotninjas.barge.proto.RaftEntry.SnapshotFileInfo;
 import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.rpc.netty.NettyRaftService;
+import org.robotninjas.barge.state.ConfigurationState;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Service.State;
@@ -107,10 +109,13 @@ public class SimpleCounterMachine {
     //
     // NettyClusterConfig config1 = NettyClusterConfig.from(replicas.get(id % clusterSize), configuration);
 
+    JournalRaftLog.Builder logBuilder = new JournalRaftLog.Builder();
+    logBuilder.logDirectory = logDirectory;
+    logBuilder.stateMachine = stateMachine;
+    logBuilder.config = ConfigurationState.buildSeed(seedConfig);
+    
     NettyRaftService.Builder b = NettyRaftService.newBuilder();
-    b.seedConfig = seedConfig;
-    b.logDir = logDirectory;
-    b.stateMachine = stateMachine;
+    b.log = logBuilder;
     NettyRaftService service1 = b.build();
 
     service1.startAsync().awaitRunning();

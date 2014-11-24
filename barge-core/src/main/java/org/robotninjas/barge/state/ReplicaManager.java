@@ -23,10 +23,12 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.inject.assistedinject.Assisted;
+
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.GetEntriesResult;
 import org.robotninjas.barge.log.RaftLog;
-import org.robotninjas.barge.rpc.RaftClientManager;
+import org.robotninjas.barge.rpc.RaftClient;
+import org.robotninjas.barge.rpc.RaftClientProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +51,7 @@ class ReplicaManager {
   private static final int BATCH_SIZE = 1000;
   private static final int MAX_RUNNING = 1;
 
-  private final RaftClientManager clientManager;
+  private final RaftClient raftClient;
   private final RaftLog log;
   private final Replica remote;
   private long nextIndex;
@@ -61,12 +63,11 @@ class ReplicaManager {
   private SettableFuture<AppendEntriesResponse> nextResponse = SettableFuture.create();
   private volatile long lastResponse;
   
-  @Inject
-  ReplicaManager(RaftClientManager clientManager, RaftLog log, @Assisted Replica remote) {
+  ReplicaManager(RaftLog log, RaftClient raftClient, Replica remote) {
 
     this.nextIndex = log.lastLogIndex() + 1;
     this.log = log;
-    this.clientManager = clientManager;
+    this.raftClient = raftClient;
     this.remote = remote;
 
   }
@@ -94,7 +95,7 @@ class ReplicaManager {
         .build();
 
     LOGGER.debug("Sending update to {} prevLogIndex {} prevLogTerm {}", remote, result.lastLogIndex(), result.lastLogTerm());
-    final ListenableFuture<AppendEntriesResponse> response = clientManager.appendEntries(remote, request);
+    final ListenableFuture<AppendEntriesResponse> response = raftClient.appendEntries(request);
 
     final SettableFuture<AppendEntriesResponse> previousResponse = nextResponse;
 

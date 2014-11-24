@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.protobuf.ByteString;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -11,7 +12,8 @@ import org.mockito.MockitoAnnotations;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.GetEntriesResult;
 import org.robotninjas.barge.log.RaftLog;
-import org.robotninjas.barge.rpc.RaftClientManager;
+import org.robotninjas.barge.rpc.RaftClient;
+import org.robotninjas.barge.rpc.RaftClientProvider;
 
 import java.util.Collections;
 
@@ -31,7 +33,7 @@ public class ReplicaManagerTest {
 
   private
   @Mock
-  RaftClientManager mockRaftClientManager;
+  RaftClientProvider mockRaftClientProvider;
   private
   @Mock
   RaftLog mockRaftLog;
@@ -52,12 +54,14 @@ public class ReplicaManagerTest {
   public void testInitialSendOutstanding() {
 
     ListenableFuture<AppendEntriesResponse> mockResponse = mock(ListenableFuture.class);
-    when(mockRaftClientManager.appendEntries(eq(FOLLOWER), any(AppendEntries.class))).thenReturn(mockResponse);
+    RaftClient mockFollowerRaftClient = mock(RaftClient.class);
+//    when(mockRaftClientProvider.get(eq(FOLLOWER))).thenReturn(mockFollowerRaftClient);
+    when(mockFollowerRaftClient.appendEntries(any(AppendEntries.class))).thenReturn(mockResponse);
 
     GetEntriesResult entriesResult = new GetEntriesResult(0l, 0l, Collections.<Entry>emptyList());
     when(mockRaftLog.getEntriesFrom(anyLong(), anyInt())).thenReturn(entriesResult);
 
-    ReplicaManager replicaManager = new ReplicaManager(mockRaftClientManager, mockRaftLog, FOLLOWER);
+    ReplicaManager replicaManager = new ReplicaManager(mockRaftLog, mockFollowerRaftClient, FOLLOWER);
     ListenableFuture f1 = replicaManager.requestUpdate();
 
     AppendEntries appendEntries =
@@ -69,8 +73,9 @@ public class ReplicaManagerTest {
         .setTerm(1)
         .build();
 
-    verify(mockRaftClientManager, times(1)).appendEntries(FOLLOWER, appendEntries);
-    verifyNoMoreInteractions(mockRaftClientManager);
+//    verify(mockRaftClientProvider, times(1)).get(FOLLOWER);
+    verify(mockFollowerRaftClient, times(1)).appendEntries(appendEntries);
+    verifyNoMoreInteractions(mockFollowerRaftClient);
 
     verify(mockRaftLog, times(1)).getEntriesFrom(1, 1);
 
@@ -91,7 +96,9 @@ public class ReplicaManagerTest {
   public void testFailedAppend() {
 
     SettableFuture<AppendEntriesResponse> response = SettableFuture.create();
-    when(mockRaftClientManager.appendEntries(eq(FOLLOWER), any(AppendEntries.class)))
+    RaftClient mockFollowerRaftClient = mock(RaftClient.class);
+    when(mockRaftClientProvider.get(eq(FOLLOWER))).thenReturn(mockFollowerRaftClient);
+    when(mockFollowerRaftClient.appendEntries(any(AppendEntries.class)))
       .thenReturn(response)
       .thenReturn(mock(ListenableFuture.class));
 
@@ -99,7 +106,7 @@ public class ReplicaManagerTest {
     GetEntriesResult entriesResult = new GetEntriesResult(0l, 0l, Collections.<Entry>emptyList());
     when(mockRaftLog.getEntriesFrom(anyLong(), anyInt())).thenReturn(entriesResult);
 
-    ReplicaManager replicaManager = new ReplicaManager(mockRaftClientManager, mockRaftLog, FOLLOWER);
+    ReplicaManager replicaManager = new ReplicaManager(mockRaftLog, mockFollowerRaftClient, FOLLOWER);
 
     replicaManager.requestUpdate();
 
@@ -125,8 +132,8 @@ public class ReplicaManagerTest {
 
     response.set(appendEntriesResponse);
 
-    verify(mockRaftClientManager, times(2)).appendEntries(FOLLOWER, appendEntries);
-    verifyNoMoreInteractions(mockRaftClientManager);
+    verify(mockFollowerRaftClient, times(2)).appendEntries(appendEntries);
+    verifyNoMoreInteractions(mockFollowerRaftClient);
 
     verify(mockRaftLog, times(2)).getEntriesFrom(1, 1);
 
@@ -140,7 +147,9 @@ public class ReplicaManagerTest {
   public void testSuccessfulAppend() {
 
     SettableFuture<AppendEntriesResponse> response = SettableFuture.create();
-    when(mockRaftClientManager.appendEntries(eq(FOLLOWER), any(AppendEntries.class)))
+    RaftClient mockFollowerRaftClient = mock(RaftClient.class);
+    when(mockRaftClientProvider.get(eq(FOLLOWER))).thenReturn(mockFollowerRaftClient);
+    when(mockFollowerRaftClient.appendEntries(any(AppendEntries.class)))
       .thenReturn(response)
       .thenReturn(mock(ListenableFuture.class));
 
@@ -152,7 +161,7 @@ public class ReplicaManagerTest {
     GetEntriesResult entriesResult = new GetEntriesResult(0l, 0l, Lists.newArrayList(entry));
     when(mockRaftLog.getEntriesFrom(anyLong(), anyInt())).thenReturn(entriesResult);
 
-    ReplicaManager replicaManager = new ReplicaManager(mockRaftClientManager, mockRaftLog, FOLLOWER);
+    ReplicaManager replicaManager = new ReplicaManager(mockRaftLog, mockFollowerRaftClient, FOLLOWER);
 
     replicaManager.requestUpdate();
 
@@ -179,8 +188,8 @@ public class ReplicaManagerTest {
 
     response.set(appendEntriesResponse);
 
-    verify(mockRaftClientManager, times(1)).appendEntries(FOLLOWER, appendEntries);
-    verifyNoMoreInteractions(mockRaftClientManager);
+    verify(mockFollowerRaftClient, times(1)).appendEntries(appendEntries);
+    verifyNoMoreInteractions(mockFollowerRaftClient);
 
     verify(mockRaftLog, times(1)).getEntriesFrom(1, 1);
 

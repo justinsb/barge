@@ -32,7 +32,6 @@ import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto.RequestVoteResponse;
-import org.robotninjas.barge.rpc.RaftClientManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,9 +156,7 @@ class Candidate extends BaseState {
         .setCandidateId(configurationState.self().toString()).setLastLogIndex(log.lastLogIndex())
         .setLastLogTerm(log.lastLogTerm()).build();
 
-    RaftClientManager clientManager = ctx.getClientManager();
-    ListenableFuture<RequestVoteResponse> response = clientManager.requestVote(replica, request);
-    return response;
+    return ctx.getRaftClient(replica).requestVote(request);
   }
 
   private FutureCallback<RequestVoteResponse> checkTerm() {

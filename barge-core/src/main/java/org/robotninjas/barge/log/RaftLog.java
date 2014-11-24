@@ -17,16 +17,32 @@
 
 package org.robotninjas.barge.log;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+
 import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.StateMachine;
+import org.robotninjas.barge.log.journalio.JournalRaftLog;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.proto.RaftProto.AppendEntries;
+import org.robotninjas.barge.state.ConfigurationState;
+
+import io.netty.util.concurrent.DefaultThreadFactory;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+
+import journal.io.api.Journal;
+import journal.io.api.JournalBuilder;
 
 @NotThreadSafe
 public interface RaftLog {
@@ -40,10 +56,12 @@ public interface RaftLog {
   public String getName();
 
   public long lastLogTerm();
+
   public long lastLogIndex();
 
   public long commitIndex();
-  public void commitIndex(long index);
+
+  public void setCommitIndex(long index);
 
   // TODO: Remove?
   public Replica self();
@@ -62,10 +80,39 @@ public interface RaftLog {
   // TODO: Create one append method?
   public boolean append(@Nonnull AppendEntries appendEntries);
 
-  public void close() throws IOException;
+  public void close() throws Exception;
 
   public void load();
 
   boolean isEmpty();
 
+  public abstract static class Builder {
+    public StateMachine stateMachine;
+    public ConfigurationState config;
+
+    public ListeningExecutorService stateMachineExecutor;
+
+    protected StateMachineProxy stateMachineProxy;
+
+    @Nonnull
+    public abstract RaftLog build();
+
+    protected void buildDefaults() {
+      String key = self().getKey();
+
+      boolean closeStateMachineExecutor = false;
+      if (stateMachineExecutor == null) {
+        stateMachineExecutor = MoreExecutors.listeningDecorator(Executors
+            .newSingleThreadExecutor(new DefaultThreadFactory("pool-state-worker-" + key)));
+        closeStateMachineExecutor = true;
+      }
+
+      stateMachineProxy = new StateMachineProxy(stateMachine, stateMachineExecutor, closeStateMachineExecutor);
+    }
+
+    public Replica self() {
+      return config.self();
+    }
+
+  }
 }

@@ -3,24 +3,30 @@ package org.robotninjas.barge;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
+import io.netty.util.concurrent.DefaultThreadFactory;
 
-import java.util.concurrent.Callable;
+import java.io.File;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.rpc.RaftClientProvider;
+import org.robotninjas.barge.rpc.netty.NettyRaftService;
+import org.robotninjas.barge.state.ConfigurationState;
 import org.robotninjas.barge.state.RaftStateContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.io.Closer;
 import com.google.common.util.concurrent.AbstractService;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 
 /**
  * An instance of a set of replica managed through Raft protocol.
@@ -33,36 +39,12 @@ public abstract class RaftService extends AbstractService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RaftService.class);
 
-  private final ListeningExecutorService executor;
-  // private final RpcServer rpcServer;
   protected final RaftStateContext ctx;
-  protected final RaftLog raftLog;
 
-  protected final BargeThreadPools bargeThreadPools;
-
-  @Inject
-  protected RaftService(@Nonnull BargeThreadPools bargeThreadPools, @Nonnull RaftStateContext ctx,
-      @Nonnull RaftLog raftLog) {
-
-    this.bargeThreadPools = checkNotNull(bargeThreadPools);
-    this.executor = checkNotNull(bargeThreadPools.getRaftExecutor());
-    // this.rpcServer = checkNotNull(rpcServer);
+  protected final Closer closer = Closer.create();
+  
+  protected RaftService(@Nonnull RaftStateContext ctx) {
     this.ctx = checkNotNull(ctx);
-    this.raftLog = raftLog;
-
-  }
-
-  public RaftClusterHealth getClusterHealth() throws RaftException {
-
-    // Make sure this happens on the Barge thread
-    ListenableFuture<RaftClusterHealth> response = executor.submit(new Callable<RaftClusterHealth>() {
-      @Override
-      public RaftClusterHealth call() throws Exception {
-        return ctx.getClusterHealth();
-      }
-    });
-
-    return Futures.get(response, RaftException.class);
   }
 
   /**
@@ -108,31 +90,11 @@ public abstract class RaftService extends AbstractService {
     }
   }
   
-  // TODO: This should probably take a RaftMembership
-  public void bootstrap(Membership membership) {
-    LOGGER.info("Bootstrapping log with {}", membership);
-    if (!raftLog.isEmpty()) {
-      LOGGER.warn("Cannot bootstrap, as raft log already contains data");
-      throw new IllegalStateException();
-    }
-    raftLog.append(null, membership);
+
+  public RaftClusterHealth getClusterHealth() throws RaftException {
+    return ctx.getClusterHealth();
   }
-
-  public ListenableFuture<Boolean> setConfiguration(final RaftMembership oldMembership,
-      final RaftMembership newMembership) {
-
-    // Make sure this happens on the Barge thread
-    ListenableFuture<ListenableFuture<Boolean>> response = executor.submit(new Callable<ListenableFuture<Boolean>>() {
-      @Override
-      public ListenableFuture<Boolean> call() throws Exception {
-        return ctx.setConfiguration(oldMembership, newMembership);
-      }
-    });
-
-    return Futures.dereference(response);
-
-  }
-
+  
   public RaftMembership getClusterMembership() {
     return ctx.getConfigurationState().getClusterMembership();
   }
@@ -147,16 +109,65 @@ public abstract class RaftService extends AbstractService {
 
   @Override
   public String toString() {
-    return "RaftService [log=" + raftLog + ", ctx=" + ctx + "]";
+    return "RaftService [ctx=" + ctx + "]";
   }
 
   public Replica self() {
     return ctx.self();
   }
 
+
+  public void bootstrap(Membership membership) {
+    ctx.bootstrap(membership);
+  }
+
+
+  public ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, RaftMembership newMembership) {
+    return ctx.setConfiguration(oldMembership, newMembership);
+  }
+
   public Optional<Replica> getLeader() {
     return ctx.getLeader();
   }
 
+  public static class Builder {
+//    public ClusterConfig seedConfig;
+    public RaftLog.Builder log;
+    public RaftClientProvider raftClientProvider;
+//    public ConfigurationState configurationState;
+//    public BargeThreadPools threadPools;
+//    public ListeningScheduledExecutorService raftExecutor;
+
+    protected RaftStateContext buildRaftStateContext() {
+      checkNotNull(log);
+      checkNotNull(raftClientProvider);
+//      checkNotNull(threadPools);
+
+      Replica self = log.self();
+      checkNotNull(self);
+      
+//      bind(Raft.class).to(RaftStateContext.class).asEagerSingleton();
+//    // expose(Raft.class);
+//
+//    bind(ConfigurationState.class).toInstance(new ConfigurationState(self, seedConfig.allMembers, seedConfig.timeouts));
+//    
+     
+//      RaftClientManager raftClientManager = new RaftClientManager(raftClientProvider, threadPools);
+      return new RaftStateContext(log.build(), raftClientProvider, log.config);
+    }
+    
+    protected Replica self() {
+      return log.self();
+    }
+    
+    protected String key() {
+      return self().toString();
+    }
+
+    protected void populateDefaults() {
+      
+    
+    }
+  }
 
 }

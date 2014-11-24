@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import org.robotninjas.barge.ClusterConfig;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
@@ -182,8 +183,8 @@ public class ConfigurationState {
 
   @Override
   public String toString() {
-    return "ConfigurationState [state=" + state + ", currentMembers=" + currentMembers + ", proposedMembers=" + proposedMembers + ", allVotingMembers="
-        + allVotingMembers + ", version=" + version + "]";
+    return "ConfigurationState [state=" + state + ", currentMembers=" + currentMembers + ", proposedMembers="
+        + proposedMembers + ", allVotingMembers=" + allVotingMembers + ", version=" + version + "]";
   }
 
   public List<Replica> getAllMembers() {
@@ -192,5 +193,9 @@ public class ConfigurationState {
 
   public ConfigTimeouts getTimeouts() {
     return timeouts;
+  }
+
+  public static ConfigurationState buildSeed(ClusterConfig seedConfig) {
+    return new ConfigurationState(seedConfig.self, seedConfig.allMembers, seedConfig.timeouts);
   }
 }

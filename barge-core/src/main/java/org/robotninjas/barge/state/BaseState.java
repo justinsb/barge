@@ -114,7 +114,7 @@ public abstract class BaseState {
       success = log.append(request);
 
       if (request.getCommitIndex() > log.commitIndex()) {
-        log.commitIndex(Math.min(request.getCommitIndex(), log.lastLogIndex()));
+        log.setCommitIndex(Math.min(request.getCommitIndex(), log.lastLogIndex()));
       }
 
     }

@@ -3,32 +3,29 @@ package org.robotninjas.barge.log;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
-import com.google.inject.Inject;
-
-import org.robotninjas.barge.BargeThreadPools;
+import com.google.common.util.concurrent.ListeningExecutorService;
 import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.StateMachine.Snapshotter;
-import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
-
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @ThreadSafe
-public class StateMachineProxy {
+public class StateMachineProxy  {
 
-  private final Executor stateMachineExecutor;
+  private final ListeningExecutorService stateMachineExecutor;
   private final StateMachine stateMachine;
+  private final boolean closeStateMachineExecutor;
 
-  @Inject
-  StateMachineProxy(@Nonnull BargeThreadPools bargeThreadPools, @Nonnull StateMachine stateMachine) {
-    this.stateMachineExecutor = checkNotNull(bargeThreadPools.getStateMachineExecutor());
+  public StateMachineProxy(@Nonnull StateMachine stateMachine, @Nonnull ListeningExecutorService stateMachineExecutor, boolean closeStateMachineExecutor) {
+    this.closeStateMachineExecutor = closeStateMachineExecutor;
+    this.stateMachineExecutor = checkNotNull(stateMachineExecutor);
     this.stateMachine = checkNotNull(stateMachine);
   }
 
@@ -68,6 +65,13 @@ public class StateMachineProxy {
   @Nonnull
   public ListenableFuture installSnapshot() {
     return Futures.immediateFailedFuture(new IllegalStateException());
+  }
+
+  public void close() throws InterruptedException {
+    if (closeStateMachineExecutor) {
+      this.stateMachineExecutor.shutdown();
+      this.stateMachineExecutor.awaitTermination(5, TimeUnit.SECONDS);
+    }
   }
 
 }

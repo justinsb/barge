@@ -26,14 +26,19 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.inject.Inject;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.protobuf.ByteString;
 
+import io.netty.util.concurrent.DefaultThreadFactory;
 import journal.io.api.Journal;
+import journal.io.api.JournalBuilder;
 
-import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.StateMachine.Snapshotter;
 import org.robotninjas.barge.log.GetEntriesResult;
 import org.robotninjas.barge.log.RaftLog;
@@ -51,11 +56,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -88,9 +95,7 @@ public class JournalRaftLog implements RaftLog {
 //  private final ListeningExecutorService executor;
   
 
-  @Inject
-  JournalRaftLog(@Nonnull Journal journal, @Nonnull ConfigurationState config,
-          @Nonnull StateMachineProxy stateMachine, @Nonnull BargeThreadPools bargeThreadPools) {
+  JournalRaftLog(@Nonnull Journal journal, @Nonnull ConfigurationState config, @Nonnull StateMachineProxy stateMachine) {
     this.journal = new RaftJournal(checkNotNull(journal));
     this.config = checkNotNull(config);
     this.stateMachine = checkNotNull(stateMachine);
@@ -99,8 +104,9 @@ public class JournalRaftLog implements RaftLog {
     this.name = journal.getDirectory().getName();
   }
 
-  public void close() throws IOException {
+  public void close() throws Exception {
     this.journal.close();
+    this.stateMachine.close();
   }
   
   public boolean isEmpty() {
@@ -330,7 +336,7 @@ public class JournalRaftLog implements RaftLog {
 //    return config;
 //  }
 
-  public void commitIndex(long index) {
+  public void setCommitIndex(long index) {
     commitIndex = index;
     journal.appendCommit(index);
     fireComitted();
@@ -400,4 +406,24 @@ public class JournalRaftLog implements RaftLog {
     return config.self();
   }
 
+  public static class Builder extends RaftLog.Builder {
+    public File logDirectory;
+    
+    @Nonnull
+    public JournalRaftLog build()  {
+      checkNotNull(logDirectory);
+
+      Journal journal;
+      try {
+        journal = JournalBuilder.of(logDirectory).setPhysicalSync(true).open();
+      } catch (IOException e) {
+        throw new IllegalStateException("Error building journal", e);
+      }
+
+      buildDefaults();
+
+      return new JournalRaftLog(journal, config, stateMachineProxy);
+    }
+
+  }
 }

@@ -22,26 +22,37 @@ import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 
-import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
-import org.robotninjas.barge.rpc.RaftClientManager;
+import org.robotninjas.barge.proto.RaftEntry.Entry;
+import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.rpc.RaftClient;
+import org.robotninjas.barge.rpc.RaftClientProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import io.netty.util.concurrent.DefaultThreadFactory;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.robotninjas.barge.proto.RaftProto.*;
@@ -51,7 +62,7 @@ public class RaftStateContext implements Raft {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RaftStateContext.class);
 
-  private final Executor executor;
+  private final ListeningScheduledExecutorService raftExecutor;
 
   private volatile BaseState state;
 
@@ -59,60 +70,43 @@ public class RaftStateContext implements Raft {
 
   private final ConfigurationState configurationState;
 
-  private final RaftClientManager clientManager;
+  private final RaftClientProvider raftClientProvider;
 
   private final RaftLog log;
 
-  private final BargeThreadPools threadPools;
+//  private final BargeThreadPools threadPools;
 
   private final Random random = new Random();
 
-  RaftStateContext(String name, RaftLog log, RaftClientManager clientManager, ConfigurationState configurationState,
-      BargeThreadPools threadPools) {
-    this.configurationState = configurationState;
-    this.log = log;
+  public RaftStateContext(RaftLog log, RaftClientProvider raftClientProvider, ConfigurationState configurationState) {
+    this.log = checkNotNull(log);
+    this.configurationState = checkNotNull(configurationState);
+    this.raftClientProvider = checkNotNull(raftClientProvider);
+    // BargeThreadPools threadPools) {
+    String name = log.self().toString();
     MDC.put("self", name);
 
-    this.executor = threadPools.getRaftExecutor();
-    this.threadPools = threadPools;
-    this.clientManager = clientManager;
+    this.raftExecutor = MoreExecutors.listeningDecorator(Executors
+        .newSingleThreadScheduledExecutor(new DefaultThreadFactory("pool-raft-executor-" + name)));
+    // this.raftExecutor = threadPools.getRaftExecutor();
+    // this.threadPools = threadPools;
   }
 
-  public ListenableFutureTask<Void> init() {
-
-    ListenableFutureTask<Void> init = ListenableFutureTask.create(new Callable<Void>() {
-      @Override
-      public Void call() throws RaftException {
-        setState(null, buildStateStart());
-        return null;
-      }
+  public void init() throws RaftException {
+    onRaftThread(() -> {
+      setState(null, buildStateStart());
+      return null;
     });
-
-    executor.execute(init);
-
-    return init;
-
   }
 
   @Override
   @Nonnull
   public RequestVoteResponse requestVote(@Nonnull final RequestVote request) {
-
     checkNotNull(request);
 
-    ListenableFutureTask<RequestVoteResponse> response = ListenableFutureTask
-        .create(new Callable<RequestVoteResponse>() {
-          @Override
-          public RequestVoteResponse call() throws Exception {
-            return state.requestVote(request);
-          }
-        });
-
-    executor.execute(response);
-
     try {
-      return response.get();
-    } catch (Exception e) {
+      return onRaftThread(() -> state.requestVote(request));
+    } catch (RaftException e) {
       throw Throwables.propagate(e);
     }
 
@@ -121,25 +115,13 @@ public class RaftStateContext implements Raft {
   @Override
   @Nonnull
   public AppendEntriesResponse appendEntries(@Nonnull final AppendEntries request) {
-
     checkNotNull(request);
 
-    ListenableFutureTask<AppendEntriesResponse> response = ListenableFutureTask
-        .create(new Callable<AppendEntriesResponse>() {
-          @Override
-          public AppendEntriesResponse call() throws Exception {
-            return state.appendEntries(request);
-          }
-        });
-
-    executor.execute(response);
-
     try {
-      return response.get();
-    } catch (Exception e) {
+      return onRaftThread(() -> state.appendEntries(request));
+    } catch (RaftException e) {
       throw Throwables.propagate(e);
     }
-
   }
 
   @Nonnull
@@ -147,27 +129,9 @@ public class RaftStateContext implements Raft {
 
     checkNotNull(op);
 
-    ListenableFutureTask<ListenableFuture<Object>> response = ListenableFutureTask
-        .create(new Callable<ListenableFuture<Object>>() {
-          @Override
-          public ListenableFuture<Object> call() throws Exception {
-            return state.commitOperation(op);
-          }
-        });
-
-    executor.execute(response);
-
-    return Futures.dereference(response);
-
+      return Futures.dereference(onRaftThreadAsync(() -> state.commitOperation(op)));
   }
 
-  @Nonnull
-  public ListenableFuture<Boolean> setConfiguration(@Nonnull RaftMembership oldMembership,
-      @Nonnull RaftMembership newMembership) throws RaftException {
-    checkNotNull(oldMembership);
-    checkNotNull(newMembership);
-    return state.setConfiguration(oldMembership, newMembership);
-  }
 
   public synchronized void setState(BaseState oldState, @Nonnull BaseState newState) {
 
@@ -216,11 +180,18 @@ public class RaftStateContext implements Raft {
     return state.type();
   }
 
-  public synchronized void stop() {
+  public synchronized void stop() throws Exception {
     stop = true;
     if (this.state != null) {
       this.state.doStop();
     }
+    while (!isStopped()) {
+      Thread.sleep(10);
+    }
+    log.close();
+
+    raftExecutor.shutdown();
+    raftExecutor.awaitTermination(5, TimeUnit.SECONDS);
   }
 
   @Nonnull
@@ -241,12 +212,27 @@ public class RaftStateContext implements Raft {
   }
 
   public RaftClusterHealth getClusterHealth() throws RaftException {
-    return state.getClusterHealth();
+    return onRaftThread(() -> state.getClusterHealth());
+  }
+  
+  /**
+   * Call callable on the raft thread (i.e. serialized)
+   */
+  <T> T onRaftThread(Callable<T> callable) throws RaftException {
+    return Futures.get(onRaftThreadAsync(callable), RaftException.class);
   }
 
-  public RaftClientManager getClientManager() {
-    return clientManager;
+  /**
+   * Call callable on the raft thread (i.e. serialized)
+   */
+  <T> ListenableFuture<T> onRaftThreadAsync(Callable<T> callable) {
+    ListenableFuture<T> response = raftExecutor.submit(callable);
+    return response;
   }
+   
+//  public RaftClientManager getClientManager() {
+//    return clientManager;
+//  }
 
   @Override
   public String toString() {
@@ -282,7 +268,7 @@ public class RaftStateContext implements Raft {
   }
 
   ScheduledExecutorService getRaftScheduler() {
-    return threadPools.getRaftScheduler();
+    return raftExecutor;
   }
 
   RaftLog getLog() {
@@ -296,4 +282,28 @@ public class RaftStateContext implements Raft {
   public Optional<Replica> getLeader() {
     return this.state.getLeader();
   }
+  
+
+  // TODO: This should probably take a RaftMembership
+  public void bootstrap(Membership membership) {
+    LOGGER.info("Bootstrapping log with {}", membership);
+    if (!log.isEmpty()) {
+      LOGGER.warn("Cannot bootstrap, as raft log already contains data");
+      throw new IllegalStateException();
+    }
+    log.append(null, membership);
+  }
+
+  public ListenableFuture<Boolean> setConfiguration(final RaftMembership oldMembership,
+      final RaftMembership newMembership) {
+    checkNotNull(oldMembership);
+    checkNotNull(newMembership);
+
+    return Futures.dereference(onRaftThreadAsync(() -> state.setConfiguration(oldMembership, newMembership)));
+  }
+
+  RaftClient getRaftClient(Replica replica) {
+    return raftClientProvider.get(replica);
+  }
+
 }

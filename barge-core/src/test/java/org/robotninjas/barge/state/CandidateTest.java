@@ -12,7 +12,8 @@ import org.robotninjas.barge.*;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto;
 import org.robotninjas.barge.proto.RaftProto.RequestVoteResponse;
-import org.robotninjas.barge.rpc.RaftClientManager;
+import org.robotninjas.barge.rpc.RaftClient;
+import org.robotninjas.barge.rpc.RaftClientProvider;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -35,7 +36,7 @@ public class CandidateTest {
 //  private final ClusterConfig config = ClusterConfigStub.getStub();
 //  private final Replica self = config.local();
   private final Replica self = Replica.fromString("localhost:1");
-  private @Mock RaftClientManager mockRaftClientManager;
+  private @Mock RaftClientProvider mockRaftClientProvider;
   private @Mock StateMachine mockStateMachine;
   private @Mock RaftLog mockRaftLog;
   private @Mock RaftStateContext mockRaftStateContext;
@@ -90,7 +91,9 @@ public class CandidateTest {
 
     RequestVoteResponse response = RequestVoteResponse.newBuilder().setTerm(0).setVoteGranted(true).build();
     ListenableFuture<RequestVoteResponse> responseFuture = Futures.immediateFuture(response);
-    when(mockRaftClientManager.requestVote(any(Replica.class), any(RequestVote.class))).thenReturn(responseFuture);
+    RaftClient mockRaftClient = mock(RaftClient.class);
+    when(mockRaftClientProvider.get(any(Replica.class))).thenReturn(mockRaftClient);
+    when(mockRaftClient.requestVote(any(RequestVote.class))).thenReturn(responseFuture);
   }
 
   @Test
@@ -119,13 +122,13 @@ public class CandidateTest {
     verify(mockRaftLog).votedFor(Optional.of(mockCandidate));
     verify(mockRaftLog, times(2)).votedFor(any(Optional.class));
 
-    verify(mockRaftLog, never()).commitIndex(anyLong());
+    verify(mockRaftLog, never()).setCommitIndex(anyLong());
 
     verify(mockRaftStateContext, times(1)).setState(isA(Candidate.class), isA(Leader.class));
     verify(mockRaftStateContext, times(1)).setState(isA(Candidate.class), isA(Follower.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(2)).type();
-    verify(mockRaftStateContext, times(1)).self();
+    verify(mockRaftStateContext, times(2)).self();
     verify(mockRaftStateContext, times(3)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
     verify(mockRaftStateContext, times(1)).getRaftScheduler();
@@ -133,7 +136,7 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).buildStateFollower(any(Optional.class));
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClientManager);
+    verifyZeroInteractions(mockRaftClientProvider);
 
   }
 
@@ -161,18 +164,18 @@ public class CandidateTest {
     verify(mockRaftLog, never()).votedFor(Optional.of(mockCandidate));
     verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
 
-    verify(mockRaftLog, never()).commitIndex(anyLong());
+    verify(mockRaftLog, never()).setCommitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
-    verify(mockRaftStateContext, times(1)).self();
+    verify(mockRaftStateContext, times(2)).self();
     verify(mockRaftStateContext, times(2)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
     verify(mockRaftStateContext, times(1)).getRaftScheduler();
     verify(mockRaftStateContext, times(1)).buildStateLeader();
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClientManager);
+    verifyZeroInteractions(mockRaftClientProvider);
   }
 
   @Test
@@ -199,11 +202,11 @@ public class CandidateTest {
     verify(mockRaftLog, times(1)).votedFor(Optional.of(mockCandidate));
     verify(mockRaftLog, times(2)).votedFor(any(Optional.class));
 
-    verify(mockRaftLog, never()).commitIndex(anyLong());
+    verify(mockRaftLog, never()).setCommitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Leader.class));
 
-    verify(mockRaftStateContext, times(1)).self();
+    verify(mockRaftStateContext, times(2)).self();
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(3)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
@@ -211,7 +214,7 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).buildStateLeader();
     verifyNoMoreInteractions(mockRaftStateContext);
 
-    verifyZeroInteractions(mockRaftClientManager);
+    verifyZeroInteractions(mockRaftClientProvider);
   }
 
   @Test
@@ -240,12 +243,12 @@ public class CandidateTest {
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
 
-    verify(mockRaftLog, times(1)).commitIndex(anyLong());
+    verify(mockRaftLog, times(1)).setCommitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Leader.class));
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Follower.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
-    verify(mockRaftStateContext, times(1)).self();
+    verify(mockRaftStateContext, times(2)).self();
     verify(mockRaftStateContext, times(2)).type();
     verify(mockRaftStateContext, times(2)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
@@ -254,7 +257,7 @@ public class CandidateTest {
     verify(mockRaftStateContext, times(1)).buildStateFollower(any(Optional.class));
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClientManager);
+    verifyZeroInteractions(mockRaftClientProvider);
 
   }
 
@@ -283,19 +286,19 @@ public class CandidateTest {
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
 
-    verify(mockRaftLog, never()).commitIndex(anyLong());
+    verify(mockRaftLog, never()).setCommitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(any(Candidate.class), any(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(1)).getConfigurationState();
-    verify(mockRaftStateContext, times(1)).self();
+    verify(mockRaftStateContext, times(2)).self();
     verify(mockRaftStateContext, times(2)).getLog();
     verify(mockRaftStateContext, times(1)).getTimeouts();
     verify(mockRaftStateContext, times(1)).getRaftScheduler();
     verify(mockRaftStateContext, times(1)).buildStateLeader();
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClientManager);
+    verifyZeroInteractions(mockRaftClientProvider);
 
   }
 
@@ -322,18 +325,18 @@ public class CandidateTest {
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
 
-    verify(mockRaftLog, times(1)).commitIndex(anyLong());
+    verify(mockRaftLog, times(1)).setCommitIndex(anyLong());
 
     verify(mockRaftStateContext).setState(isA(Candidate.class), isA(Leader.class));
     verify(mockRaftStateContext, times(1)).getConfigurationState();
     verify(mockRaftStateContext, times(2)).getLog();
-    verify(mockRaftStateContext, times(1)).self();
+    verify(mockRaftStateContext, times(2)).self();
     verify(mockRaftStateContext, times(1)).getTimeouts();
     verify(mockRaftStateContext, times(1)).getRaftScheduler();
     verify(mockRaftStateContext, times(1)).buildStateLeader();
     verifyNoMoreInteractions(mockRaftStateContext);
     
-    verifyZeroInteractions(mockRaftClientManager);
+    verifyZeroInteractions(mockRaftClientProvider);
 
   }
 

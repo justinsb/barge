@@ -27,13 +27,13 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
-import org.robotninjas.barge.BargeThreadPools;
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.rpc.RaftClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +90,8 @@ class Leader extends BaseState {
     ReplicaManager replicaManager = replicaManagers.get(replica);
     if (replicaManager == null) {
       // replicaManager = replicaManagerFactory.create(replica);
-      replicaManager = new ReplicaManager(ctx.getClientManager(), ctx.getLog(), replica);
+      RaftClient raftClient = ctx.getRaftClient(replica);
+      replicaManager = new ReplicaManager(ctx.getLog(), raftClient, replica);
       replicaManagers.put(replica, replicaManager);
     }
 
@@ -229,7 +230,7 @@ class Leader extends BaseState {
     ConfigurationState configurationState = ctx.getConfigurationState();
 
     long committed = getQuorumMatchIndex(configurationState);
-    log.commitIndex(committed);
+    log.setCommitIndex(committed);
 
     if (committed >= configurationState.getId()) {
       handleConfigurationUpdate();
