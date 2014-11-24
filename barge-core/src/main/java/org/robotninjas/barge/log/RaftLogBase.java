@@ -33,7 +33,6 @@ import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.state.ConfigurationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -53,7 +52,7 @@ import static org.robotninjas.barge.proto.RaftProto.AppendEntries;
 public abstract class RaftLogBase implements RaftLog {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RaftLogBase.class);
-  
+
   private final String name;
 
   private final ConfigurationState config;
@@ -66,13 +65,13 @@ public abstract class RaftLogBase implements RaftLog {
   private volatile long currentTerm = 0;
   private volatile Optional<Replica> votedFor = Optional.absent();
   private volatile long commitIndex = 0;
-  
+
   /**
    * Index applied to stateMachine
    */
   private volatile long lastApplied = 0;
-//  private final ListeningExecutorService executor;
-  
+
+  // private final ListeningExecutorService executor;
 
   public static interface Visitor {
 
@@ -85,11 +84,11 @@ public abstract class RaftLogBase implements RaftLog {
     void append(RaftEntry.Entry entry, long index);
 
   };
-  
+
   protected RaftLogBase(@Nonnull ConfigurationState config, @Nonnull StateMachineProxy stateMachine) {
     this.config = checkNotNull(config);
     this.stateMachine = checkNotNull(stateMachine);
-//    this.executor = checkNotNull(bargeThreadPools.getRaftExecutor());
+    // this.executor = checkNotNull(bargeThreadPools.getRaftExecutor());
 
     this.name = config.self().getKey();
   }
@@ -97,31 +96,30 @@ public abstract class RaftLogBase implements RaftLog {
   public void close() throws Exception {
     this.stateMachine.close();
   }
-  
-  
+
   public void load() throws IOException {
 
     LOGGER.info("Replaying log");
-    
-//    journal.init();
-    
+
+    // journal.init();
+
     long oldCommitIndex = commitIndex;
 
- // TODO: fireCommitted more often??
-    
+    // TODO: fireCommitted more often??
+
     replay(new Visitor() {
       @Override
-      public void term( long term) {
+      public void term(long term) {
         currentTerm = Math.max(currentTerm, term);
       }
 
       @Override
-      public void vote( Optional<Replica> vote) {
+      public void vote(Optional<Replica> vote) {
         votedFor = vote;
       }
 
       @Override
-      public void commit( long commit) {
+      public void commit(long commit) {
         commitIndex = Math.max(commitIndex, commit);
       }
 
@@ -129,7 +127,7 @@ public abstract class RaftLogBase implements RaftLog {
       public void append(Entry entry, long index) {
         lastLogIndex = Math.max(index, lastLogIndex);
         lastLogTerm = Math.max(entry.getTerm(), lastLogTerm);
-        
+
         if (entry.hasMembership()) {
           config.addMembershipEntry(index, entry);
         }
@@ -143,23 +141,23 @@ public abstract class RaftLogBase implements RaftLog {
     } else {
       lastResult = null;
     }
-    
+
     fireComitted();
 
     if (lastResult != null) {
       Futures.getUnchecked(lastResult);
     }
 
-    LOGGER.info("Finished replaying log lastIndex {}, currentTerm {}, commitIndex {}, lastVotedFor {}",
-        lastLogIndex, currentTerm, commitIndex, votedFor.orNull());
+    LOGGER.info("Finished replaying log lastIndex {}, currentTerm {}, commitIndex {}, lastVotedFor {}", lastLogIndex,
+        currentTerm, commitIndex, votedFor.orNull());
   }
 
   protected abstract void replay(Visitor visitor) throws IOException;
-  
+
   private SettableFuture<Object> storeEntry(final long index, @Nonnull Entry entry) {
-//    LOGGER.debug("{} storing {}", config.self(), entry);
+    // LOGGER.debug("{} storing {}", config.self(), entry);
     writeEntry(index, entry);
-    
+
     if (entry.hasMembership()) {
       config.addMembershipEntry(index, entry);
     }
@@ -170,9 +168,8 @@ public abstract class RaftLogBase implements RaftLog {
   }
 
   protected abstract void writeEntry(long index, Entry entry);
-  
-  public ListenableFuture<Object> append(@Nonnull byte[] operation,
-      @Nonnull Membership membership) {
+
+  public ListenableFuture<Object> append(@Nonnull byte[] operation, @Nonnull Membership membership) {
     long index = ++lastLogIndex;
     lastLogTerm = currentTerm;
 
@@ -186,7 +183,7 @@ public abstract class RaftLogBase implements RaftLog {
     } else {
       checkArgument(false);
     }
-    
+
     return storeEntry(index, entry.build());
 
   }
@@ -227,7 +224,7 @@ public abstract class RaftLogBase implements RaftLog {
   }
 
   protected abstract boolean truncateLog(long afterIndex) throws IOException;
-  
+
   @Nonnull
   public GetEntriesResult getEntriesFrom(@Nonnegative long beginningIndex, @Nonnegative int max) {
     checkArgument(beginningIndex >= 0);
@@ -236,18 +233,18 @@ public abstract class RaftLogBase implements RaftLog {
   }
 
   protected abstract GetEntriesResult readEntriesFrom(long beginningIndex, int max);
-  
-//  SnapshotInfo doSnapshot() throws RaftException {
-//    Snapshotter snapshotter;
-//    synchronized (this) {
-//      ListenableFuture<Snapshotter> snapshotterFuture = stateMachine.prepareSnapshot(currentTerm, lastApplied);
-//      snapshotter = snapshotterFuture.get();
-//    }
-//    
-//    SnapshotInfo snapshotInfo = snapshotter.finishSnapshot();
-//    return snapshotInfo;
-//  }
-  
+
+  // SnapshotInfo doSnapshot() throws RaftException {
+  // Snapshotter snapshotter;
+  // synchronized (this) {
+  // ListenableFuture<Snapshotter> snapshotterFuture = stateMachine.prepareSnapshot(currentTerm, lastApplied);
+  // snapshotter = snapshotterFuture.get();
+  // }
+  //
+  // SnapshotInfo snapshotInfo = snapshotter.finishSnapshot();
+  // return snapshotInfo;
+  // }
+
   void fireComitted() {
     synchronized (this) {
       for (long i = lastApplied + 1; i <= Math.min(commitIndex, lastLogIndex); ++i) {
@@ -288,7 +285,7 @@ public abstract class RaftLogBase implements RaftLog {
         } else {
           LOGGER.warn("Ignoring unusual log entry: {}", entry);
         }
-        
+
         assert (lastApplied + 1) == i;
         lastApplied = i;
       }
@@ -296,7 +293,7 @@ public abstract class RaftLogBase implements RaftLog {
   }
 
   protected abstract Entry readLogEntry(long index);
-  
+
   public String getName() {
     return name;
   }
@@ -313,9 +310,9 @@ public abstract class RaftLogBase implements RaftLog {
     return commitIndex;
   }
 
-//  public ClusterConfig config() {
-//    return config;
-//  }
+  // public ClusterConfig config() {
+  // return config;
+  // }
 
   public void setCommitIndex(long index) {
     commitIndex = index;
@@ -324,22 +321,21 @@ public abstract class RaftLogBase implements RaftLog {
   }
 
   protected abstract void recordCommit(long index);
-  
+
   public long currentTerm() {
     return currentTerm;
   }
 
   public void currentTerm(@Nonnegative long term) {
     checkArgument(term >= 0);
-    MDC.put("term", Long.toString(term));
+    // MDC.put("term", Long.toString(term));
     LOGGER.debug("New term {}", term);
     currentTerm = term;
     votedFor = Optional.absent();
     recordTerm(term);
   }
-  
+
   protected abstract void recordTerm(long term);
-  
 
   @Nonnull
   public Optional<Replica> votedFor() {
@@ -353,15 +349,11 @@ public abstract class RaftLogBase implements RaftLog {
   }
 
   protected abstract void recordVote(@Nonnull Optional<Replica> vote);
-  
+
   @Override
   public String toString() {
-    return Objects.toStringHelper(getClass())
-        .add("lastLogIndex", lastLogIndex)
-        .add("lastApplied", lastApplied)
-        .add("commitIndex", commitIndex)
-        .add("lastVotedFor", votedFor)
-        .toString();
+    return Objects.toStringHelper(getClass()).add("lastLogIndex", lastLogIndex).add("lastApplied", lastApplied)
+        .add("commitIndex", commitIndex).add("lastVotedFor", votedFor).toString();
   }
 
   private static class PromiseBridge<V> implements FutureCallback<V> {
@@ -383,7 +375,7 @@ public abstract class RaftLogBase implements RaftLog {
       promise.setException(t);
     }
   }
-  
+
   public Replica self() {
     return config.self();
   }
