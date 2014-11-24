@@ -194,7 +194,7 @@ public abstract class BaseState {
     return type.toString() + " [" + log.getName() + " @ " + self() + "]";
   }
 
-  public void init() {
+  public void init()  {
 
   }
 

@@ -34,6 +34,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import java.io.IOException;
 import java.util.concurrent.Executors;
 
 @NotThreadSafe
@@ -74,7 +75,7 @@ public interface RaftLog {
 
   public void close() throws Exception;
 
-  public void load();
+  public void load() throws IOException;
 
   boolean isEmpty();
 

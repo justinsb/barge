@@ -1,12 +1,13 @@
 package org.robotninjas.barge.state;
 
+import java.io.IOException;
+
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.log.RaftLog;
-import org.slf4j.MDC;
 
 import javax.annotation.Nonnull;
 
@@ -22,10 +23,15 @@ class Start extends BaseState {
   public void init() {
     RaftLog log = getLog();
 
-    MDC.put("state", RaftState.START.name());
-    MDC.put("term", Long.toString(log.currentTerm()));
-    MDC.put("self", self().toString());
-    log.load();
+    // MDC.put("state", RaftState.START.name());
+    // MDC.put("term", Long.toString(log.currentTerm()));
+    // MDC.put("self", self().toString());
+
+    try {
+      log.load();
+    } catch (IOException e) {
+      throw new IllegalStateException("Error loading log", e);
+    }
     ctx.setState(this, ctx.buildStateFollower(leader));
   }
 
@@ -43,7 +49,7 @@ class Start extends BaseState {
 
   @Nonnull
   @Override
-  public ListenableFuture<Object> commitOperation( @Nonnull byte[] operation) throws RaftException {
+  public ListenableFuture<Object> commitOperation(@Nonnull byte[] operation) throws RaftException {
     throw new RaftException("Service has not started yet");
   }
 
@@ -51,10 +57,11 @@ class Start extends BaseState {
   public RaftClusterHealth getClusterHealth() throws RaftException {
     throw new RaftException("Service has not started yet");
   }
-  
+
   @Override
-  public ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, RaftMembership newMembership) throws RaftException {
+  public ListenableFuture<Boolean> setConfiguration(RaftMembership oldMembership, RaftMembership newMembership)
+      throws RaftException {
     throw new RaftException("Service has not started yet");
   }
-  
+
 }
