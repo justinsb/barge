@@ -3,10 +3,13 @@ package org.robotninjas.barge;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
+
 import java.util.concurrent.ExecutionException;
+
 import javax.annotation.Nonnull;
 
 import org.robotninjas.barge.log.RaftLog;
+import org.robotninjas.barge.log.RaftLogBase;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.rpc.RaftClientProvider;
 import org.robotninjas.barge.state.RaftStateContext;
@@ -122,7 +125,7 @@ public abstract class RaftService extends AbstractService {
 
   public static class Builder {
 //    public ClusterConfig seedConfig;
-    public RaftLog.Builder log;
+    public RaftLogBase.Builder log;
     public RaftClientProvider raftClientProvider;
 //    public ConfigurationState configurationState;
 //    public BargeThreadPools threadPools;

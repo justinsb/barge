@@ -93,7 +93,7 @@ public class JournalRaftLog extends RaftLogBase {
     return journal.getFiles().isEmpty();
   }
 
-  public static class Builder extends RaftLog.Builder {
+  public static class Builder extends RaftLogBase.Builder {
     public File logDirectory;
 
     @Nonnull

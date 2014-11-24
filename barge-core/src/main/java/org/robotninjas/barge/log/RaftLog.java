@@ -79,33 +79,4 @@ public interface RaftLog {
 
   boolean isEmpty();
 
-  public abstract static class Builder {
-    public StateMachine stateMachine;
-    public ConfigurationState config;
-
-    public ListeningExecutorService stateMachineExecutor;
-
-    protected StateMachineProxy stateMachineProxy;
-
-    @Nonnull
-    public abstract RaftLog build();
-
-    protected void buildDefaults() {
-      String key = self().getKey();
-
-      boolean closeStateMachineExecutor = false;
-      if (stateMachineExecutor == null) {
-        stateMachineExecutor = MoreExecutors.listeningDecorator(Executors
-            .newSingleThreadExecutor(new DefaultThreadFactory("pool-state-worker-" + key)));
-        closeStateMachineExecutor = true;
-      }
-
-      stateMachineProxy = new StateMachineProxy(stateMachine, stateMachineExecutor, closeStateMachineExecutor);
-    }
-
-    public Replica self() {
-      return config.self();
-    }
-
-  }
 }

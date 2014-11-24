@@ -23,16 +23,21 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.protobuf.ByteString;
 
 import org.robotninjas.barge.Replica;
+import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.proto.RaftEntry;
 import org.robotninjas.barge.proto.RaftEntry.Entry;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.state.ConfigurationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -43,6 +48,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -380,4 +386,34 @@ public abstract class RaftLogBase implements RaftLog {
     return config.self();
   }
 
+
+  public abstract static class Builder {
+    public StateMachine stateMachine;
+    public ConfigurationState config;
+
+    public ListeningExecutorService stateMachineExecutor;
+
+    protected StateMachineProxy stateMachineProxy;
+
+    @Nonnull
+    public abstract RaftLog build();
+
+    protected void buildDefaults() {
+      String key = self().getKey();
+
+      boolean closeStateMachineExecutor = false;
+      if (stateMachineExecutor == null) {
+        stateMachineExecutor = MoreExecutors.listeningDecorator(Executors
+            .newSingleThreadExecutor(new DefaultThreadFactory("pool-state-worker-" + key)));
+        closeStateMachineExecutor = true;
+      }
+
+      stateMachineProxy = new StateMachineProxy(stateMachine, stateMachineExecutor, closeStateMachineExecutor);
+    }
+
+    public Replica self() {
+      return config.self();
+    }
+
+  }
 }
