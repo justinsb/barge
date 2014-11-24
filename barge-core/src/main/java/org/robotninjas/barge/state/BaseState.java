@@ -61,10 +61,10 @@ public abstract class BaseState {
     assert !votedFor.isPresent() || votedFor.get().equals(candidate);
 
     boolean logIsComplete;
-    if (request.getLastLogTerm() > log.lastLogTerm()) {
+    if (request.getLastLogTerm() > log.getLastLogTerm()) {
       logIsComplete = true;
-    } else if (request.getLastLogTerm() == log.lastLogTerm()) {
-      if (request.getLastLogIndex() >= log.lastLogIndex()) {
+    } else if (request.getLastLogTerm() == log.getLastLogTerm()) {
+      if (request.getLastLogIndex() >= log.getLastLogIndex()) {
         logIsComplete = true;
       } else {
         logIsComplete = false;
@@ -96,11 +96,11 @@ public abstract class BaseState {
 
     boolean success = false;
 
-    if (request.getTerm() >= log.currentTerm()) {
+    if (request.getTerm() >= log.getCurrentTerm()) {
 
-      if (request.getTerm() > log.currentTerm()) {
+      if (request.getTerm() > log.getCurrentTerm()) {
 
-        log.currentTerm(request.getTerm());
+        log.setCurrentTerm(request.getTerm());
 
         if (ctx.type().equals(RaftState.LEADER) || ctx.type().equals(RaftState.CANDIDATE)) {
           Follower follower = ctx.buildStateFollower(Optional.of(Replica.fromString(request.getLeaderId())));
@@ -114,14 +114,14 @@ public abstract class BaseState {
       resetTimer();
       success = log.append(request);
 
-      if (request.getCommitIndex() > log.commitIndex()) {
-        log.setCommitIndex(Math.min(request.getCommitIndex(), log.lastLogIndex()));
+      if (request.getCommitIndex() > log.getCommitIndex()) {
+        log.setCommitIndex(Math.min(request.getCommitIndex(), log.getLastLogIndex()));
       }
 
     }
 
-    return AppendEntriesResponse.newBuilder().setTerm(log.currentTerm()).setSuccess(success)
-        .setLastLogIndex(log.lastLogIndex()).build();
+    return AppendEntriesResponse.newBuilder().setTerm(log.getCurrentTerm()).setSuccess(success)
+        .setLastLogIndex(log.getLastLogIndex()).build();
 
   }
 
@@ -134,7 +134,7 @@ public abstract class BaseState {
     boolean voteGranted;
 
     long term = request.getTerm();
-    long currentTerm = log.currentTerm();
+    long currentTerm = log.getCurrentTerm();
 
     LOGGER.debug("RequestVote received for term {}", term);
 
@@ -147,7 +147,7 @@ public abstract class BaseState {
       // set currentTerm = T, convert to follower (§5.1)
       if (term > currentTerm) {
 
-        log.currentTerm(term);
+        log.setCurrentTerm(term);
 
         if (ctx.type().equals(RaftState.LEADER) || ctx.type().equals(RaftState.CANDIDATE)) {
           ctx.setState(this, ctx.buildStateFollower(Optional.<Replica> absent()));

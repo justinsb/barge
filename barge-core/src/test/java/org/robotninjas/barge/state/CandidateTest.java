@@ -71,9 +71,9 @@ public class CandidateTest {
     
     when(mockRaftLog.self()).thenReturn(self);
     when(mockRaftLog.votedFor()).thenReturn(Optional.<Replica>absent());
-    when(mockRaftLog.lastLogTerm()).thenReturn(0L);
-    when(mockRaftLog.lastLogIndex()).thenReturn(0L);
-    when(mockRaftLog.currentTerm()).thenReturn(term);
+    when(mockRaftLog.getLastLogTerm()).thenReturn(0L);
+    when(mockRaftLog.getLastLogIndex()).thenReturn(0L);
+    when(mockRaftLog.getCurrentTerm()).thenReturn(term);
     
 //    when(mockRaftLog.config()).thenReturn(config);
 //    when(mockRaftLog.getReplica(anyString())).thenAnswer(new Answer<Replica>() {
@@ -114,9 +114,9 @@ public class CandidateTest {
 
     candidate.requestVote(request);
 
-    verify(mockRaftLog).currentTerm(3L);
-    verify(mockRaftLog).currentTerm(4L);
-    verify(mockRaftLog, times(2)).currentTerm(anyLong());
+    verify(mockRaftLog).setCurrentTerm(3L);
+    verify(mockRaftLog).setCurrentTerm(4L);
+    verify(mockRaftLog, times(2)).setCurrentTerm(anyLong());
 
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog).votedFor(Optional.of(mockCandidate));
@@ -157,8 +157,8 @@ public class CandidateTest {
 
     candidate.requestVote(request);
 
-    verify(mockRaftLog).currentTerm(3L);
-    verify(mockRaftLog, times(1)).currentTerm(anyLong());
+    verify(mockRaftLog).setCurrentTerm(3L);
+    verify(mockRaftLog, times(1)).setCurrentTerm(anyLong());
 
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog, never()).votedFor(Optional.of(mockCandidate));
@@ -195,8 +195,8 @@ public class CandidateTest {
 
     candidate.requestVote(request);
 
-    verify(mockRaftLog).currentTerm(3L);
-    verify(mockRaftLog, times(1)).currentTerm(anyLong());
+    verify(mockRaftLog).setCurrentTerm(3L);
+    verify(mockRaftLog, times(1)).setCurrentTerm(anyLong());
 
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog, times(1)).votedFor(Optional.of(mockCandidate));
@@ -236,9 +236,9 @@ public class CandidateTest {
 
     candidate.appendEntries( request);
 
-    verify(mockRaftLog).currentTerm(3L);
-    verify(mockRaftLog).currentTerm(4L);
-    verify(mockRaftLog, times(2)).currentTerm(anyLong());
+    verify(mockRaftLog).setCurrentTerm(3L);
+    verify(mockRaftLog).setCurrentTerm(4L);
+    verify(mockRaftLog, times(2)).setCurrentTerm(anyLong());
 
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
@@ -280,8 +280,8 @@ public class CandidateTest {
 
     candidate.appendEntries(request);
 
-    verify(mockRaftLog).currentTerm(3L);
-    verify(mockRaftLog, times(1)).currentTerm(anyLong());
+    verify(mockRaftLog).setCurrentTerm(3L);
+    verify(mockRaftLog, times(1)).setCurrentTerm(anyLong());
 
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog, times(1)).votedFor(any(Optional.class));
@@ -319,8 +319,8 @@ public class CandidateTest {
 
     candidate.appendEntries(request);
 
-    verify(mockRaftLog).currentTerm(3L);
-    verify(mockRaftLog, times(1)).currentTerm(anyLong());
+    verify(mockRaftLog).setCurrentTerm(3L);
+    verify(mockRaftLog, times(1)).setCurrentTerm(anyLong());
 
     verify(mockRaftLog).votedFor(Optional.of(self));
     verify(mockRaftLog, times(1)).votedFor(any(Optional.class));

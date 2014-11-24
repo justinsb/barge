@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nonnull;
 
-import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.log.RaftLogBase;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.rpc.RaftClientProvider;

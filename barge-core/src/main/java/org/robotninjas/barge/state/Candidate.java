@@ -69,12 +69,12 @@ class Candidate extends BaseState {
     final SettableFuture<Boolean> result = SettableFuture.create();
     final RaftLog log = getLog();
 
-    log.currentTerm(log.currentTerm() + 1);
+    log.setCurrentTerm(log.getCurrentTerm() + 1);
     log.votedFor(Optional.of(self()));
 
     ConfigurationState configurationState = ctx.getConfigurationState();
 
-    LOGGER.debug("Election starting for term {}", log.currentTerm());
+    LOGGER.debug("Election starting for term {}", log.getCurrentTerm());
 
     List<ListenableFuture<RequestVoteResponse>> responses = Lists.newArrayList();
     Replica self = configurationState.self();
@@ -152,9 +152,9 @@ class Candidate extends BaseState {
     ConfigurationState configurationState = ctx.getConfigurationState();
 
     RaftLog log = getLog();
-    RequestVote request = RequestVote.newBuilder().setTerm(log.currentTerm())
-        .setCandidateId(configurationState.self().toString()).setLastLogIndex(log.lastLogIndex())
-        .setLastLogTerm(log.lastLogTerm()).build();
+    RequestVote request = RequestVote.newBuilder().setTerm(log.getCurrentTerm())
+        .setCandidateId(configurationState.self().toString()).setLastLogIndex(log.getLastLogIndex())
+        .setLastLogTerm(log.getLastLogTerm()).build();
 
     return ctx.getRaftClient(replica).requestVote(request);
   }
@@ -163,8 +163,8 @@ class Candidate extends BaseState {
     return new FutureCallback<RequestVoteResponse>() {
       @Override
       public void onSuccess(@Nullable RequestVoteResponse response) {
-        if (response.getTerm() > getLog().currentTerm()) {
-          getLog().currentTerm(response.getTerm());
+        if (response.getTerm() > getLog().getCurrentTerm()) {
+          getLog().setCurrentTerm(response.getTerm());
           ctx.setState(Candidate.this, ctx.buildStateFollower(Optional.<Replica> absent()));
         }
       }

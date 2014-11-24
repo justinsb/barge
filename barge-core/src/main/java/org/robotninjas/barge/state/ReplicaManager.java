@@ -60,7 +60,7 @@ class ReplicaManager {
   
   ReplicaManager(RaftLog log, RaftClient raftClient, Replica remote) {
 
-    this.nextIndex = log.lastLogIndex() + 1;
+    this.nextIndex = log.getLastLogIndex() + 1;
     this.log = log;
     this.raftClient = raftClient;
     this.remote = remote;
@@ -81,11 +81,11 @@ class ReplicaManager {
 
     final AppendEntries request =
       AppendEntries.newBuilder()
-        .setTerm(log.currentTerm())
+        .setTerm(log.getCurrentTerm())
         .setLeaderId(log.self().toString())
         .setPrevLogIndex(result.lastLogIndex())
         .setPrevLogTerm(result.lastLogTerm())
-        .setCommitIndex(log.commitIndex())
+        .setCommitIndex(log.getCommitIndex())
         .addAllEntries(result.entries())
         .build();
 

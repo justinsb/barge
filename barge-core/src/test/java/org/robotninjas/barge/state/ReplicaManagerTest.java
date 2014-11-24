@@ -44,9 +44,9 @@ public class ReplicaManagerTest {
     MockitoAnnotations.initMocks(this);
 
     when(mockRaftLog.self()).thenReturn(SELF);
-    when(mockRaftLog.lastLogTerm()).thenReturn(0L);
-    when(mockRaftLog.lastLogIndex()).thenReturn(0L);
-    when(mockRaftLog.currentTerm()).thenReturn(1L);
+    when(mockRaftLog.getLastLogTerm()).thenReturn(0L);
+    when(mockRaftLog.getLastLogIndex()).thenReturn(0L);
+    when(mockRaftLog.getCurrentTerm()).thenReturn(1L);
 
   }
 

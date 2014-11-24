@@ -36,9 +36,9 @@ public class BaseStateTest {
 
     MockitoAnnotations.initMocks(this);
 
-    when(mockRaftLog.currentTerm()).thenReturn(2l);
-    when(mockRaftLog.lastLogIndex()).thenReturn(2l);
-    when(mockRaftLog.lastLogTerm()).thenReturn(2l);
+    when(mockRaftLog.getCurrentTerm()).thenReturn(2l);
+    when(mockRaftLog.getLastLogIndex()).thenReturn(2l);
+    when(mockRaftLog.getLastLogTerm()).thenReturn(2l);
     when(mockRaftLog.self()).thenReturn(self);
 
     when(mockRaftStateContext.getLog()).thenReturn(mockRaftLog);

@@ -19,40 +19,31 @@ package org.robotninjas.barge.log;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-
 import org.robotninjas.barge.Replica;
-import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.proto.RaftProto.AppendEntries;
-import org.robotninjas.barge.state.ConfigurationState;
-
-import io.netty.util.concurrent.DefaultThreadFactory;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
 
 @NotThreadSafe
 public interface RaftLog {
 
-  long currentTerm();
+  long getCurrentTerm();
 
-  void currentTerm(long currentTerm);
+  void setCurrentTerm(long currentTerm);
 
   GetEntriesResult getEntriesFrom(@Nonnegative long beginningIndex, @Nonnegative int max);
 
   public String getName();
 
-  public long lastLogTerm();
+  public long getLastLogTerm();
 
-  public long lastLogIndex();
+  public long getLastLogIndex();
 
-  public long commitIndex();
+  public long getCommitIndex();
 
   public void setCommitIndex(long index);
 

@@ -304,15 +304,15 @@ public abstract class RaftLogBase implements RaftLog {
     return name;
   }
 
-  public long lastLogIndex() {
+  public long getLastLogIndex() {
     return lastLogIndex;
   }
 
-  public long lastLogTerm() {
+  public long getLastLogTerm() {
     return lastLogTerm;
   }
 
-  public long commitIndex() {
+  public long getCommitIndex() {
     return commitIndex;
   }
 
@@ -328,11 +328,11 @@ public abstract class RaftLogBase implements RaftLog {
 
   protected abstract void recordCommit(long index);
 
-  public long currentTerm() {
+  public long getCurrentTerm() {
     return currentTerm;
   }
 
-  public void currentTerm(@Nonnegative long term) {
+  public void setCurrentTerm(@Nonnegative long term) {
     checkArgument(term >= 0);
     // MDC.put("term", Long.toString(term));
     LOGGER.debug("New term {}", term);

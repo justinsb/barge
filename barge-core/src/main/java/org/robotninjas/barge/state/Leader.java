@@ -181,7 +181,7 @@ class Leader extends BaseState {
     List<Long> sorted = newArrayList();
     for (Replica replica : replicas) {
       if (replica == self) {
-        sorted.add(log.lastLogIndex());
+        sorted.add(log.getLastLogIndex());
       } else {
         ReplicaManager replicaManager = getManagerForReplica(replica);
         if (replicaManager == null) {
@@ -275,7 +275,7 @@ class Leader extends BaseState {
   private void checkTermOnResponse(AppendEntriesResponse response) {
     RaftLog log = ctx.getLog();
 
-    long currentTerm = log.currentTerm();
+    long currentTerm = log.getCurrentTerm();
     if (response.getTerm() < currentTerm) {
       LOGGER.info("Responder has out-of-date term; ignoring response: {}", response);
     }
@@ -283,7 +283,7 @@ class Leader extends BaseState {
     if (response.getTerm() > currentTerm) {
       LOGGER.debug("Got response with greater term; stepping down: {}", response);
 
-      log.currentTerm(response.getTerm());
+      log.setCurrentTerm(response.getTerm());
       Optional<Replica> newLeader = Optional.absent();
 
       stepDown(newLeader);
