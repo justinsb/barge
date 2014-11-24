@@ -18,6 +18,8 @@ package org.robotninjas.barge.state;
 
 import javax.annotation.Nonnull;
 
+import org.robotninjas.barge.RaftException;
+
 import static org.robotninjas.barge.proto.RaftProto.*;
 
 /**
@@ -28,10 +30,10 @@ public interface Raft {
 //  ListenableFuture init();
 
   @Nonnull
-  RequestVoteResponse requestVote(@Nonnull RequestVote request);
+  RequestVoteResponse requestVote(@Nonnull RequestVote request) throws RaftException;
 
   @Nonnull
-  AppendEntriesResponse appendEntries(@Nonnull AppendEntries request);
+  AppendEntriesResponse appendEntries(@Nonnull AppendEntries request) throws RaftException;
 
 //  @Nonnull
 //  ListenableFuture<Object> commitOperation(@Nonnull byte[] op) throws RaftException;

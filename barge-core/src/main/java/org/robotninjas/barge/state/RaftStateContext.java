@@ -18,11 +18,8 @@
 package org.robotninjas.barge.state;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListenableFutureTask;
-import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
@@ -32,7 +29,6 @@ import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
-import org.robotninjas.barge.proto.RaftEntry.Entry;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.rpc.RaftClient;
 import org.robotninjas.barge.rpc.RaftClientProvider;
@@ -45,11 +41,8 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -93,43 +86,27 @@ public class RaftStateContext implements Raft {
   }
 
   public void init() throws RaftException {
-    onRaftThread(() -> {
-      setState(null, buildStateStart());
-      return null;
-    });
+    onRaftThread(() -> { setState(null, buildStateStart()); return null; });
   }
 
   @Override
   @Nonnull
-  public RequestVoteResponse requestVote(@Nonnull final RequestVote request) {
-    checkNotNull(request);
-
-    try {
-      return onRaftThread(() -> state.requestVote(request));
-    } catch (RaftException e) {
-      throw Throwables.propagate(e);
-    }
+  public RequestVoteResponse requestVote(@Nonnull final RequestVote request) throws RaftException {
+    return onRaftThread(() -> state.requestVote(request));
 
   }
 
   @Override
   @Nonnull
-  public AppendEntriesResponse appendEntries(@Nonnull final AppendEntries request) {
-    checkNotNull(request);
-
-    try {
-      return onRaftThread(() -> state.appendEntries(request));
-    } catch (RaftException e) {
-      throw Throwables.propagate(e);
-    }
+  public AppendEntriesResponse appendEntries(@Nonnull final AppendEntries request) throws RaftException {
+    return onRaftThread(() -> state.appendEntries(request));
   }
 
   @Nonnull
   public ListenableFuture<Object> commitOperation(@Nonnull final byte[] op) throws RaftException {
-
     checkNotNull(op);
 
-      return Futures.dereference(onRaftThreadAsync(() -> state.commitOperation(op)));
+    return Futures.dereference(onRaftThreadAsync(() -> state.commitOperation(op)));
   }
 
 

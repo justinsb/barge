@@ -17,18 +17,11 @@
 
 package org.robotninjas.barge.rpc.netty;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.protobuf.Service;
 
-import org.robotninjas.barge.ClusterConfig;
 import org.robotninjas.barge.RaftService;
 import org.robotninjas.barge.Replica;
-import org.robotninjas.barge.StateMachine;
-import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftProto;
-import org.robotninjas.barge.rpc.RaftClient;
-import org.robotninjas.barge.rpc.RaftClientProvider;
 import org.robotninjas.barge.state.RaftStateContext;
 import org.robotninjas.protobuf.netty.client.RpcClient;
 import org.robotninjas.protobuf.netty.server.RpcServer;
@@ -41,10 +34,7 @@ import io.netty.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.inject.Inject;
-
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 

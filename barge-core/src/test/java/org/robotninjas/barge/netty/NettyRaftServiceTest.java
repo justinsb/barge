@@ -1,7 +1,5 @@
 package org.robotninjas.barge.netty;
 
-import static org.junit.Assert.*;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotninjas.barge.Replica;
@@ -9,7 +7,6 @@ import org.robotninjas.barge.Replica;
 import com.google.common.collect.Lists;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 

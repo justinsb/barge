@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.robotninjas.barge.proto.RaftProto.*;
@@ -88,6 +87,8 @@ public abstract class BaseState {
 
   @Nonnull
   public AppendEntriesResponse appendEntries(@Nonnull AppendEntries request) {
+    checkNotNull(request);
+
     LOGGER.debug("AppendEntries prev index {}, prev term {}, num entries {}, term {}", request.getPrevLogIndex(),
         request.getPrevLogTerm(), request.getEntriesCount(), request.getTerm());
 
@@ -126,6 +127,7 @@ public abstract class BaseState {
 
   @Nonnull
   public RequestVoteResponse requestVote(@Nonnull RequestVote request) {
+    checkNotNull(request);
 
     RaftLog log = getLog();
 

@@ -1,13 +1,9 @@
 package org.robotninjas.barge.state;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.inject.Inject;
-
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
-import org.robotninjas.barge.log.RaftLog;
-
 import javax.annotation.Nonnull;
 
 import static org.robotninjas.barge.proto.RaftProto.*;

@@ -25,27 +25,18 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import com.google.inject.Inject;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.protobuf.ByteString;
 
-import io.netty.util.concurrent.DefaultThreadFactory;
 import journal.io.api.Journal;
 import journal.io.api.JournalBuilder;
 
 import org.robotninjas.barge.Replica;
-import org.robotninjas.barge.StateMachine;
-import org.robotninjas.barge.StateMachine.Snapshotter;
 import org.robotninjas.barge.log.GetEntriesResult;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.log.StateMachineProxy;
 import org.robotninjas.barge.log.journalio.RaftJournal.Mark;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
-import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.state.ConfigurationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,13 +53,8 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Throwables.propagate;
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.unmodifiableList;
 import static org.robotninjas.barge.proto.RaftEntry.Entry;
 import static org.robotninjas.barge.proto.RaftProto.AppendEntries;
 

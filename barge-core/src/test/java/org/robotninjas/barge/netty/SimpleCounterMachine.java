@@ -12,7 +12,6 @@ import org.robotninjas.barge.rpc.netty.NettyRaftService;
 import org.robotninjas.barge.state.ConfigurationState;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.Service.State;
 
 import java.io.File;
 import java.io.IOException;

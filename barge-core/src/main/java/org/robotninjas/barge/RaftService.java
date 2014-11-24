@@ -3,19 +3,12 @@ package org.robotninjas.barge;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
-import io.netty.util.concurrent.DefaultThreadFactory;
-
-import java.io.File;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-
 import javax.annotation.Nonnull;
 
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.rpc.RaftClientProvider;
-import org.robotninjas.barge.rpc.netty.NettyRaftService;
-import org.robotninjas.barge.state.ConfigurationState;
 import org.robotninjas.barge.state.RaftStateContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +17,6 @@ import com.google.common.base.Optional;
 import com.google.common.io.Closer;
 import com.google.common.util.concurrent.AbstractService;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.ListeningScheduledExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 
 /**
  * An instance of a set of replica managed through Raft protocol.

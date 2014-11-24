@@ -27,11 +27,6 @@ import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
-import org.robotninjas.barge.state.Raft;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;

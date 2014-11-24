@@ -17,8 +17,6 @@
 
 package org.robotninjas.barge.log;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -26,7 +24,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
-import org.robotninjas.barge.log.journalio.JournalRaftLog;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.proto.RaftProto.AppendEntries;
 import org.robotninjas.barge.state.ConfigurationState;
@@ -37,12 +34,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.Executors;
-
-import journal.io.api.Journal;
-import journal.io.api.JournalBuilder;
 
 @NotThreadSafe
 public interface RaftLog {
