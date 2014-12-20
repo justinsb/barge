@@ -1,4 +1,5 @@
 language: java
+sudo: false
 script: "mvn package -Ptravis --settings travis-settings.xml"
 jdk:
     - oraclejdk8
