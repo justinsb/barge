@@ -8,6 +8,7 @@ import journal.io.api.Location;
 
 import org.robotninjas.barge.proto.LogProto;
 import org.robotninjas.barge.proto.RaftEntry.Entry;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +52,12 @@ public class LogTool {
         if (appendEntry.hasCommand()) {
           lastEntryType = Type.APPEND;
         }
+        if (appendEntry.hasSnapshot()) {
+          SnapshotInfo s = appendEntry.getSnapshot();
+          index = s.getLastIncludedIndex();
+          term = s.getLastIncludedTerm();
+          lastEntryType = Type.SNAPSHOT;
+        }
 
         term = a.getEntry().getTerm();
 
@@ -59,13 +66,6 @@ public class LogTool {
         LogProto.Commit c = entry.getCommit();
         committed = c.getIndex();
         lastEntryType = Type.COMMIT;
-
-      } else if (entry.hasSnapshot()) {
-
-        LogProto.Snapshot s = entry.getSnapshot();
-        index = s.getLastIncludedIndex();
-        term = s.getLastIncludedTerm();
-        lastEntryType = Type.SNAPSHOT;
 
       } else if (entry.hasTerm()) {
 
