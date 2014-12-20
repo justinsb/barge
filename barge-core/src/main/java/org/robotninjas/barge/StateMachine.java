@@ -28,11 +28,13 @@ public interface StateMachine {
 
   Object applyOperation(@Nonnull ByteBuffer entry);
 
-  Snapshotter prepareSnapshot(long currentTerm, long currentIndex);
-
   // void installSnapshot(@Nonnull InputStream snapshot);
 
   public interface Snapshotter {
     SnapshotInfo finishSnapshot() throws InterruptedException, ExecutionException;
   }
+
+  Snapshotter prepareSnapshot(long currentTerm, long currentIndex);
+
+  void gotSnapshot(SnapshotInfo snapshotInfo);
 }

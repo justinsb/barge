@@ -4,8 +4,11 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ListeningExecutorService;
+
 import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.StateMachine.Snapshotter;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
+
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -62,16 +65,27 @@ public class StateMachineProxy  {
     });
   }
 
-  @Nonnull
-  public ListenableFuture installSnapshot() {
-    return Futures.immediateFailedFuture(new IllegalStateException());
-  }
+//  @Nonnull
+//  public ListenableFuture installSnapshot() {
+//    return Futures.immediateFailedFuture(new IllegalStateException());
+//  }
 
   public void close() throws InterruptedException {
     if (closeStateMachineExecutor) {
       this.stateMachineExecutor.shutdown();
       this.stateMachineExecutor.awaitTermination(5, TimeUnit.SECONDS);
     }
+  }
+
+  public ListenableFuture<Object> gotSnapshot(SnapshotInfo snapshotInfo) {
+    checkNotNull(snapshotInfo);
+    return submit(new Callable<Object>() {
+      @Override
+      public Object call() {
+        stateMachine.gotSnapshot(snapshotInfo);
+        return Boolean.TRUE;
+      }
+    });
   }
 
 }

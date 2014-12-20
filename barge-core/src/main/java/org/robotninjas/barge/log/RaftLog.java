@@ -19,9 +19,13 @@ package org.robotninjas.barge.log;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.proto.RaftProto.AppendEntries;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -69,5 +73,11 @@ public interface RaftLog {
   public void load() throws IOException;
 
   boolean isEmpty();
+
+  ListenableFuture<SnapshotInfo> performSnapshot() throws RaftException;
+
+  boolean shouldSnapshot();
+
+  SnapshotInfo getLastSnapshotInfo();
 
 }

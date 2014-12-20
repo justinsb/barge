@@ -1904,662 +1904,6 @@ public final class LogProto {
     // @@protoc_insertion_point(class_scope:Commit)
   }
 
-  public interface SnapshotOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:Snapshot)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>required int64 last_included_index = 1;</code>
-     */
-    boolean hasLastIncludedIndex();
-    /**
-     * <code>required int64 last_included_index = 1;</code>
-     */
-    long getLastIncludedIndex();
-
-    /**
-     * <code>required int64 last_included_term = 2;</code>
-     */
-    boolean hasLastIncludedTerm();
-    /**
-     * <code>required int64 last_included_term = 2;</code>
-     */
-    long getLastIncludedTerm();
-
-    /**
-     * <code>required string snapshot_file = 3;</code>
-     */
-    boolean hasSnapshotFile();
-    /**
-     * <code>required string snapshot_file = 3;</code>
-     */
-    java.lang.String getSnapshotFile();
-    /**
-     * <code>required string snapshot_file = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getSnapshotFileBytes();
-  }
-  /**
-   * Protobuf type {@code Snapshot}
-   */
-  public static final class Snapshot extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:Snapshot)
-      SnapshotOrBuilder {
-    // Use Snapshot.newBuilder() to construct.
-    private Snapshot(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private Snapshot(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Snapshot defaultInstance;
-    public static Snapshot getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public Snapshot getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private Snapshot(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              lastIncludedIndex_ = input.readInt64();
-              break;
-            }
-            case 16: {
-              bitField0_ |= 0x00000002;
-              lastIncludedTerm_ = input.readInt64();
-              break;
-            }
-            case 26: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000004;
-              snapshotFile_ = bs;
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.robotninjas.barge.proto.LogProto.internal_static_Snapshot_descriptor;
-    }
-
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.robotninjas.barge.proto.LogProto.internal_static_Snapshot_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.robotninjas.barge.proto.LogProto.Snapshot.class, org.robotninjas.barge.proto.LogProto.Snapshot.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<Snapshot> PARSER =
-        new com.google.protobuf.AbstractParser<Snapshot>() {
-      public Snapshot parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Snapshot(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Snapshot> getParserForType() {
-      return PARSER;
-    }
-
-    private int bitField0_;
-    public static final int LAST_INCLUDED_INDEX_FIELD_NUMBER = 1;
-    private long lastIncludedIndex_;
-    /**
-     * <code>required int64 last_included_index = 1;</code>
-     */
-    public boolean hasLastIncludedIndex() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>required int64 last_included_index = 1;</code>
-     */
-    public long getLastIncludedIndex() {
-      return lastIncludedIndex_;
-    }
-
-    public static final int LAST_INCLUDED_TERM_FIELD_NUMBER = 2;
-    private long lastIncludedTerm_;
-    /**
-     * <code>required int64 last_included_term = 2;</code>
-     */
-    public boolean hasLastIncludedTerm() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>required int64 last_included_term = 2;</code>
-     */
-    public long getLastIncludedTerm() {
-      return lastIncludedTerm_;
-    }
-
-    public static final int SNAPSHOT_FILE_FIELD_NUMBER = 3;
-    private java.lang.Object snapshotFile_;
-    /**
-     * <code>required string snapshot_file = 3;</code>
-     */
-    public boolean hasSnapshotFile() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>required string snapshot_file = 3;</code>
-     */
-    public java.lang.String getSnapshotFile() {
-      java.lang.Object ref = snapshotFile_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          snapshotFile_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>required string snapshot_file = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getSnapshotFileBytes() {
-      java.lang.Object ref = snapshotFile_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        snapshotFile_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private void initFields() {
-      lastIncludedIndex_ = 0L;
-      lastIncludedTerm_ = 0L;
-      snapshotFile_ = "";
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      if (!hasLastIncludedIndex()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasLastIncludedTerm()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasSnapshotFile()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt64(1, lastIncludedIndex_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt64(2, lastIncludedTerm_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getSnapshotFileBytes());
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(1, lastIncludedIndex_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, lastIncludedTerm_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getSnapshotFileBytes());
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.robotninjas.barge.proto.LogProto.Snapshot parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.robotninjas.barge.proto.LogProto.Snapshot prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code Snapshot}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:Snapshot)
-        org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.robotninjas.barge.proto.LogProto.internal_static_Snapshot_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.robotninjas.barge.proto.LogProto.internal_static_Snapshot_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.robotninjas.barge.proto.LogProto.Snapshot.class, org.robotninjas.barge.proto.LogProto.Snapshot.Builder.class);
-      }
-
-      // Construct using org.robotninjas.barge.proto.LogProto.Snapshot.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-
-      public Builder clear() {
-        super.clear();
-        lastIncludedIndex_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        lastIncludedTerm_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        snapshotFile_ = "";
-        bitField0_ = (bitField0_ & ~0x00000004);
-        return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.robotninjas.barge.proto.LogProto.internal_static_Snapshot_descriptor;
-      }
-
-      public org.robotninjas.barge.proto.LogProto.Snapshot getDefaultInstanceForType() {
-        return org.robotninjas.barge.proto.LogProto.Snapshot.getDefaultInstance();
-      }
-
-      public org.robotninjas.barge.proto.LogProto.Snapshot build() {
-        org.robotninjas.barge.proto.LogProto.Snapshot result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      public org.robotninjas.barge.proto.LogProto.Snapshot buildPartial() {
-        org.robotninjas.barge.proto.LogProto.Snapshot result = new org.robotninjas.barge.proto.LogProto.Snapshot(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.lastIncludedIndex_ = lastIncludedIndex_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.lastIncludedTerm_ = lastIncludedTerm_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.snapshotFile_ = snapshotFile_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.robotninjas.barge.proto.LogProto.Snapshot) {
-          return mergeFrom((org.robotninjas.barge.proto.LogProto.Snapshot)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(org.robotninjas.barge.proto.LogProto.Snapshot other) {
-        if (other == org.robotninjas.barge.proto.LogProto.Snapshot.getDefaultInstance()) return this;
-        if (other.hasLastIncludedIndex()) {
-          setLastIncludedIndex(other.getLastIncludedIndex());
-        }
-        if (other.hasLastIncludedTerm()) {
-          setLastIncludedTerm(other.getLastIncludedTerm());
-        }
-        if (other.hasSnapshotFile()) {
-          bitField0_ |= 0x00000004;
-          snapshotFile_ = other.snapshotFile_;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-
-      public final boolean isInitialized() {
-        if (!hasLastIncludedIndex()) {
-          
-          return false;
-        }
-        if (!hasLastIncludedTerm()) {
-          
-          return false;
-        }
-        if (!hasSnapshotFile()) {
-          
-          return false;
-        }
-        return true;
-      }
-
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        org.robotninjas.barge.proto.LogProto.Snapshot parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (org.robotninjas.barge.proto.LogProto.Snapshot) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
-
-      private long lastIncludedIndex_ ;
-      /**
-       * <code>required int64 last_included_index = 1;</code>
-       */
-      public boolean hasLastIncludedIndex() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>required int64 last_included_index = 1;</code>
-       */
-      public long getLastIncludedIndex() {
-        return lastIncludedIndex_;
-      }
-      /**
-       * <code>required int64 last_included_index = 1;</code>
-       */
-      public Builder setLastIncludedIndex(long value) {
-        bitField0_ |= 0x00000001;
-        lastIncludedIndex_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int64 last_included_index = 1;</code>
-       */
-      public Builder clearLastIncludedIndex() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        lastIncludedIndex_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      private long lastIncludedTerm_ ;
-      /**
-       * <code>required int64 last_included_term = 2;</code>
-       */
-      public boolean hasLastIncludedTerm() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>required int64 last_included_term = 2;</code>
-       */
-      public long getLastIncludedTerm() {
-        return lastIncludedTerm_;
-      }
-      /**
-       * <code>required int64 last_included_term = 2;</code>
-       */
-      public Builder setLastIncludedTerm(long value) {
-        bitField0_ |= 0x00000002;
-        lastIncludedTerm_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int64 last_included_term = 2;</code>
-       */
-      public Builder clearLastIncludedTerm() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        lastIncludedTerm_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object snapshotFile_ = "";
-      /**
-       * <code>required string snapshot_file = 3;</code>
-       */
-      public boolean hasSnapshotFile() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      /**
-       * <code>required string snapshot_file = 3;</code>
-       */
-      public java.lang.String getSnapshotFile() {
-        java.lang.Object ref = snapshotFile_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            snapshotFile_ = s;
-          }
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>required string snapshot_file = 3;</code>
-       */
-      public com.google.protobuf.ByteString
-          getSnapshotFileBytes() {
-        java.lang.Object ref = snapshotFile_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          snapshotFile_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>required string snapshot_file = 3;</code>
-       */
-      public Builder setSnapshotFile(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
-        snapshotFile_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required string snapshot_file = 3;</code>
-       */
-      public Builder clearSnapshotFile() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        snapshotFile_ = getDefaultInstance().getSnapshotFile();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required string snapshot_file = 3;</code>
-       */
-      public Builder setSnapshotFileBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
-        snapshotFile_ = value;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:Snapshot)
-    }
-
-    static {
-      defaultInstance = new Snapshot(true);
-      defaultInstance.initFields();
-    }
-
-    // @@protoc_insertion_point(class_scope:Snapshot)
-  }
-
   public interface JournalEntryOrBuilder extends
       // @@protoc_insertion_point(interface_extends:JournalEntry)
       com.google.protobuf.MessageOrBuilder {
@@ -2615,19 +1959,6 @@ public final class LogProto {
      * <code>optional .Commit commit = 6;</code>
      */
     org.robotninjas.barge.proto.LogProto.CommitOrBuilder getCommitOrBuilder();
-
-    /**
-     * <code>optional .Snapshot snapshot = 7;</code>
-     */
-    boolean hasSnapshot();
-    /**
-     * <code>optional .Snapshot snapshot = 7;</code>
-     */
-    org.robotninjas.barge.proto.LogProto.Snapshot getSnapshot();
-    /**
-     * <code>optional .Snapshot snapshot = 7;</code>
-     */
-    org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder getSnapshotOrBuilder();
   }
   /**
    * Protobuf type {@code JournalEntry}
@@ -2731,19 +2062,6 @@ public final class LogProto {
                 commit_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000008;
-              break;
-            }
-            case 58: {
-              org.robotninjas.barge.proto.LogProto.Snapshot.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000010) == 0x00000010)) {
-                subBuilder = snapshot_.toBuilder();
-              }
-              snapshot_ = input.readMessage(org.robotninjas.barge.proto.LogProto.Snapshot.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(snapshot_);
-                snapshot_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000010;
               break;
             }
           }
@@ -2870,33 +2188,11 @@ public final class LogProto {
       return commit_;
     }
 
-    public static final int SNAPSHOT_FIELD_NUMBER = 7;
-    private org.robotninjas.barge.proto.LogProto.Snapshot snapshot_;
-    /**
-     * <code>optional .Snapshot snapshot = 7;</code>
-     */
-    public boolean hasSnapshot() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    /**
-     * <code>optional .Snapshot snapshot = 7;</code>
-     */
-    public org.robotninjas.barge.proto.LogProto.Snapshot getSnapshot() {
-      return snapshot_;
-    }
-    /**
-     * <code>optional .Snapshot snapshot = 7;</code>
-     */
-    public org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder getSnapshotOrBuilder() {
-      return snapshot_;
-    }
-
     private void initFields() {
       append_ = org.robotninjas.barge.proto.LogProto.Append.getDefaultInstance();
       vote_ = org.robotninjas.barge.proto.LogProto.Vote.getDefaultInstance();
       term_ = org.robotninjas.barge.proto.LogProto.Term.getDefaultInstance();
       commit_ = org.robotninjas.barge.proto.LogProto.Commit.getDefaultInstance();
-      snapshot_ = org.robotninjas.barge.proto.LogProto.Snapshot.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2922,12 +2218,6 @@ public final class LogProto {
           return false;
         }
       }
-      if (hasSnapshot()) {
-        if (!getSnapshot().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -2946,9 +2236,6 @@ public final class LogProto {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeMessage(6, commit_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeMessage(7, snapshot_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2974,10 +2261,6 @@ public final class LogProto {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, commit_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, snapshot_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3092,7 +2375,6 @@ public final class LogProto {
           getVoteFieldBuilder();
           getTermFieldBuilder();
           getCommitFieldBuilder();
-          getSnapshotFieldBuilder();
         }
       }
       private static Builder create() {
@@ -3125,12 +2407,6 @@ public final class LogProto {
           commitBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
-        if (snapshotBuilder_ == null) {
-          snapshot_ = org.robotninjas.barge.proto.LogProto.Snapshot.getDefaultInstance();
-        } else {
-          snapshotBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -3191,14 +2467,6 @@ public final class LogProto {
         } else {
           result.commit_ = commitBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000010;
-        }
-        if (snapshotBuilder_ == null) {
-          result.snapshot_ = snapshot_;
-        } else {
-          result.snapshot_ = snapshotBuilder_.build();
-        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3227,9 +2495,6 @@ public final class LogProto {
         if (other.hasCommit()) {
           mergeCommit(other.getCommit());
         }
-        if (other.hasSnapshot()) {
-          mergeSnapshot(other.getSnapshot());
-        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -3249,12 +2514,6 @@ public final class LogProto {
         }
         if (hasCommit()) {
           if (!getCommit().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasSnapshot()) {
-          if (!getSnapshot().isInitialized()) {
             
             return false;
           }
@@ -3745,122 +3004,6 @@ public final class LogProto {
         return commitBuilder_;
       }
 
-      private org.robotninjas.barge.proto.LogProto.Snapshot snapshot_ = org.robotninjas.barge.proto.LogProto.Snapshot.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          org.robotninjas.barge.proto.LogProto.Snapshot, org.robotninjas.barge.proto.LogProto.Snapshot.Builder, org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder> snapshotBuilder_;
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      public boolean hasSnapshot() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
-      }
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      public org.robotninjas.barge.proto.LogProto.Snapshot getSnapshot() {
-        if (snapshotBuilder_ == null) {
-          return snapshot_;
-        } else {
-          return snapshotBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      public Builder setSnapshot(org.robotninjas.barge.proto.LogProto.Snapshot value) {
-        if (snapshotBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          snapshot_ = value;
-          onChanged();
-        } else {
-          snapshotBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000010;
-        return this;
-      }
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      public Builder setSnapshot(
-          org.robotninjas.barge.proto.LogProto.Snapshot.Builder builderForValue) {
-        if (snapshotBuilder_ == null) {
-          snapshot_ = builderForValue.build();
-          onChanged();
-        } else {
-          snapshotBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000010;
-        return this;
-      }
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      public Builder mergeSnapshot(org.robotninjas.barge.proto.LogProto.Snapshot value) {
-        if (snapshotBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010) &&
-              snapshot_ != org.robotninjas.barge.proto.LogProto.Snapshot.getDefaultInstance()) {
-            snapshot_ =
-              org.robotninjas.barge.proto.LogProto.Snapshot.newBuilder(snapshot_).mergeFrom(value).buildPartial();
-          } else {
-            snapshot_ = value;
-          }
-          onChanged();
-        } else {
-          snapshotBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000010;
-        return this;
-      }
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      public Builder clearSnapshot() {
-        if (snapshotBuilder_ == null) {
-          snapshot_ = org.robotninjas.barge.proto.LogProto.Snapshot.getDefaultInstance();
-          onChanged();
-        } else {
-          snapshotBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000010);
-        return this;
-      }
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      public org.robotninjas.barge.proto.LogProto.Snapshot.Builder getSnapshotBuilder() {
-        bitField0_ |= 0x00000010;
-        onChanged();
-        return getSnapshotFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      public org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder getSnapshotOrBuilder() {
-        if (snapshotBuilder_ != null) {
-          return snapshotBuilder_.getMessageOrBuilder();
-        } else {
-          return snapshot_;
-        }
-      }
-      /**
-       * <code>optional .Snapshot snapshot = 7;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          org.robotninjas.barge.proto.LogProto.Snapshot, org.robotninjas.barge.proto.LogProto.Snapshot.Builder, org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder> 
-          getSnapshotFieldBuilder() {
-        if (snapshotBuilder_ == null) {
-          snapshotBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.robotninjas.barge.proto.LogProto.Snapshot, org.robotninjas.barge.proto.LogProto.Snapshot.Builder, org.robotninjas.barge.proto.LogProto.SnapshotOrBuilder>(
-                  getSnapshot(),
-                  getParentForChildren(),
-                  isClean());
-          snapshot_ = null;
-        }
-        return snapshotBuilder_;
-      }
-
       // @@protoc_insertion_point(builder_scope:JournalEntry)
     }
 
@@ -3893,11 +3036,6 @@ public final class LogProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Commit_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Snapshot_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_Snapshot_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_JournalEntry_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -3914,14 +3052,11 @@ public final class LogProto {
       "\n\tlog.proto\032\013entry.proto\".\n\006Append\022\r\n\005in" +
       "dex\030\001 \002(\003\022\025\n\005entry\030\002 \002(\0132\006.Entry\"\031\n\004Vote" +
       "\022\021\n\tvoted_for\030\002 \001(\t\"\024\n\004Term\022\014\n\004term\030\001 \002(" +
-      "\003\"\027\n\006Commit\022\r\n\005index\030\001 \002(\003\"Z\n\010Snapshot\022\033" +
-      "\n\023last_included_index\030\001 \002(\003\022\032\n\022last_incl" +
-      "uded_term\030\002 \002(\003\022\025\n\rsnapshot_file\030\003 \002(\t\"\207" +
-      "\001\n\014JournalEntry\022\027\n\006append\030\002 \001(\0132\007.Append" +
-      "\022\023\n\004vote\030\004 \001(\0132\005.Vote\022\023\n\004term\030\005 \001(\0132\005.Te" +
-      "rm\022\027\n\006commit\030\006 \001(\0132\007.Commit\022\033\n\010snapshot\030" +
-      "\007 \001(\0132\t.SnapshotB\'\n\033org.robotninjas.barg",
-      "e.protoB\010LogProto"
+      "\003\"\027\n\006Commit\022\r\n\005index\030\001 \002(\003\"j\n\014JournalEnt" +
+      "ry\022\027\n\006append\030\002 \001(\0132\007.Append\022\023\n\004vote\030\004 \001(" +
+      "\0132\005.Vote\022\023\n\004term\030\005 \001(\0132\005.Term\022\027\n\006commit\030" +
+      "\006 \001(\0132\007.CommitB\'\n\033org.robotninjas.barge." +
+      "protoB\010LogProto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3960,18 +3095,12 @@ public final class LogProto {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Commit_descriptor,
         new java.lang.String[] { "Index", });
-    internal_static_Snapshot_descriptor =
-      getDescriptor().getMessageTypes().get(4);
-    internal_static_Snapshot_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_Snapshot_descriptor,
-        new java.lang.String[] { "LastIncludedIndex", "LastIncludedTerm", "SnapshotFile", });
     internal_static_JournalEntry_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_JournalEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_JournalEntry_descriptor,
-        new java.lang.String[] { "Append", "Vote", "Term", "Commit", "Snapshot", });
+        new java.lang.String[] { "Append", "Vote", "Term", "Commit", });
     org.robotninjas.barge.proto.RaftEntry.getDescriptor();
   }
 

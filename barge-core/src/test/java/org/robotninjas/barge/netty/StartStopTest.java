@@ -9,6 +9,7 @@ import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.log.journalio.JournalRaftLog;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.rpc.netty.NettyRaftService;
 import org.robotninjas.barge.state.ConfigurationState;
 import org.slf4j.Logger;
@@ -180,6 +181,10 @@ public class StartStopTest {
     @Override
     public Snapshotter prepareSnapshot(long currentTerm, long currentIndex) {
       throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void gotSnapshot(SnapshotInfo snapshotInfo) {
     }
   }
 }

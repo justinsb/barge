@@ -33,6 +33,7 @@ import org.robotninjas.barge.RaftMembership;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.rpc.RaftClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -68,16 +70,23 @@ class Leader extends BaseState {
 
   private boolean isShutdown;
 
+  final long minSnapshotInterval;
+
   Leader(RaftStateContext ctx) {
     super(RaftState.LEADER, ctx);
 
     this.leader = Optional.of(ctx.self());
+
+    this.minSnapshotInterval = 60 * 1000;
   }
+
+  long lastRequest;
+  long lastSnapshot;
 
   @Override
   public void init() {
-    sendRequests();
-    resetTimeout();
+    sendRequests(false);
+    startHeartbeatTimer();
   }
 
   private ReplicaManager getManagerForReplica(Replica replica) {
@@ -129,7 +138,8 @@ class Leader extends BaseState {
     }
   }
 
-  void resetTimeout() {
+  void startHeartbeatTimer() {
+    lastRequest = System.nanoTime();
 
     if (heartbeatTask != null) {
       heartbeatTask.cancel(false);
@@ -143,11 +153,36 @@ class Leader extends BaseState {
     heartbeatTask = scheduler.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
-        LOGGER.debug("Sending heartbeat");
-        sendRequests();
+        doHeartbeat();
       }
     }, heartbeatInterval, heartbeatInterval, MILLISECONDS);
 
+  }
+
+  void doHeartbeat() {
+    long now = System.nanoTime();
+    long timeSinceLastRequest = now - lastRequest;
+    long timeSinceLastSnapshot = now - lastSnapshot;
+
+    long heartbeatInterval = ctx.getTimeouts().getHeartbeatInterval();
+    heartbeatInterval *= 1E6;
+    if (timeSinceLastRequest > heartbeatInterval) {
+      LOGGER.debug("Sending heartbeat");
+      sendRequests(true);
+    }
+
+    if (timeSinceLastSnapshot > (minSnapshotInterval * 1E6)) {
+      if (getLog().shouldSnapshot()) {
+        LOGGER.debug("Starting snapshot");
+
+        lastSnapshot = now;
+        ctx.onRaftThreadAsync(() -> performSnapshot());
+      }
+    }
+  }
+
+  void resetTimeout() {
+    lastRequest = System.nanoTime();
   }
 
   @Nonnull
@@ -155,16 +190,22 @@ class Leader extends BaseState {
   public ListenableFuture<Object> commitOperation(@Nonnull byte[] operation) throws RaftException {
     resetTimeout();
     ListenableFuture<Object> result = getLog().append(operation, null);
-    sendRequests();
-    return result;
+    sendRequests(false);
 
+    return result;
   }
 
   ListenableFuture<Object> commitMembership(@Nonnull Membership membership) {
     resetTimeout();
 
     ListenableFuture<Object> result = ctx.getLog().append(null, membership);
-    sendRequests();
+    sendRequests(false);
+    return result;
+  }
+
+  ListenableFuture<SnapshotInfo> performSnapshot() throws RaftException {
+    ListenableFuture<SnapshotInfo> result = ctx.getLog().performSnapshot();
+    sendRequests(false);
     return result;
   }
 
@@ -298,7 +339,7 @@ class Leader extends BaseState {
    */
   @Nonnull
   @VisibleForTesting
-  List<ListenableFuture<AppendEntriesResponse>> sendRequests() {
+  List<ListenableFuture<AppendEntriesResponse>> sendRequests(boolean heartbeat) {
     if (ctx.shouldStop()) {
       LOGGER.info("Context stopping; stepping down");
 

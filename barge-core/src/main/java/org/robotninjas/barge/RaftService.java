@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 
 import org.robotninjas.barge.log.RaftLogBase;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.rpc.RaftClientProvider;
 import org.robotninjas.barge.state.RaftStateContext;
 import org.slf4j.Logger;
@@ -160,6 +161,10 @@ public abstract class RaftService extends AbstractService {
       
     
     }
+  }
+
+  public SnapshotInfo getLastSnapshotInfo() {
+    return ctx.getLastSnapshotInfo();
   }
 
 }

@@ -28,11 +28,14 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.protobuf.ByteString;
 
+import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
+import org.robotninjas.barge.StateMachine.Snapshotter;
 import org.robotninjas.barge.proto.RaftEntry;
 import org.robotninjas.barge.proto.RaftEntry.Entry;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.state.ConfigurationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +74,11 @@ public abstract class RaftLogBase implements RaftLog {
   private volatile long currentTerm = 0;
   private volatile Optional<Replica> votedFor = Optional.absent();
   private volatile long commitIndex = 0;
+
+  /**
+   * Most recent snapshot
+   */
+  private SnapshotInfo lastSnapshot;
 
   /**
    * Index applied to stateMachine
@@ -114,6 +122,7 @@ public abstract class RaftLogBase implements RaftLog {
     // TODO: fireCommitted more often??
 
     replay(new Visitor() {
+
       @Override
       public void term(long term) {
         currentTerm = Math.max(currentTerm, term);
@@ -136,6 +145,10 @@ public abstract class RaftLogBase implements RaftLog {
 
         if (entry.hasMembership()) {
           config.addMembershipEntry(index, entry);
+        }
+
+        if (entry.hasSnapshot()) {
+          lastSnapshot = entry.getSnapshot();
         }
       }
     });
@@ -176,7 +189,6 @@ public abstract class RaftLogBase implements RaftLog {
   protected abstract void writeEntry(long index, Entry entry);
 
   public ListenableFuture<Object> append(@Nonnull byte[] operation, @Nonnull Membership membership) {
-    long index = ++lastLogIndex;
     lastLogTerm = currentTerm;
 
     Entry.Builder entry = Entry.newBuilder().setTerm(currentTerm);
@@ -190,18 +202,45 @@ public abstract class RaftLogBase implements RaftLog {
       checkArgument(false);
     }
 
-    return storeEntry(index, entry.build());
+    return proposeEntry(entry);
+  }
 
+  private ListenableFuture<Object> proposeEntry(Entry.Builder entry) {
+    long index = ++lastLogIndex;
+    lastLogTerm = currentTerm;
+
+    entry.setTerm(currentTerm);
+
+    return storeEntry(index, entry.build());
   }
 
   public boolean append(@Nonnull AppendEntries appendEntries) {
 
-    final long prevLogIndex = appendEntries.getPrevLogIndex();
+    long prevLogIndex = appendEntries.getPrevLogIndex();
     final long prevLogTerm = appendEntries.getPrevLogTerm();
-    final List<Entry> entries = appendEntries.getEntriesList();
+    List<Entry> entries = appendEntries.getEntriesList();
 
     Entry previousEntry = readLogEntry(prevLogIndex);
-    if (prevLogIndex > 0 && previousEntry == null) {
+    boolean restoreFromSnapshot = false;
+    
+    if (previousEntry == null) {
+      // Check if we can restore from a snapshot
+      int snapshotIndex = -1;
+      for (int i = 0; i < entries.size(); i++) {
+        Entry entry = entries.get(i);
+        if (entry.hasSnapshot()) {
+          snapshotIndex = i;
+        }
+      }
+      if (snapshotIndex != -1) {
+        LOGGER.debug("Got appendEntries that includes snapshot; will use: {}", entries.get(snapshotIndex));
+        restoreFromSnapshot = true;
+        prevLogIndex = appendEntries.getPrevLogIndex() + snapshotIndex;
+        entries = entries.subList(snapshotIndex, entries.size());
+      }
+    }
+    
+    if (!restoreFromSnapshot && prevLogIndex > 0 && previousEntry == null) {
       LOGGER.debug("Can't append; missing tail: prevLogIndex {} prevLogTerm {}", prevLogIndex, prevLogTerm);
       return false;
     }
@@ -240,35 +279,64 @@ public abstract class RaftLogBase implements RaftLog {
 
   protected abstract GetEntriesResult readEntriesFrom(long beginningIndex, int max);
 
-  // SnapshotInfo doSnapshot() throws RaftException {
-  // Snapshotter snapshotter;
-  // synchronized (this) {
-  // ListenableFuture<Snapshotter> snapshotterFuture = stateMachine.prepareSnapshot(currentTerm, lastApplied);
-  // snapshotter = snapshotterFuture.get();
-  // }
-  //
-  // SnapshotInfo snapshotInfo = snapshotter.finishSnapshot();
-  // return snapshotInfo;
-  // }
+  public ListenableFuture<SnapshotInfo> performSnapshot() throws RaftException {
+    SnapshotInfo snapshotInfo;
+    try {
+      Snapshotter snapshotter;
+      synchronized (this) {
+        ListenableFuture<Snapshotter> snapshotterFuture = stateMachine.prepareSnapshot(currentTerm, lastApplied);
+        snapshotter = snapshotterFuture.get();
+      }
+
+      snapshotInfo = snapshotter.finishSnapshot();
+    } catch (Exception e) {
+      LOGGER.error("Error during snapshot", e);
+      throw RaftException.propagate(e);
+    }
+
+    LOGGER.info("Wrote snapshot {}", snapshotInfo);
+    
+    ListenableFuture<Object> entryFuture = proposeEntry(Entry.newBuilder().setSnapshot(snapshotInfo));
+
+    return Futures.transform(entryFuture, G8.fn((result) -> {
+//      if (!Objects.equal(result, Boolean.TRUE))
+//        throw new IllegalStateException();
+      this.lastSnapshot = snapshotInfo;
+      return snapshotInfo;
+    }));
+  }
 
   void fireComitted() {
     synchronized (this) {
-      for (long i = lastApplied + 1; i <= Math.min(commitIndex, lastLogIndex); ++i) {
-        // Entry entry = journal.get(log.get(i));
-        // byte[] rawCommand = entry.getCommand().toByteArray();
-        // final ByteBuffer operation = ByteBuffer.wrap(rawCommand).asReadOnlyBuffer();
-        // ListenableFuture<Object> result = stateMachine.dispatchOperation(operation);
-        //
-        // final SettableFuture<Object> returnedResult = operationResults.remove(i);
-        // // returnedResult may be null on log replay
-        // if (returnedResult != null) {
-        // Futures.addCallback(result, new PromiseBridge<Object>(returnedResult));
-        // }
-
+      long end = Math.min(commitIndex, lastLogIndex);
+      long start = lastApplied + 1;
+      
+      for (long i = start; i <= end; ++i) {
         Entry entry = readLogEntry(i);
-        if (entry == null) {
-          LOGGER.warn("Cannot find log entry @{}", i);
-          throw new IllegalStateException();
+        if (entry == null && i == start) {
+          // Check if this is a snapshot restore
+          long pos = end;
+          boolean isSnapshotRestore = false;
+          while (pos >= start) {
+            entry = readLogEntry(pos);
+            if (entry == null) {
+              break;
+            }
+            if (entry.hasSnapshot()) {
+              isSnapshotRestore = true;
+              break;
+            }
+            pos--;
+          }
+          if (!isSnapshotRestore) {
+            LOGGER.warn("Cannot find log entry @{}", i);
+            throw new IllegalStateException();
+          } else {
+            LOGGER.info("Detected snapshot restore @{}", pos);
+            i = pos;
+            
+            // Fall through
+          }
         }
         final SettableFuture<Object> operationResult = operationResults.remove(i);
         assert operationResult != null;
@@ -288,6 +356,30 @@ public abstract class RaftLogBase implements RaftLog {
           if (operationResult != null) {
             operationResult.set(Boolean.TRUE);
           }
+        } else if (entry.hasSnapshot()) {
+          SnapshotInfo snapshotInfo = entry.getSnapshot();
+          
+          ListenableFuture<Object> result = stateMachine.gotSnapshot(snapshotInfo);
+          if (operationResult != null) {
+            Futures.addCallback(result, new PromiseBridge<Object>(operationResult));
+          }
+          Futures.addCallback(result, new FutureCallback<Object>() {
+            @Override
+            public void onSuccess(Object result) {
+              LOGGER.info("Deleting entries before snapshot: {}", snapshotInfo);
+              
+              try {
+                removeLogEntriesBefore(snapshotInfo.getLastIncludedIndex());
+              } catch (IOException e) {
+                LOGGER.error("Unable to perform log compaction", e);
+              }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+               LOGGER.warn("Error from state machine on snapshot; won't truncate log", t);
+            }
+          });
         } else {
           LOGGER.warn("Ignoring unusual log entry: {}", entry);
         }
@@ -298,8 +390,8 @@ public abstract class RaftLogBase implements RaftLog {
     }
   }
 
-  protected abstract Entry readLogEntry(long index);
-
+  protected abstract void removeLogEntriesBefore(long snapshotIndex) throws IOException;
+  
   public String getName() {
     return name;
   }
@@ -328,6 +420,12 @@ public abstract class RaftLogBase implements RaftLog {
 
   protected abstract void recordCommit(long index);
 
+  protected abstract void recordTerm(long term);
+
+  protected abstract void recordVote(@Nonnull Optional<Replica> vote);
+
+  protected abstract Entry readLogEntry(long index);
+
   public long getCurrentTerm() {
     return currentTerm;
   }
@@ -341,8 +439,6 @@ public abstract class RaftLogBase implements RaftLog {
     recordTerm(term);
   }
 
-  protected abstract void recordTerm(long term);
-
   @Nonnull
   public Optional<Replica> votedFor() {
     return votedFor;
@@ -353,8 +449,6 @@ public abstract class RaftLogBase implements RaftLog {
     votedFor = vote;
     recordVote(vote);
   }
-
-  protected abstract void recordVote(@Nonnull Optional<Replica> vote);
 
   @Override
   public String toString() {
@@ -386,7 +480,6 @@ public abstract class RaftLogBase implements RaftLog {
     return config.self();
   }
 
-
   public abstract static class Builder {
     public StateMachine stateMachine;
     public ConfigurationState config;
@@ -416,4 +509,28 @@ public abstract class RaftLogBase implements RaftLog {
     }
 
   }
+
+  @Override
+  public boolean shouldSnapshot() {
+    long lastSnapshotIndex = 0;
+    SnapshotInfo lastSnapshot = this.lastSnapshot;
+
+    if (lastSnapshot != null) {
+      lastSnapshotIndex = lastSnapshot.getLastIncludedIndex();
+    }
+
+    long delta = this.lastApplied - lastSnapshotIndex;
+    long snapshotIntervalIndexes = 1000;
+    if (delta > snapshotIntervalIndexes) {
+      return true;
+    }
+    return false;
+
+  }
+  
+  @Override
+  public SnapshotInfo getLastSnapshotInfo() {
+    return lastSnapshot;
+  }
+
 }

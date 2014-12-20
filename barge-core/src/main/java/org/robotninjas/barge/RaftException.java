@@ -16,6 +16,8 @@
 
 package org.robotninjas.barge;
 
+import java.util.concurrent.ExecutionException;
+
 public class RaftException extends Exception {
 
   public RaftException() {
@@ -31,5 +33,12 @@ public class RaftException extends Exception {
 
   public RaftException(Throwable throwable) {
     super(throwable);
+  }
+
+  public static RaftException propagate(Exception e) {
+    if (e instanceof InterruptedException) {
+      Thread.currentThread().interrupt();
+    }
+    return new RaftException(e);
   }
 }

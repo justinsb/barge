@@ -59,16 +59,11 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.google.common.base.Functions.toStringFunction;
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Throwables.propagate;
-import static org.robotninjas.barge.proto.RaftProto.AppendEntries;
 
 @NotThreadSafe
 public class JournalRaftLog extends RaftLogBase {
@@ -244,24 +239,29 @@ public class JournalRaftLog extends RaftLogBase {
     return new GetEntriesResult(previous.getTerm(), previousIndex, entries);
   }
 
-  // public void truncateHead(Mark mark) {
-  // try {
-  // for (Location loc : journal.undo(mark.getLocation())) {
-  // delete(loc);
-  // }
-  // } catch (IOException e) {
-  // throw propagate(e);
-  // }
-  // }
-  //
-  // public Mark appendSnapshot(File file, long index, long term) {
-  // Location location =
-  // write(LogProto.JournalEntry.newBuilder()
-  // .setSnapshot(LogProto.Snapshot.newBuilder()
-  // .setLastIncludedIndex(index)
-  // .setLastIncludedTerm(term)
-  // .setSnapshotFile(file.getName()))
-  // .build());
-  // return new Mark(location);
-  // }
+  @Override
+  protected void removeLogEntriesBefore(long snapshotIndex) throws IOException {
+    Location end = log.get(snapshotIndex);
+    if (end == null) {
+      return;
+    }
+
+    Iterable<Location> locations = journal.redo();
+    for (Location loc : locations) {
+      if (loc.compareTo(end) >= 0) {
+        break;
+      }
+      //LOGGER.debug("Deleting entry {}", loc);
+      journal.delete(loc);
+    }
+    journal.compact();
+    log.headMap(snapshotIndex, false).clear();
+  }
+
+
+//  @Override
+//  protected Location recordSnapshot(SnapshotInfo snapshotInfo) {
+//    Location location = write(LogProto.JournalEntry.newBuilder().setSnapshot(snapshotInfo).build());
+//    return location;
+//  }
 }

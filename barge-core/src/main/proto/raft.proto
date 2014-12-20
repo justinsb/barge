@@ -56,6 +56,7 @@ message AppendEntriesResponse {
 
 }
 
+/*
 message InstallSnapshot {
 	required int64 term = 1;
 	required int64 last_included_index = 2;
@@ -67,6 +68,7 @@ message InstallSnapshotResponse {
 	required int64 term = 1;
 	required bool success = 2;
 }
+*/
 
 service RaftService {
 	rpc requestVote (RequestVote) returns (RequestVoteResponse);

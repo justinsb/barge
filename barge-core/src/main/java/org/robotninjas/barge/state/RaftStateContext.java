@@ -30,6 +30,7 @@ import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
+import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
 import org.robotninjas.barge.rpc.RaftClient;
 import org.robotninjas.barge.rpc.RaftClientProvider;
 import org.slf4j.Logger;
@@ -282,5 +283,10 @@ public class RaftStateContext implements Raft {
   RaftClient getRaftClient(Replica replica) {
     return raftClientProvider.get(replica);
   }
+
+  public SnapshotInfo getLastSnapshotInfo() {
+    return this.log.getLastSnapshotInfo();
+  }
+
 
 }

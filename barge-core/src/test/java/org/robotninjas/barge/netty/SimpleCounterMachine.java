@@ -73,6 +73,10 @@ public class SimpleCounterMachine {
       }
     }
 
+    @Override
+    public void gotSnapshot(SnapshotInfo snapshotInfo) {
+    }
+
   }
 
   final StateMachineImpl stateMachine = new StateMachineImpl();
