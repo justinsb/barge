@@ -212,4 +212,9 @@ public abstract class BaseState {
   protected Replica self() {
     return ctx.self();
   }
+  
+  protected boolean isActive() {
+    return ctx.isActive(this);
+  }
+
 }

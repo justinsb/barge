@@ -26,6 +26,7 @@ import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
@@ -359,17 +360,28 @@ class Leader extends BaseState {
       boolean isVoting = configurationState.hasVote(replica);
       ReplicaManager replicaManager = getManagerForReplica(replica);
       ListenableFuture<AppendEntriesResponse> response = replicaManager.requestUpdate();
-      responses.add(response);
+      SettableFuture<AppendEntriesResponse> returned = SettableFuture.create();
+      responses.add(returned);
       Futures.addCallback(response, new FutureCallback<AppendEntriesResponse>() {
         @Override
         public void onSuccess(@Nullable AppendEntriesResponse result) {
-          updateCommitted();
-          checkTermOnResponse(result);
+          try {
+            if (!isActive()) {
+              LOGGER.warn("Ignoring response for inactive state");
+              throw new IllegalStateException("No longer active");
+            }
+            updateCommitted();
+            checkTermOnResponse(result);
+            returned.set(result);
+          } catch (Exception e) {
+            returned.setException(e);
+          }
         }
 
         @Override
         public void onFailure(Throwable t) {
           LOGGER.debug("Failure response from replica", t);
+          returned.setException(t);
         }
 
       });

@@ -31,6 +31,7 @@ import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
+import org.robotninjas.barge.proto.RaftProto.RequestVoteResponse;
 import org.robotninjas.barge.rpc.RaftClient;
 import org.robotninjas.barge.rpc.RaftClientProvider;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class RaftStateContext implements Raft {
 
   private final ListeningScheduledExecutorService raftExecutor;
 
-  private volatile BaseState state;
+  private BaseState currentState;
 
   private boolean stop;
 
@@ -87,57 +88,73 @@ public class RaftStateContext implements Raft {
   }
 
   public void init() throws RaftException {
-    onRaftThread(() -> { setState(null, buildStateStart()); return null; });
+    Futures.get(onRaftThreadAsync(() -> { setState(null, buildStateStart()); return null; }), RaftException.class);
   }
 
   @Override
   @Nonnull
   public RequestVoteResponse requestVote(@Nonnull final RequestVote request) throws RaftException {
-    return onRaftThread(() -> state.requestVote(request));
-
+    ListenableFuture<RequestVoteResponse> future;
+    
+    synchronized (this) {
+      final BaseState state = this.currentState;
+      future = onRaftThreadAsync(() -> state.requestVote(request));
+    }
+    
+    return Futures.get(future, RaftException.class);
   }
 
   @Override
   @Nonnull
   public AppendEntriesResponse appendEntries(@Nonnull final AppendEntries request) throws RaftException {
-    return onRaftThread(() -> state.appendEntries(request));
+    ListenableFuture<AppendEntriesResponse> future;
+    
+    synchronized (this) {
+      final BaseState state = this.currentState;
+      future = onRaftThreadAsync(() -> state.appendEntries(request));
+    }
+    
+    return Futures.get(future, RaftException.class);
   }
 
   @Nonnull
   public ListenableFuture<Object> commitOperation(@Nonnull final byte[] op) throws RaftException {
     checkNotNull(op);
-
-    return Futures.dereference(onRaftThreadAsync(() -> state.commitOperation(op)));
+    
+    synchronized (this) {
+      final BaseState state = this.currentState;
+      return Futures.dereference(onRaftThreadAsync(() -> state.commitOperation(op)));
+    }
   }
 
 
   public synchronized void setState(BaseState oldState, @Nonnull BaseState newState) {
 
-    if (this.state != oldState) {
-      LOGGER.info("Previous state was not correct (transitioning to {}). Expected {}, was {}", newState, state,
+    if (this.currentState != oldState) {
+      LOGGER.info("Previous state was not correct (transitioning to {}). Expected {}, was {}", newState, currentState,
           oldState);
       throw new IllegalStateException();
     }
 
     // StateType newState;
-    if (stop && state.type() != RaftState.STOPPED) {
+    if (stop && this.currentState.type() != RaftState.STOPPED) {
       newState = buildStateStopped();
       LOGGER.info("Service stopping; replaced state with {}", newState);
       // } else {
       // newState = checkNotNull(state);
     }
 
-    LOGGER.info("Transition: old state: {}, new state: {}", this.state, newState);
-    if (this.state != null) {
-      this.state.destroy();
+    LOGGER.info("Transition: old state: {}, new state: {}", this.currentState, newState);
+    if (this.currentState != null) {
+      this.currentState.destroy();
     }
 
-    this.state = checkNotNull(newState);
+    this.currentState = checkNotNull(newState);
 
-    MDC.put("state", this.state.toString());
+    MDC.put("state", this.currentState.toString());
 
-    if (state != null) {
-      state.init();
+    if (currentState != null) {
+      currentState.init();
     }
 
     // if (this.state.type() == StateType.LEADER) {
@@ -154,14 +171,14 @@ public class RaftStateContext implements Raft {
   }
 
   @Nonnull
-  public RaftState type() {
-    return state.type();
+  public synchronized RaftState type() {
+    return currentState.type();
   }
 
   public synchronized void stop() throws Exception {
     stop = true;
-    if (this.state != null) {
-      this.state.doStop();
+    if (this.currentState != null) {
+      this.currentState.doStop();
     }
     while (!isStopped()) {
       Thread.sleep(10);
@@ -182,23 +199,24 @@ public class RaftStateContext implements Raft {
   }
 
   public synchronized boolean isStopped() {
-    return this.state.type() == RaftState.STOPPED;
+    return this.currentState.type() == RaftState.STOPPED;
   }
 
-  public boolean isLeader() {
-    return this.state.type() == RaftState.LEADER;
+  public synchronized boolean isLeader() {
+    return this.currentState.type() == RaftState.LEADER;
   }
 
   public RaftClusterHealth getClusterHealth() throws RaftException {
-    return onRaftThread(() -> state.getClusterHealth());
+    ListenableFuture<RaftClusterHealth> future;
+    
+    synchronized (this) {
+      final BaseState state = this.currentState;
+      future = onRaftThreadAsync(() -> state.getClusterHealth());
+    }
+    
+    return Futures.get(future, RaftException.class);
   }
   
-  /**
-   * Call callable on the raft thread (i.e. serialized)
-   */
-  <T> T onRaftThread(Callable<T> callable) throws RaftException {
-    return Futures.get(onRaftThreadAsync(callable), RaftException.class);
-  }
 
   /**
    * Call callable on the raft thread (i.e. serialized)
@@ -213,8 +231,8 @@ public class RaftStateContext implements Raft {
 //  }
 
   @Override
-  public String toString() {
-    return "RaftStateContext [state=" + state + ", configurationState=" + configurationState + "]";
+  public synchronized String toString() {
+    return "RaftStateContext [state=" + currentState + ", configurationState=" + configurationState + "]";
   }
 
   Follower buildStateFollower(Optional<Replica> leader) {
@@ -257,8 +275,8 @@ public class RaftStateContext implements Raft {
     return configurationState.getTimeouts();
   }
 
-  public Optional<Replica> getLeader() {
-    return this.state.getLeader();
+  public synchronized Optional<Replica> getLeader() {
+    return this.currentState.getLeader();
   }
   
 
@@ -272,11 +290,12 @@ public class RaftStateContext implements Raft {
     log.append(null, membership);
   }
 
-  public ListenableFuture<Boolean> setConfiguration(final RaftMembership oldMembership,
+  public synchronized ListenableFuture<Boolean> setConfiguration(final RaftMembership oldMembership,
       final RaftMembership newMembership) {
     checkNotNull(oldMembership);
     checkNotNull(newMembership);
 
+    final BaseState state = this.currentState;
     return Futures.dereference(onRaftThreadAsync(() -> state.setConfiguration(oldMembership, newMembership)));
   }
 
@@ -286,6 +305,11 @@ public class RaftStateContext implements Raft {
 
   public SnapshotInfo getLastSnapshotInfo() {
     return this.log.getLastSnapshotInfo();
+  }
+
+  synchronized boolean isActive(BaseState state) {
+    // Strict reference equality
+    return this.currentState == state;
   }
 
 
