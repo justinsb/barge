@@ -25,6 +25,8 @@ import org.robotninjas.barge.proto.RaftProto;
 import org.robotninjas.barge.state.RaftStateContext;
 import org.robotninjas.protobuf.netty.client.RpcClient;
 import org.robotninjas.protobuf.netty.server.RpcServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.concurrent.DefaultThreadFactory;
@@ -34,6 +36,7 @@ import io.netty.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +46,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @ThreadSafe
 @Immutable
 public class NettyRaftService extends RaftService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(NettyRaftService.class);
 
   private final RpcServer rpcServer;
 
@@ -57,8 +62,7 @@ public class NettyRaftService extends RaftService {
   protected void doStart() {
 
     try {
-
-      ctx.init();
+      ctx.init(this);
 
       configureRpcServer();
       rpcServer.startAsync().awaitRunning();
@@ -79,10 +83,11 @@ public class NettyRaftService extends RaftService {
 
   @Override
   protected void doStop() {
-
     try {
       rpcServer.stopAsync().awaitTerminated();
       ctx.stop();
+
+      closer.close();
 
       notifyStopped();
     } catch (Exception e) {

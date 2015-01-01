@@ -26,11 +26,15 @@ import com.google.common.util.concurrent.MoreExecutors;
 import org.robotninjas.barge.RaftClusterHealth;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
+import org.robotninjas.barge.RaftService;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.log.RaftLog;
 import org.robotninjas.barge.proto.RaftEntry.ConfigTimeouts;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
+import org.robotninjas.barge.proto.RaftProto.AppendEntries;
+import org.robotninjas.barge.proto.RaftProto.AppendEntriesResponse;
+import org.robotninjas.barge.proto.RaftProto.RequestVote;
 import org.robotninjas.barge.proto.RaftProto.RequestVoteResponse;
 import org.robotninjas.barge.rpc.RaftClient;
 import org.robotninjas.barge.rpc.RaftClientProvider;
@@ -50,7 +54,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.robotninjas.barge.proto.RaftProto.*;
 
 @NotThreadSafe
 public class RaftStateContext implements Raft {
@@ -87,7 +90,9 @@ public class RaftStateContext implements Raft {
     // this.threadPools = threadPools;
   }
 
-  public void init() throws RaftException {
+  public void init(RaftService raftService) throws RaftException {
+    log.init(raftService);
+
     Futures.get(onRaftThreadAsync(() -> { setState(null, buildStateStart()); return null; }), RaftException.class);
   }
 

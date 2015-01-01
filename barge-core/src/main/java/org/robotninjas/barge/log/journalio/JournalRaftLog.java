@@ -36,6 +36,7 @@ import journal.io.api.Location;
 import journal.io.api.Journal.ReadType;
 import journal.io.api.Journal.WriteType;
 
+import org.robotninjas.barge.RaftService;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine.Snapshotter;
 import org.robotninjas.barge.log.GetEntriesResult;

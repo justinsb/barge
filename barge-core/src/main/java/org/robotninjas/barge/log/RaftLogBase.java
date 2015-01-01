@@ -29,6 +29,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.google.protobuf.ByteString;
 
 import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.RaftService;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.StateMachine.Snapshotter;
@@ -531,6 +532,12 @@ public abstract class RaftLogBase implements RaftLog {
   @Override
   public SnapshotInfo getLastSnapshotInfo() {
     return lastSnapshot;
+  }
+
+
+  @Override
+  public void init(RaftService raftService) {
+    this.stateMachine.init(raftService);
   }
 
 }

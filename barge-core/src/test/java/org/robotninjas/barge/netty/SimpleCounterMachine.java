@@ -3,6 +3,7 @@ package org.robotninjas.barge.netty;
 import org.robotninjas.barge.ClusterConfig;
 import org.robotninjas.barge.RaftException;
 import org.robotninjas.barge.RaftMembership;
+import org.robotninjas.barge.RaftService;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.log.journalio.JournalRaftLog;
@@ -75,6 +76,16 @@ public class SimpleCounterMachine {
 
     @Override
     public void gotSnapshot(SnapshotInfo snapshotInfo) {
+    }
+
+    @Override
+    public void close() {
+      
+    }
+
+    @Override
+    public void init(RaftService raft) {
+      
     }
 
   }

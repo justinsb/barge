@@ -37,4 +37,8 @@ public interface StateMachine {
   Snapshotter prepareSnapshot(long currentTerm, long currentIndex);
 
   void gotSnapshot(SnapshotInfo snapshotInfo);
+
+  void close();
+
+  void init(RaftService raft);
 }

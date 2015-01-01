@@ -21,6 +21,7 @@ import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.robotninjas.barge.RaftException;
+import org.robotninjas.barge.RaftService;
 import org.robotninjas.barge.Replica;
 import org.robotninjas.barge.proto.RaftEntry.Membership;
 import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
@@ -79,5 +80,7 @@ public interface RaftLog {
   boolean shouldSnapshot();
 
   SnapshotInfo getLastSnapshotInfo();
+
+  void init(RaftService raftService);
 
 }

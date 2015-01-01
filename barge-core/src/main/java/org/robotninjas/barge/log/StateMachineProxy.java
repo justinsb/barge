@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
+import org.robotninjas.barge.RaftService;
 import org.robotninjas.barge.StateMachine;
 import org.robotninjas.barge.StateMachine.Snapshotter;
 import org.robotninjas.barge.proto.RaftEntry.SnapshotInfo;
@@ -86,6 +87,10 @@ public class StateMachineProxy  {
         return Boolean.TRUE;
       }
     });
+  }
+
+  public void init(RaftService raftService) {
+    stateMachine.init(raftService);
   }
 
 }

@@ -122,6 +122,8 @@ class Leader extends BaseState {
 
   @Override
   public void destroy() {
+    this.isShutdown = true;
+    
     if (heartbeatTask != null) {
       heartbeatTask.cancel(false);
       heartbeatTask = null;
@@ -154,7 +156,9 @@ class Leader extends BaseState {
     heartbeatTask = scheduler.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
-        doHeartbeat();
+        if (isActive()) {
+          doHeartbeat();
+        }
       }
     }, heartbeatInterval, heartbeatInterval, MILLISECONDS);
 
